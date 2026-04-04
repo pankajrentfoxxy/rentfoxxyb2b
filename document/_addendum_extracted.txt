@@ -1,0 +1,1068 @@
+🦊 RENTFOXXY
+B2B Multi-Vendor Laptop & Accessories Platform
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PRD ADDENDUM v1.1 + CURSOR PROMPT DOCUMENT
+Feature Addendum: Product Grading · Dual Reviews · Token Payment System · Vendor Payment Preferences
+Document Type
+PRD Addendum + Implementation Cursor Prompts
+Parent Document
+Rentfoxxy PRD v1.0 + Cursor Prompt Doc v1.0
+This Version
+Addendum v1.1
+Features Covered
+4 New Features (6A → 6D)
+Implementation Slot
+Between Phase 6 and Phase 7 (before Polish)
+Research Basis
+Back Market, Alibaba B2B, Amazon Business, Ankorstore BNPL
+Date
+June 2025
+Market Research: What Top B2B Platforms Do
+Before defining the features, here is what the leading platforms in the refurbished and B2B electronics space implement — and what Rentfoxxy should learn from each.
+Platform
+Grading System
+Payment Flexibility
+Review System
+Key Lesson for Rentfoxxy
+Back Market
+A/B/C/D grading with detailed cosmetic + functional criteria per grade. Seller must certify each unit.
+Full payment only. Refund within 30 days.
+Two-way: buyer rates seller; seller service score visible to buyers.
+Grade criteria must be strict and transparent — builds trust that justifies premium pricing for Grade A+
+Alibaba B2B
+Condition tags: New / Refurbished / Used. No standardised grading.
+Trade Assurance escrow. 30/60/90 day payment terms for verified buyers.
+Supplier rating + transaction count shown. Buyer identity partly visible to supplier.
+Token/advance payment with escrow is a proven model for large B2B orders.
+Amazon Business
+Renewed: Like New / Good / Acceptable with strict cosmetic criteria.
+Invoice payment (Net 30) for business accounts. Card at checkout.
+Verified purchase reviews. Seller rating visible.
+Grade labelling with clear definitions reduces disputes and returns.
+Ankorstore (EU)
+New products only.
+BNPL: pay in 60 days. Token-like advance to lock stock.
+Brand/supplier score visible to retailers.
+Advance payment to lock stock + balance on delivery is proven in B2B wholesale.
+Cashify (India)
+Grade A/B/C with cosmetic + battery + functional scoring.
+Full payment. EMI options.
+Buyer reviews only.
+India market already understands A/B/C grading — Rentfoxxy can build on this familiarity.
+💡 INSIGHT: The refurbished laptop market is projected to reach USD 14.32 billion by 2030 at 9.6% CAGR (Markntel Advisors). Grade A holds ~47% market share. Adding grading to Rentfoxxy positions it to capture this rapidly growing segment alongside new laptop sales.
+FEATURE 6A: PRODUCT CONDITION GRADING SYSTEM
+Brand New · Refurbished (A+, A, B, C) — Vendor listing, customer filtering, UI display
+6A.1 Business Rationale
+Refurbished laptops carry significantly higher margin potential for vendors (35-50% margin vs 8-15% on new). Offering graded refurbished alongside new gives Rentfoxxy a wider price band — attracting cost-sensitive buyers (schools, NGOs, SMBs) while retaining enterprise buyers who want Grade A+ or Brand New.
+6A.2 Grade Definitions — Official Rentfoxxy Standard
+These definitions must be displayed to customers verbatim on the platform. Vendors certify they are listing according to these standards.
+Grade
+Label
+Condition
+Cosmetic
+Battery
+Warranty
+Brand New
+🟢 Brand New
+Factory sealed, never used, original packaging
+No marks, scratches, or blemishes
+Full OEM battery (100%)
+Full OEM warranty
+A+
+🔵 Refurb A+
+Open-box or lightly used (< 3 months). Professionally cleaned & tested.
+No visible marks. Screen spotless.
+≥ 90% battery health
+6–12 months Rentfoxxy-backed
+A
+🟣 Refurb A
+Lightly used (3–12 months). Fully functional, passed QC.
+Minor hairline scratches only (not visible at arm's length)
+≥ 80% battery health
+3–6 months Rentfoxxy-backed
+B
+🟡 Refurb B
+Used (1–3 years). Fully functional. Cosmetically imperfect.
+Visible light scratches on lid/palm rest. No dents.
+≥ 70% battery health
+3 months Rentfoxxy-backed
+C
+🟠 Refurb C
+Heavy use (3+ years). Functional. Cosmetically worn.
+Visible scratches, possible minor dents. Screen OK.
+≥ 60% battery health
+1 month or As-Is
+⚠️  IMPORTANT: Grade C listings require Admin approval before going live. The minimum bid price for Grade C must be set at least 15% below the platform floor price to reflect condition. Add a "Sold As-Is" disclaimer on Grade C product pages.
+6A.3 Database Schema Changes
+// Add to ProductListing model in prisma/schema.prisma:
+enum ProductCondition { BRAND_NEW REFURB_A_PLUS REFURB_A REFURB_B REFURB_C }
+model ProductListing {
+// ... existing fields ...
+condition        ProductCondition  @default(BRAND_NEW)
+batteryHealth    Int?              // percentage, e.g. 85
+conditionNotes   String?           // vendor's own description
+warrantyMonths   Int               @default(0)
+warrantyType     String?           // "OEM" | "Rentfoxxy-backed" | "As-Is"
+refurbImages     String[]          // extra images showing cosmetic condition
+isAdminApproved  Boolean           @default(true) // false for Grade C
+}
+// Add to Category/Product for filter support:
+// No changes needed — condition lives at ProductListing level
+6A.4 Vendor UI — Listing Form Changes
+In /vendor/products/new and /vendor/products/[id]/edit, add after "Unit Price":
+Condition selector — styled radio cards (not a dropdown) showing the 5 grades with visual icons and a one-line description for each. Selected card gets a highlighted border.
+Conditional fields that appear based on selected condition:
+If NOT Brand New → Battery Health % input (slider 50–100)
+If NOT Brand New → Warranty Type dropdown + Warranty Months input
+If NOT Brand New → Condition Notes textarea (200 char, "Describe cosmetic condition honestly")
+If NOT Brand New → Refurbished Images upload (up to 3 extra images showing actual unit)
+If Grade C → Admin approval notice: "Grade C listings require Rentfoxxy admin review before going live"
+Below condition selector: show a "Grade Guide" info accordion that explains Rentfoxxy's grading standard.
+6A.5 Customer-Facing UI Changes
+Product Listing Page Filters
+Add "Condition" filter group in left sidebar:
+Checkboxes: Brand New | Refurb A+ | Refurb A | Refurb B | Refurb C
+Each checkbox has a colour dot matching the grade colour
+Selecting multiple conditions returns union (OR) results
+Product Card (in listing grid)
+Add a condition badge on the card image (top-right corner): coloured pill e.g. "🔵 Refurb A+"
+Show "Multiple conditions available" if the product has listings in > 1 condition
+Product Detail Page — Price Options Table
+The price options table (which shows anonymised vendor listings) now shows:
+Column
+Value
+Notes
+Option
+Option A / Option B
+Still anonymised — no vendor name
+Condition
+🔵 Refurb A+
+Grade badge with colour dot
+Battery Health
+88%
+Only for non-new items
+Warranty
+6 months
+Duration + type
+Price
+₹18,500
+Unit price
+Stock
+42 units
+Available quantity
+MOQ
+5 units
+Min order
+Add a "What do these grades mean?" link that opens a modal with the full grade table.
+Add a "Condition Certified by Rentfoxxy" trust badge under the price options table.
+6A.6 API Changes
+GET /api/public/products/[slug] → include condition, batteryHealth, warrantyMonths, warrantyType per listing (STRIP vendorId as always)
+GET /api/public/products?condition=REFURB_A,REFURB_A_PLUS → filter by condition
+POST /api/vendor/products → accept condition and related fields
+POST /api/admin/products/[id]/approve-grade-c → admin approval for Grade C listings
+FEATURE 6B: DUAL RATING & REVIEW SYSTEM
+Customer rates Vendor (anonymised) · Vendor rates Customer · Trust-based negotiation logic
+6B.1 Business Rationale
+Two-way ratings create a trust flywheel: high-rated customers get better bid terms from vendors; high-rated anonymous "suppliers" build customer confidence. This is the same principle that powers Alibaba's Gold Supplier ratings and Airbnb's bidirectional reviews. For Rentfoxxy, vendor anonymity is maintained — customers rate their "purchase experience" not a named vendor.
+6B.2 Review Flows — Who Reviews Whom
+Review Type
+Trigger
+What's Rated
+Who Sees It
+Vendor Identity
+Customer → Experience Review
+7 days after DELIVERY_CONFIRMED
+Product quality, packaging, delivery speed, overall experience (1–5 stars + text)
+Public on product page (anonymised attribution)
+NEVER shown — review attributed to "Verified Buyer"
+Customer → Platform Review
+After any completed order
+Platform experience only (not supplier)
+Admin dashboard only
+N/A
+Vendor → Customer Rating
+After order marked DELIVERED by vendor
+Payment reliability, communication, legitimate order (1–5 stars + private tags)
+Vendor portal ONLY when reviewing a bid from same customer
+Customer name shown to vendor (vendor already knows order details)
+6B.3 Database Schema
+// Add to prisma/schema.prisma:
+enum ReviewType { CUSTOMER_EXPERIENCE VENDOR_CUSTOMER }
+model Review {
+id           String     @id @default(cuid())
+type         ReviewType
+orderId      String
+order        Order      @relation(fields: [orderId], references: [id])
+reviewerId   String     // User ID of person writing review
+reviewer     User       @relation("ReviewsWritten", fields: [reviewerId], references: [id])
+subjectId    String     // vendorId (for CUSTOMER_EXPERIENCE) or customerId
+rating       Int        // 1-5
+comment      String?    @db.Text
+tags         String[]   // e.g. ["fast_delivery", "good_packaging", "reliable_payment"]
+isPublic     Boolean    @default(true)
+isVerified   Boolean    @default(true) // always true — only post-order reviews
+adminFlagged Boolean    @default(false)
+createdAt    DateTime   @default(now())
+@@unique([orderId, reviewerId, type])
+}
+// Computed rating fields (use DB views or computed on query):
+// VendorProfile.avgRating = AVG(Review.rating WHERE type=CUSTOMER_EXPERIENCE AND subjectId=vendorId)
+// CustomerProfile.avgRating = AVG(Review.rating WHERE type=VENDOR_CUSTOMER AND subjectId=customerId)
+// Add to VendorProfile:
+avgRating    Float    @default(0)
+reviewCount  Int      @default(0)
+// Add to CustomerProfile:
+avgRating    Float    @default(0)
+reviewCount  Int      @default(0)
+6B.4 Customer Review UI (Post-Delivery)
+7 days after delivery, customer receives email + notification: "How was your recent purchase? Share your experience."
+Customer visits /customer/orders/[id] → "Write a Review" card appears (with 7-day countdown).
+Review form:
+Star rating: 1–5 stars (large interactive stars)
+Quick tags (multi-select chips): "Exactly as described" | "Great packaging" | "Fast delivery" | "Good value" | "Would order again"
+Written review textarea (optional, 50–500 chars)
+Submit button
+On submit: review saved, vendor's avgRating recomputed, customer gets +5 loyalty points (future feature).
+6B.5 Public Review Display — Product Detail Page
+Below the price options table: "Customer Reviews" section
+Overall rating: large star display + distribution bar (5★ x%, 4★ y%, etc.)
+Review cards: star rating, quick tags as chips, comment (if any), "Verified B2B Buyer" attribution, date
+Pagination: show 5 reviews, "Load more" button
+🚫 RULE: NEVER display any vendor name or identifier on the review. Attribution is always "Verified B2B Buyer". The review is for the PRODUCT EXPERIENCE, not the vendor.
+6B.6 Vendor Review UI
+In /vendor/orders/[id]: after marking order as DELIVERED, a "Rate This Customer" section appears.
+Vendor sees customer's company name (they already processed the order).
+Rating: 1–5 stars + Private Tags: "Paid on time" | "Clear communication" | "Bulk buyer" | "Disputed unnecessarily" | "Delayed payment"
+This review is PRIVATE — customer never sees their own vendor-assigned rating score directly. They only see "Your Trust Score" as a blurred/aggregated metric.
+6B.7 Trust Score in Bid Flow — Vendor Decision Support
+When a vendor opens an incoming bid in /vendor/bids/[id], they see:
+Customer "Buyer Trust Score": displayed as a badge (Gold ★ 4.8 / Silver ★ 3.5 / New Buyer)
+Breakdown: "Paid on time: 95% | Repeat buyer: Yes | Orders completed: 12"
+This helps vendor decide: should I approve this bid at this price?
+Tier thresholds: Gold = avg ≥ 4.0 AND ≥ 3 completed orders. Silver = avg ≥ 3.0. Bronze/New = < 3 orders.
+💡 INSIGHT: Vendors on Alibaba use transaction count + ratings to decide net terms. A Gold-rated Rentfoxxy buyer could be offered extended token payment windows automatically — this creates a virtuous loop.
+FEATURE 6C: TOKEN PAYMENT & DEFERRED BALANCE SYSTEM
+Pay X% to lock stock · Balance due within N hours · Non-refundable token on default · Full payment option
+6C.1 Business Rationale
+Token-based advance payment is a proven B2B mechanism (similar to advance in real estate, advance booking in manufacturing). It benefits all parties: customer locks in stock and approved bid price; vendor has commitment and cash assurance; Rentfoxxy earns float income on held funds. Research confirms that B2B BNPL and advance-deposit models increase average order value by 20-35% on wholesale platforms (Ankorstore, Hokodo case studies).
+6C.2 Token Payment Options Matrix
+Option
+Token %
+Token Amount (₹4L order)
+Balance Window
+Balance Amount
+Stock Hold
+Token Forfeit if Default
+Token 2%
+2%
+₹8,000
+48 hours
+₹3,92,000
+Held for 48h
+₹8,000 non-refundable
+Token 3%
+3%
+₹12,000
+72 hours
+₹3,88,000
+Held for 72h
+₹12,000 non-refundable
+Token 4%
+4%
+₹16,000
+96 hours (4 days)
+₹3,84,000
+Held for 4 days
+₹16,000 non-refundable
+Token 5%
+5%
+₹20,000
+120 hours (5 days)
+₹3,80,000
+Held for 5 days
+₹20,000 non-refundable
+Full Payment
+100%
+₹4,00,000
+None — order immediate
+₹0
+Immediate dispatch
+N/A
+6C.3 How Customer Selects Payment Option
+Customer selects payment method in the BID FORM (not at checkout). This is part of the bid terms.
+In the bid modal (product detail page), after entering quantity and price:
+"How would you like to pay if this bid is approved?" — radio selection of 5 options
+Each option shows: Token %, Amount preview (calculated live), Balance window, Forfeit warning
+Default selected: Full Payment
+This selection becomes part of the Bid record. Vendor sees it when reviewing the bid.
+Vendor CAN reject a bid based on payment option chosen (e.g., vendor may not want 2% token for large orders).
+On bid approval, Razorpay payment link is generated for the TOKEN AMOUNT ONLY (or full if full payment selected).
+On token payment: stock is reserved, order created with status STOCK_RESERVED.
+Balance payment reminder: automated email + notification at T-12h, T-2h before deadline.
+If balance paid on time → order moves to ORDER_PLACED → vendor dispatches.
+If balance NOT paid by deadline → order status = TOKEN_FORFEITED, stock released, token kept by Rentfoxxy, small portion forwarded to vendor as compensation (Admin configures split %).
+6C.4 Updated Order Status Machine (additions to Phase 0 schema)
+// Add these statuses to OrderStatus enum in prisma/schema.prisma:
+enum OrderStatus {
+// ... existing statuses ...
+TOKEN_PAID          // Token collected, awaiting balance
+STOCK_RESERVED      // Stock held for this order pending balance
+BALANCE_OVERDUE     // Balance deadline passed, grace period active
+TOKEN_FORFEITED     // Customer defaulted, token non-refundable, stock released
+BALANCE_PAID        // Full balance received, order proceeds to dispatch
+}
+6C.5 Database Schema Changes
+// Add to Bid model:
+paymentOption   String    @default('FULL')
+// Values: FULL | TOKEN_2 | TOKEN_3 | TOKEN_4 | TOKEN_5
+// Add to Order model:
+tokenAmount        Float?
+tokenPercentage    Float?
+tokenPaidAt        DateTime?
+balanceDueAt       DateTime?
+balancePaidAt      DateTime?
+tokenForfeitedAt   DateTime?
+isTokenForfeited   Boolean   @default(false)
+// Add to Payment model (for split payments):
+paymentPurpose  String   @default('FULL')
+// Values: FULL | TOKEN | BALANCE
+// Add to PlatformSettings:
+tokenForfeitVendorShare  Float  @default(30.0)
+// % of forfeited token forwarded to vendor as compensation
+6C.6 Frontend — Bid Form Payment Option UI
+Replace the current simple bid modal with a two-step modal:
+Step 1: Quantity + Proposed Price + Note (existing)
+Step 2: Payment Option selector (NEW)
+Step 2 UI details:
+Title: "Choose Your Payment Preference"
+5 radio cards in a vertical stack. Each card shows:
+Option name ("Pay 2% Token Now")
+Token amount in ₹ (calculated live from bid total)
+Balance window (e.g., "Pay balance within 48 hours")
+Balance amount in ₹
+Warning line (amber): "⚠ Token is non-refundable if balance is not paid in time"
+"Best Commitment" badge on Full Payment option
+A "Why choose token payment?" info accordion explaining the benefit (stock lock, better bid acceptance chance).
+6C.7 Vendor View of Payment Option
+In /vendor/bids/[id], below bid price show:
+"Buyer's payment preference: Pay 3% token (₹X) now, balance within 72 hours"
+Vendor's margin impact is unchanged — they receive full payment before dispatch regardless
+Vendor can add a condition when approving: "Requires Full Payment only" (override toggle)
+6C.8 Balance Payment Reminder System
+POST /api/cron/balance-reminders — runs every hour via Vercel Cron
+Query: Orders with status TOKEN_PAID where balanceDueAt < now() + 12h → send T-12h reminder
+Query: Orders with status TOKEN_PAID where balanceDueAt < now() + 2h → send T-2h urgent reminder
+Query: Orders with status TOKEN_PAID where balanceDueAt < now() → mark as TOKEN_FORFEITED, release stock, notify customer + vendor + admin
+// vercel.json — add to crons:
+{ "path": "/api/cron/balance-reminders", "schedule": "0 * * * *" }
+6C.9 Customer Portal — Balance Payment CTA
+In /customer/orders, TOKEN_PAID orders show a prominent amber banner with countdown timer
+"Balance Due: ₹3,88,000 — Pay by [date/time] to avoid forfeiture" + "Pay Now" button
+In /customer/bids, approved bids with token option show Token vs Balance split clearly
+FEATURE 6D: VENDOR PAYMENT METHOD PREFERENCES
+Vendor sets accepted payment methods · Customer sees available options before bidding
+6D.1 Business Rationale
+Different vendors have different operational constraints. A vendor processing ₹50L+ orders may only accept NEFT/RTGS. A smaller vendor may prefer UPI. Displaying accepted payment methods per vendor (anonymised) helps customers plan and reduces bid rejections due to payment method mismatch. This is standard on IndiaMART, Alibaba, and TradeIndia for B2B sellers.
+6D.2 Supported Payment Methods
+Method ID
+Label
+Description
+Suitable For
+UPI
+UPI / QR Code
+Instant bank transfer via UPI apps (GPay, PhonePe, Paytm)
+Orders up to ₹1L
+NET_BANKING
+Net Banking
+IMPS/NEFT via internet banking
+Orders ₹50K – ₹10L
+CARD
+Debit / Credit Card
+Visa, Mastercard, RuPay
+Any amount
+NEFT_RTGS
+NEFT / RTGS
+Bank wire transfer (high value)
+Orders ₹5L+
+CORPORATE_CARD
+Corporate Credit Card
+Business card with GST invoice
+Enterprise buyers
+RAZORPAY_LINK
+Payment Link
+Auto-generated Razorpay link
+Token + balance payments
+TOKEN_PAYMENT
+Token + Balance
+Advance token with deferred balance (Feature 6C)
+Bulk/bid orders
+FULL_ADVANCE
+Full Advance
+100% upfront before dispatch
+New customers, Grade C items
+6D.3 Database Schema Changes
+// Add to VendorProfile model:
+acceptedPaymentMethods  String[]  @default(["UPI", "NET_BANKING", "CARD", "RAZORPAY_LINK"])
+requiresFullAdvance     Boolean   @default(false)
+// If true, vendor does not accept token payment — overrides bid payment option
+minOrderForRTGS         Float?    // Order value above which vendor requires NEFT/RTGS
+6D.4 Vendor Onboarding & Profile UI Changes
+In /vendor/profile → "Payment Preferences" tab (NEW):
+Section: "Accepted Payment Methods"
+Multi-select checkbox grid — each method as a card with icon and description
+Minimum 1 method must be selected (validation)
+Section: "Advance Payment Policy"
+"Require full advance payment for all orders?" — toggle (default: OFF)
+"Require NEFT/RTGS for orders above ₹___" — number input (optional)
+Section: "Token Payment Policy"
+"Accept token payment (bid orders)?" — toggle (default: ON)
+"Minimum token % you will accept" — dropdown (2% / 3% / 4% / 5% / Full only)
+6D.5 Customer-Facing: Payment Methods on Product Detail Page
+Below the price options table, add "Payment Options Available" row.
+Since multiple vendors may offer the same product, show the UNION of all accepted methods across active listings.
+Display as icon chips: UPI icon, Card icon, Net Banking icon, NEFT icon, Token icon.
+Hovering each chip shows a tooltip: e.g. "UPI payments accepted for this product"
+🚫 RULE: Do NOT show "Accepted by Vendor X" — just "Accepted for this product". Maintain full anonymity.
+6D.6 Bid Flow Integration
+When customer opens the bid modal, after selecting payment option:
+System checks: does the selected listing's vendor accept the chosen payment method?
+If vendor requires Full Advance but customer selected Token: show warning "This seller requires full advance payment. Please select Full Payment."
+If conflict exists, disable the incompatible options (greyed out with reason tooltip).
+This check is also run server-side on bid submission (POST /api/customer/bids) to prevent bypass.
+Additional B2B Features — Research-Based Recommendations
+Based on analysis of Back Market, Alibaba Business, Amazon Business, and Ankorstore, the following features are recommended for future phases. They are NOT in the current sprint but should be designed into the architecture now.
+Feature
+Inspired By
+Business Value
+Recommended Phase
+RFQ (Request for Quote)
+Alibaba, IndiaMART
+Customers post bulk requirements; multiple vendors quote. Increases deal size.
+Phase 9
+Wishlist / Save for Later
+Amazon Business
+Customers save products for procurement planning. Increases return visits.
+Phase 7
+Purchase Order Upload
+Amazon Business
+Customer uploads company PO document; auto-fills order details. Enterprise feature.
+Phase 9
+Bulk CSV Order Upload
+Alibaba
+Customers upload CSV of SKUs + quantities; auto-creates cart. Enterprise procurement.
+Phase 9
+Net Payment Terms (Net 30/60)
+Alibaba, Hokodo
+Credit terms for verified enterprise customers. High AOV driver.
+Phase 10
+Loyalty Points
+Cashify, IndiaMART
+Points per purchase, redeemable for discounts. Increases repeat orders.
+Phase 8
+Vendor Performance Badge
+Back Market, Alibaba
+Anonymised "Top Rated Supplier" or "Fast Fulfiller" badges on listings.
+Phase 8
+Price Alert / Watch
+Back Market
+Customer sets a target price; gets notified when any vendor lists at/below that price.
+Phase 9
+Bulk Discount Calculator
+Alibaba
+Interactive calculator on product page showing savings at different qty tiers.
+Phase 7
+Product Comparison
+NeweggBusiness
+Compare up to 3 products side-by-side on specs, price, condition, warranty.
+Phase 8
+Returns & Refund Portal
+Back Market, Amazon
+Structured return request flow with reason codes, photo upload, and refund tracking.
+Phase 7
+Chat with Support (Live)
+IndiaMART, IndiaBizStore
+Real-time support chat for procurement queries. Increases conversion.
+Phase 10
+Cursor Implementation Prompts
+📌 NOTE: Insert these prompts between Phase 6 and Phase 7 of your original Cursor Prompt Document. Execute them in order: 6A → 6B → 6C → 6D.
+CURSOR PROMPT 6A — PRODUCT CONDITION GRADING SYSTEM
+=== CURSOR PROMPT 6A — PRODUCT CONDITION GRADING ===
+─── 6A-1: PRISMA SCHEMA UPDATE ──────────────────────────────────────
+Open prisma/schema.prisma and add:
+enum ProductCondition { BRAND_NEW REFURB_A_PLUS REFURB_A REFURB_B REFURB_C }
+Add these fields to ProductListing:
+condition        ProductCondition  @default(BRAND_NEW)
+batteryHealth    Int?
+conditionNotes   String?
+warrantyMonths   Int               @default(0)
+warrantyType     String?
+refurbImages     String[]
+requiresAdminApproval Boolean      @default(false)
+Run: npx prisma migrate dev --name add_product_condition
+─── 6A-2: CONSTANTS FILE ────────────────────────────────────────────
+Create src/constants/grading.ts:
+export const GRADE_CONFIG = {
+BRAND_NEW:    { label: "Brand New",  color: "#15803D", dot: "🟢",
+description: "Factory sealed, original packaging, never used" },
+REFURB_A_PLUS:{ label: "Refurb A+",  color: "#2563EB", dot: "🔵",
+description: "Open-box/lightly used (<3mo). Spotless, ≥90% battery." },
+REFURB_A:     { label: "Refurb A",   color: "#7C3AED", dot: "🟣",
+description: "Lightly used (3-12mo). Minor hairlines only, ≥80% battery." },
+REFURB_B:     { label: "Refurb B",   color: "#D97706", dot: "🟡",
+description: "Used 1-3yr. Visible light scratches, no dents, ≥70% battery." },
+REFURB_C:     { label: "Refurb C",   color: "#DC2626", dot: "🟠",
+description: "Heavy use 3+yr. Cosmetically worn, functional. ≥60% battery." },
+}
+─── 6A-3: VENDOR LISTING FORM (src/components/vendor/ProductForm.tsx) ─
+After the "Unit Price" field, add a CONDITION SELECTOR section:
+1. Heading: "Product Condition *"
+2. Render 5 radio cards in a 2-column grid (Brand New + A+ top row, A+B middle, C bottom):
+Each card:
+- Gradient border (default: gray, selected: grade color)
+- Large dot emoji + grade label (bold) + description (small text)
+- onClick: set condition in form state
+3. Conditional section (hidden when BRAND_NEW is selected):
+"Additional Refurbishment Details"
+- Battery Health: <Slider min={50} max={100} step={5} />
+Label: "Battery Health: {value}%"
+- Warranty Type: <Select> ["Rentfoxxy-backed", "Manufacturer", "As-Is"]
+- Warranty Duration: <Input type="number" min={0} max={24}> + "months"
+- Condition Notes: <Textarea maxLength={200} />
+- Refurbished Images: <UploadThing> max 3 images
+Label: "Upload photos of actual unit condition (shows scratches etc.)"
+4. Grade C warning box (shown only when REFURB_C selected):
+Amber callout: "Grade C listings require Rentfoxxy admin review before going live.
+Your listing will be submitted for approval."
+Set requiresAdminApproval = true in form data when REFURB_C selected.
+5. "Grade Guide" accordion at bottom:
+Shows the full GRADE_CONFIG table with descriptions.
+Collapsed by default.
+─── 6A-4: API UPDATE ────────────────────────────────────────────────
+Update POST /api/vendor/products to accept and save:
+condition, batteryHealth, conditionNotes, warrantyMonths,
+warrantyType, refurbImages, requiresAdminApproval
+Update GET /api/public/products/[slug] to return per listing:
+condition, batteryHealth, warrantyMonths, warrantyType
+(STILL STRIP vendorId — this is safe, condition is product attribute)
+Update GET /api/public/products with filter:
+if req.query.condition → add WHERE condition IN [...] to Prisma query
+Add POST /api/admin/listings/[id]/approve:
+Set requiresAdminApproval = false, isActive = true
+Send notification to vendor: "Your Grade C listing is now live"
+─── 6A-5: PRODUCT LISTING PAGE FILTERS ──────────────────────────────
+In src/components/storefront/ProductFilters.tsx,
+add a new filter group after "Price Range":
+"Product Condition" group:
+For each grade in GRADE_CONFIG:
+<Checkbox id={grade} />
+<label>
+<span className="condition-dot" style={{ color: gradeConfig.color }}>
+{gradeConfig.dot}
+</span>
+{gradeConfig.label}
+</label>
+On checkbox change: add/remove condition from URL query params.
+URL format: /products?condition=BRAND_NEW,REFURB_A_PLUS
+─── 6A-6: PRODUCT CARD & DETAIL PAGE ────────────────────────────────
+ProductCard component:
+- Add condition badge (top-right of image):
+<span className="condition-badge" style={{ background: gradeColor }}>
+{gradeDot} {gradeLabel}
+</span>
+- If product has multiple conditions: show "Multiple conditions available"
+as a secondary info line below price
+ProductDetail page — price options table:
+Replace simple price table with enhanced table:
+Columns: Option | Condition | Battery | Warranty | Price | Stock | MOQ
+Sort: BRAND_NEW first, then by condition grade DESC
+Add below table:
+- "What do these grades mean?" → <Dialog> containing GRADE_CONFIG table
+- "✓ All conditions certified by Rentfoxxy" trust badge
+─── 6A-7: ADMIN PANEL ───────────────────────────────────────────────
+In /admin/products/[id]:
+New "Pending Approval" tab showing Grade C listings needing review
+Columns: Vendor (admin-only visible), SKU, Condition, Condition Notes,
+Refurb Images preview, Approve / Reject buttons
+In /admin/products (main listing):
+Add "Condition" column showing the range of conditions for that product
+Add filter: "Show only Grade C pending approval"
+CURSOR PROMPT 6B — DUAL RATING & REVIEW SYSTEM
+=== CURSOR PROMPT 6B — DUAL RATING & REVIEW SYSTEM ===
+─── 6B-1: PRISMA SCHEMA ─────────────────────────────────────────────
+Add to prisma/schema.prisma:
+enum ReviewType { CUSTOMER_EXPERIENCE VENDOR_CUSTOMER }
+model Review {
+id           String     @id @default(cuid())
+type         ReviewType
+orderId      String
+order        Order      @relation(fields: [orderId], references: [id])
+reviewerId   String
+reviewer     User       @relation("ReviewsWritten", fields: [reviewerId], references: [id])
+subjectId    String     // vendorProfileId or customerProfileId
+rating       Int
+comment      String?
+tags         String[]
+isPublic     Boolean    @default(true)
+adminFlagged Boolean    @default(false)
+createdAt    DateTime   @default(now())
+@@unique([orderId, reviewerId, type])
+}
+Add relation to Order:
+reviews  Review[]
+Add User relation:
+reviewsWritten  Review[]  @relation("ReviewsWritten")
+Add to VendorProfile:
+avgRating    Float  @default(0.0)
+reviewCount  Int    @default(0)
+Add to CustomerProfile:
+avgRating    Float  @default(0.0)
+reviewCount  Int    @default(0)
+Run: npx prisma migrate dev --name add_review_system
+─── 6B-2: REVIEW API ROUTES ─────────────────────────────────────────
+POST /api/customer/reviews:
+Body: { orderId, rating, comment?, tags[] }
+Validate:
+- Order belongs to authenticated customer
+- Order status = DELIVERY_CONFIRMED or DELIVERED
+- Order was delivered more than 0 and less than 7 days ago
+- No duplicate review (@@unique constraint)
+Action:
+- Create Review (type=CUSTOMER_EXPERIENCE, subjectId=vendorProfileId from order items)
+- Recompute VendorProfile.avgRating and reviewCount
+(AVG of all CUSTOMER_EXPERIENCE reviews for this vendor)
+- Create notification for customer: "Thank you for your review!"
+Return: { success: true, review }
+POST /api/vendor/reviews:
+Body: { orderId, rating, tags[] }  // no public comment for vendor->customer
+Validate:
+- Order item belongs to authenticated vendor
+- Order status = DELIVERED or later
+- No duplicate review
+Action:
+- Create Review (type=VENDOR_CUSTOMER, subjectId=customerProfileId, isPublic=false)
+- Recompute CustomerProfile.avgRating and reviewCount
+Return: { success: true }
+GET /api/public/products/[slug]/reviews:
+Return: paginated CUSTOMER_EXPERIENCE reviews for all listings of this product
+STRIP: reviewerId, any identifying fields
+Return: { rating, comment, tags, grade: gradeLabel, createdAt, attribution: "Verified B2B Buyer" }
+GET /api/vendor/bids/[id]/customer-trust:
+Return customer trust score for bid's customer (vendor only, authenticated)
+Calculate:
+avgRating = CustomerProfile.avgRating
+orderCount = CustomerProfile total completed orders
+onTimePaymentRate = % of orders where balancePaidAt <= balanceDueAt
+tier = Gold (avg≥4.0 AND orders≥3) | Silver (avg≥3.0) | Bronze/New
+Return: { tier, avgRating, orderCount, onTimePaymentRate }
+NEVER return customer name in this endpoint beyond what vendor already sees in order
+─── 6B-3: CUSTOMER REVIEW UI ────────────────────────────────────────
+In src/app/(customer)/customer/orders/[id]/page.tsx:
+Add "Review Your Purchase" section:
+Show condition: order.status is DELIVERED/DELIVERY_CONFIRMED AND
+no existing review AND delivered < 7 days ago
+Review Card UI:
+Heading: "How was your experience?"
+Subtitle: "Your feedback helps other buyers make informed decisions"
+Star Rating Component:
+5 large star icons (40px), initially unfilled
+On hover: fill stars up to hovered star
+On click: lock rating + show confirmation ring
+Quick Tags (multi-select chips, shown after star selection):
+For rating 4-5: ["Exactly as described","Great packaging",
+"Fast delivery","Great value","Would reorder"]
+For rating 1-3: ["Not as described","Poor packaging",
+"Slow delivery","Poor value","Damaged item"]
+Optional Comment: <Textarea placeholder="Share more details..." minLength={10} />
+Submit button: "Submit Review"
+After submit: replace card with "Thank you! Your review has been submitted." banner
+─── 6B-4: VENDOR REVIEW UI ──────────────────────────────────────────
+In src/app/(vendor)/vendor/orders/[id]/page.tsx:
+Add "Rate This Buyer" section (after marking order DELIVERED):
+Heading: "Rate This Customer" (subtitle: "Private — not shown to customer")
+Star Rating: same 5-star component as above
+Private Tags (multi-select):
+["Paid on time", "Clear communication", "Legitimate bulk buyer",
+"Requested unreasonable terms", "Delayed payment",
+"Good repeat customer", "First-time buyer — smooth transaction"]
+No comment field — tags only for vendor reviews
+Submit: "Save Rating"
+─── 6B-5: PRODUCT REVIEWS ON PRODUCT DETAIL PAGE ────────────────────
+In src/app/(public)/products/[slug]/page.tsx,
+add "Customer Reviews" section below the price options:
+Overall Rating Block:
+Large number (e.g., "4.3") in primary color
+5-star visual (partially filled)
+"(47 verified purchases)"
+Distribution bars: 5★ |████████░░| 72%
+4★ |█████░░░░░| 18%  etc.
+Review list: fetch GET /api/public/products/[slug]/reviews?page=1
+Each review card:
+Stars | condition badge (grade of item reviewed) | tags chips
+Comment (if any, truncated at 200 chars with "Read more")
+"Verified B2B Buyer  ·  {timeAgo}"
+"Load more reviews" button (loads next page)
+─── 6B-6: VENDOR BID PANEL — TRUST SCORE ────────────────────────────
+In src/app/(vendor)/vendor/bids/[id]/page.tsx,
+fetch GET /api/vendor/bids/[id]/customer-trust
+Add "Buyer Profile" card in right sidebar:
+Trust tier badge:
+Gold: gold background, "⭐ Gold Buyer — Highly Reliable"
+Silver: gray background, "🥈 Silver Buyer — Good Track Record"
+New: blue background, "🆕 New Buyer — No rating yet"
+Stats row: "X orders completed | Y% on-time payment | Z avg rating (private)"
+Info text: "This score is based on past Rentfoxxy transactions.
+Use it to inform your bid decision."
+CURSOR PROMPT 6C — TOKEN PAYMENT & DEFERRED BALANCE SYSTEM
+=== CURSOR PROMPT 6C — TOKEN PAYMENT SYSTEM ===
+─── 6C-1: PRISMA SCHEMA ─────────────────────────────────────────────
+Add to OrderStatus enum:
+TOKEN_PAID STOCK_RESERVED BALANCE_OVERDUE TOKEN_FORFEITED BALANCE_PAID
+Add to Order model:
+tokenAmount        Float?
+tokenPercentage    Float?
+tokenPaidAt        DateTime?
+balanceDueAt       DateTime?
+balancePaidAt      DateTime?
+isTokenForfeited   Boolean   @default(false)
+tokenForfeitedAt   DateTime?
+Add to Bid model:
+paymentOption  String  @default('FULL')
+// FULL | TOKEN_2 | TOKEN_3 | TOKEN_4 | TOKEN_5
+Add to Payment model:
+paymentPurpose  String  @default('FULL')  // FULL | TOKEN | BALANCE
+Add to PlatformSettings:
+tokenForfeitVendorShare  Float  @default(30.0)
+Run: npx prisma migrate dev --name add_token_payment_system
+─── 6C-2: CONSTANTS ─────────────────────────────────────────────────
+Create src/constants/payment-options.ts:
+export const PAYMENT_OPTIONS = [
+{ id: 'FULL',    label: 'Full Payment',      tokenPct: 100, windowHours: 0,   description: 'Pay 100% now. Immediate dispatch on approval.' },
+{ id: 'TOKEN_2', label: 'Pay 2% Token Now',  tokenPct: 2,   windowHours: 48,  description: 'Pay 2% to lock stock. Pay balance within 48 hours.' },
+{ id: 'TOKEN_3', label: 'Pay 3% Token Now',  tokenPct: 3,   windowHours: 72,  description: 'Pay 3% to lock stock. Pay balance within 72 hours.' },
+{ id: 'TOKEN_4', label: 'Pay 4% Token Now',  tokenPct: 4,   windowHours: 96,  description: 'Pay 4% to lock stock. Pay balance within 96 hours (4 days).' },
+{ id: 'TOKEN_5', label: 'Pay 5% Token Now',  tokenPct: 5,   windowHours: 120, description: 'Pay 5% to lock stock. Pay balance within 5 days.' },
+]
+─── 6C-3: BID FORM UPDATE ───────────────────────────────────────────
+Update src/components/storefront/BidModal.tsx to a 2-step modal:
+Step 1 — Bid Details (existing): product, quantity, price per unit, note
+Step 2 — Payment Preference (NEW):
+Title: "Choose Payment Structure"
+Subtitle: "Select how you'd like to pay if this bid is approved"
+Render PAYMENT_OPTIONS as vertical radio cards:
+Each card:
+Left: radio button + option label (bold)
+Right: calculated amounts (use live bid total from Step 1)
+Body:
+"Pay now: ₹{tokenAmount}" (green, large)
+"Balance: ₹{balanceAmount} within {windowHours}h" (gray)
+Footer (for token options):
+Amber warning: "⚠ Token is non-refundable if balance payment deadline is missed"
+For FULL option:
+Green badge: "✓ Recommended — Fastest dispatch"
+Live calculation (React state):
+const totalBid = bidPrice * quantity
+const tokenAmount = (totalBid * option.tokenPct) / 100
+const balanceAmount = totalBid - tokenAmount
+Navigation: "Back" button returns to Step 1
+"Submit Bid" button on Step 2
+─── 6C-4: BID API UPDATE ────────────────────────────────────────────
+Update POST /api/customer/bids:
+Accept paymentOption in request body
+Save to Bid.paymentOption
+Return paymentOption in response
+─── 6C-5: BID APPROVAL → TOKEN PAYMENT FLOW ─────────────────────────
+Update PUT /api/vendor/bids/[id]/approve:
+After approving bid:
+1. Fetch bid.paymentOption
+2. Find matching PAYMENT_OPTIONS config
+3. If FULL:
+- Generate Razorpay order for full bid amount
+- Set bid.expiresAt = now + 48h (existing logic)
+4. If TOKEN_*:
+- Calculate tokenAmount = totalBid * tokenPct / 100
+- Generate Razorpay order for tokenAmount only
+- Set bid.expiresAt = now + 24h (pay token within 24h)
+- Include paymentPurpose: "TOKEN" in Razorpay order notes
+Update POST /api/customer/payments/verify (Razorpay callback):
+Check payment.paymentPurpose:
+If FULL or no purpose:
+// existing flow — ORDER_PLACED
+If TOKEN:
+Create Order with status TOKEN_PAID
+Set order.tokenAmount, order.tokenPercentage
+Set order.tokenPaidAt = now()
+Set order.balanceDueAt = now + windowHours (from PAYMENT_OPTIONS config)
+Reduce ProductListing.stockQty by order quantity (stock reserved)
+Create notification: "Token received! Stock reserved. Pay balance by {balanceDueAt}"
+Send email: TokenPaymentConfirmed template
+Return { success: true, nextStep: "BALANCE_PAYMENT", balanceDueAt, balanceAmount }
+─── 6C-6: BALANCE PAYMENT ENDPOINT ─────────────────────────────────
+POST /api/customer/orders/[id]/pay-balance:
+Validate:
+- Order belongs to customer
+- Order status = TOKEN_PAID or STOCK_RESERVED
+- Current time < order.balanceDueAt
+Action:
+- Create Razorpay order for balanceAmount
+(totalAmount - tokenAmount)
+- Return razorpayOrderId
+On balance payment verify:
+- Set order.balancePaidAt = now()
+- Update order.status = ORDER_PLACED
+- Send order confirmation email
+- Create notification: "Balance received! Your order is confirmed."
+─── 6C-7: TOKEN FORFEITURE CRON ─────────────────────────────────────
+Create src/app/api/cron/balance-reminders/route.ts:
+GET handler (Vercel cron, runs every hour):
+// T-12 hour reminder
+const soonDue = await prisma.order.findMany({
+where: {
+status: "TOKEN_PAID",
+balanceDueAt: { gt: new Date(), lt: addHours(new Date(), 12) },
+// Check if T-12h notification already sent (use a flag or Notification check)
+}
+})
+for (const order of soonDue) {
+await sendEmail("BalanceDueReminder", customer, { urgency: "12h", balanceDueAt, balanceAmount })
+await createNotification(customerId, "BALANCE_DUE_SOON", "Balance payment due in 12 hours", ...)
+}
+// T-2 hour urgent reminder
+const urgentDue = ... // same but < 2 hours
+// FORFEITURE: past due
+const overdue = await prisma.order.findMany({
+where: { status: "TOKEN_PAID", balanceDueAt: { lt: new Date() } }
+})
+for (const order of overdue) {
+// Release reserved stock
+await prisma.productListing.update({
+where: { id: order.items[0].listingId },
+data: { stockQty: { increment: order.items[0].quantity } }
+})
+// Mark order forfeited
+await prisma.order.update({
+where: { id: order.id },
+data: { status: "TOKEN_FORFEITED", isTokenForfeited: true, tokenForfeitedAt: new Date() }
+})
+// Calculate vendor compensation
+const settings = await prisma.platformSettings.findUnique({ where: { id: "singleton" } })
+const vendorShare = order.tokenAmount * (settings.tokenForfeitVendorShare / 100)
+// TODO: trigger vendor compensation payout (manual or auto)
+await sendEmail("TokenForfeited", customer, { tokenAmount, productName })
+await createNotification(customerId, "TOKEN_FORFEITED", "Your stock reservation has expired", ...)
+await createNotification(vendorUserId, "TOKEN_FORFEITURE_COMPENSATION", ...)
+}
+// Add cron to vercel.json:
+{ "path": "/api/cron/balance-reminders", "schedule": "0 * * * *" }
+─── 6C-8: CUSTOMER PORTAL UI ────────────────────────────────────────
+In /customer/orders, add special card for TOKEN_PAID orders:
+TokenPaymentBanner component:
+Background: amber/warning gradient
+"⏰ Stock Reserved — Balance Payment Due"
+Progress bar: time elapsed vs total window
+"Balance: ₹{balanceAmount}"
+Countdown: "Pay within: {days}d {hours}h {minutes}m"
+CTA button: "Pay Balance Now" (primary, large)
+Small text: "⚠ Token of ₹{tokenAmount} is non-refundable if missed"
+On click "Pay Balance Now" → calls /api/customer/orders/[id]/pay-balance
+→ opens Razorpay checkout for balance amount
+CURSOR PROMPT 6D — VENDOR PAYMENT METHOD PREFERENCES
+=== CURSOR PROMPT 6D — VENDOR PAYMENT PREFERENCES ===
+─── 6D-1: SCHEMA UPDATE ─────────────────────────────────────────────
+Add to VendorProfile:
+acceptedPaymentMethods  String[]  @default(["UPI","NET_BANKING","CARD","RAZORPAY_LINK"])
+requiresFullAdvance     Boolean   @default(false)
+minOrderForRTGS         Float?
+minTokenPercentage      Int       @default(2)
+// 2 = accept 2%+, 100 = full payment only
+Run: npx prisma migrate dev --name add_vendor_payment_prefs
+─── 6D-2: CONSTANTS ─────────────────────────────────────────────────
+Add to src/constants/payment-options.ts:
+export const PAYMENT_METHOD_CONFIG = {
+UPI:            { label: 'UPI / QR Code',          icon: 'Smartphone',  description: 'GPay, PhonePe, Paytm — instant' },
+NET_BANKING:    { label: 'Net Banking',            icon: 'Building2',   description: 'IMPS/NEFT via internet banking' },
+CARD:           { label: 'Debit / Credit Card',   icon: 'CreditCard',  description: 'Visa, Mastercard, RuPay' },
+NEFT_RTGS:      { label: 'NEFT / RTGS',           icon: 'ArrowLeftRight', description: 'Bank wire transfer (high value)' },
+CORPORATE_CARD: { label: 'Corporate Credit Card', icon: 'Briefcase',   description: 'Business card + GST invoice' },
+RAZORPAY_LINK:  { label: 'Payment Link',          icon: 'Link',        description: 'Razorpay payment link' },
+TOKEN_PAYMENT:  { label: 'Token + Balance',       icon: 'Percent',     description: 'Advance token with deferred balance' },
+}
+─── 6D-3: VENDOR PROFILE — PAYMENT PREFERENCES TAB ─────────────────
+In src/app/(vendor)/vendor/profile/page.tsx:
+Add 4th tab: "Payment Preferences"
+Section 1 — "Accepted Payment Methods":
+Subtitle: "Customers will see which methods you accept before placing bids"
+Render PAYMENT_METHOD_CONFIG as checkbox cards (2-column grid):
+Each card: icon + label + description
+Checked = accepted by vendor
+Validation: at least 1 must be selected
+Section 2 — "Advance Payment Policy":
+Toggle: "Require full payment upfront for all orders"
+Sub-text: "If enabled, token/deferred payments are not accepted"
+Number input: "Require NEFT/RTGS for orders above ₹___"
+Sub-text: "Leave blank to accept all methods for any order size"
+Section 3 — "Token Payment Policy" (hidden if full advance toggle is ON):
+Toggle: "Accept token-based bid payments"
+If ON → Dropdown: "Minimum token percentage I will accept"
+Options: 2% | 3% | 4% | 5% | Full payment only
+Save button: PUT /api/vendor/profile/payment-preferences
+Save acceptedPaymentMethods, requiresFullAdvance, minOrderForRTGS, minTokenPercentage
+─── 6D-4: API ROUTES ────────────────────────────────────────────────
+PUT /api/vendor/profile/payment-preferences:
+Validate: auth + role=VENDOR
+Update VendorProfile: acceptedPaymentMethods, requiresFullAdvance,
+minOrderForRTGS, minTokenPercentage
+Return: { success: true }
+GET /api/public/products/[slug]/payment-methods:
+For a product slug:
+1. Find all active ProductListings for this product
+2. For each listing, get the vendor's acceptedPaymentMethods (DO NOT return vendorId)
+3. Return union of all methods + whether token payment is available
+Return: { availableMethods: ["UPI","CARD","TOKEN_PAYMENT"], tokenAvailable: true }
+─── 6D-5: PRODUCT DETAIL PAGE — PAYMENT METHODS DISPLAY ─────────────
+In src/app/(public)/products/[slug]/page.tsx:
+Fetch GET /api/public/products/[slug]/payment-methods
+Add "Payment Options" section below price options table:
+Heading: "Payment Options Available"
+Render accepted methods as icon chips:
+For each method in availableMethods:
+<Chip>
+<Icon name={PAYMENT_METHOD_CONFIG[method].icon} />
+{PAYMENT_METHOD_CONFIG[method].label}
+</Chip>
+Tooltip on hover: "This payment method is accepted for this product"
+If tokenAvailable: show amber chip "Token Payment Available"
+With tooltip: "Pay a small advance now and the balance later"
+─── 6D-6: BID FORM VALIDATION ───────────────────────────────────────
+Update BidModal Step 2 (payment option selection):
+After fetching the listing to bid on:
+GET /api/public/products/[slug]/payment-methods (already fetched above)
+Also fetch: listing.vendor.minTokenPercentage (from listing detail endpoint)
+listing.vendor.requiresFullAdvance
+For each payment option card:
+Calculate isCompatible:
+if requiresFullAdvance → only FULL is compatible
+if option is TOKEN_* → check option.tokenPct >= vendor.minTokenPercentage
+if not in acceptedPaymentMethods → incompatible
+Incompatible options:
+Greyed out card, reduced opacity
+"Not available for this product" tooltip
+Cannot be selected
+Server-side enforcement in POST /api/customer/bids:
+Re-fetch vendor.requiresFullAdvance and vendor.minTokenPercentage
+Validate paymentOption against vendor rules
+If incompatible: return 400 { error: "Payment option not accepted by supplier" }
+─── 6D-7: ADMIN PANEL ───────────────────────────────────────────────
+In /admin/vendors/[id]:
+Add "Payment Preferences" to the overview tab:
+Show: accepted methods, requiresFullAdvance, minTokenPercentage
+Admin can override these settings (for onboarding assistance)
+CURSOR PROMPT 6E — SEED DATA UPDATE FOR NEW FEATURES
+=== CURSOR PROMPT 6E — UPDATE SEED DATA ===
+Update prisma/seed.ts to include new feature demo data:
+─── Product Listings with Conditions ────────────────────────────────
+// Dell Latitude 5540 — 4 listings across conditions and vendors
+await prisma.productListing.createMany({ data: [
+{ productId: dellLat.id, vendorId: v1.id, sku: "DL5540-V1-NEW",
+condition: 'BRAND_NEW', unitPrice: 52000, stockQty: 20, minOrderQty: 1,
+minBidPrice: 48000, warrantyMonths: 12, warrantyType: 'OEM' },
+{ productId: dellLat.id, vendorId: v1.id, sku: "DL5540-V1-APLUS",
+condition: 'REFURB_A_PLUS', unitPrice: 41000, stockQty: 15, minOrderQty: 2,
+minBidPrice: 37000, batteryHealth: 92, warrantyMonths: 6, warrantyType: 'Rentfoxxy-backed',
+conditionNotes: 'Open box. Spotless screen. Barely used.' },
+{ productId: dellLat.id, vendorId: v2.id, sku: "DL5540-V2-A",
+condition: 'REFURB_A', unitPrice: 34000, stockQty: 30, minOrderQty: 5,
+minBidPrice: 30000, batteryHealth: 83, warrantyMonths: 3, warrantyType: 'Rentfoxxy-backed' },
+{ productId: dellLat.id, vendorId: v2.id, sku: "DL5540-V2-B",
+condition: 'REFURB_B', unitPrice: 27000, stockQty: 50, minOrderQty: 10,
+minBidPrice: 23000, batteryHealth: 74, warrantyMonths: 3, warrantyType: 'Rentfoxxy-backed',
+conditionNotes: 'Light scratches on palm rest. Fully functional.' },
+]})
+─── Vendor Payment Preferences ──────────────────────────────────────
+// Update vendor1 payment preferences:
+await prisma.vendorProfile.update({ where: { id: vendor1Profile.id }, data: {
+acceptedPaymentMethods: ['UPI','NET_BANKING','CARD','RAZORPAY_LINK','TOKEN_PAYMENT'],
+requiresFullAdvance: false,
+minTokenPercentage: 2,
+}})
+// Update vendor2 payment preferences (stricter):
+await prisma.vendorProfile.update({ where: { id: vendor2Profile.id }, data: {
+acceptedPaymentMethods: ['NET_BANKING','NEFT_RTGS','CARD','RAZORPAY_LINK'],
+requiresFullAdvance: false,
+minTokenPercentage: 4,  // only accept 4%+ token
+minOrderForRTGS: 200000, // require NEFT/RTGS above ₹2L
+}})
+─── Demo Reviews ────────────────────────────────────────────────────
+// Create sample reviews for delivered order:
+await prisma.review.create({ data: {
+type: 'CUSTOMER_EXPERIENCE',
+orderId: deliveredOrder.id,
+reviewerId: customerUser.id,
+subjectId: vendor1Profile.id,
+rating: 5,
+tags: ['Exactly as described','Great packaging','Fast delivery'],
+comment: 'Excellent quality. The A+ grade laptops were spotless. Will order again.',
+isPublic: true,
+}})
+// Vendor rates the customer:
+await prisma.review.create({ data: {
+type: 'VENDOR_CUSTOMER',
+orderId: deliveredOrder.id,
+reviewerId: vendor1User.id,
+subjectId: customerProfile.id,
+rating: 5,
+tags: ['Paid on time','Legitimate bulk buyer'],
+isPublic: false,
+}})
+// Update computed ratings:
+await prisma.vendorProfile.update({ where: { id: v1.id }, data: { avgRating: 4.8, reviewCount: 1 } })
+await prisma.customerProfile.update({ where: { id: cp.id }, data: { avgRating: 5.0, reviewCount: 1 } })
+─── Demo Token Payment Order ─────────────────────────────────────────
+// Create an order in TOKEN_PAID status for demo:
+const tokenOrder = await prisma.order.create({ data: {
+orderNumber: "RFX-ORD-2025-000004",
+customerId: customerProfile.id,
+addressId: customerAddress.id,
+status: 'TOKEN_PAID',
+subtotal: 400000, gstAmount: 72000, totalAmount: 472000,
+tokenAmount: 9440,    // 2% of 472000
+tokenPercentage: 2,
+tokenPaidAt: new Date(),
+balanceDueAt: addHours(new Date(), 36), // 12h remaining in demo
+items: { create: [{ listingId: refurbAListing.id, quantity: 10, unitPrice: 40000, subtotal: 400000 }] }
+}})
+Post-Addendum: Pre-Phase 7 Checklist
+Before proceeding to Phase 7 (Polish & SEO), verify all 4 features work end-to-end:
+Feature
+Test Scenario
+Expected Result
+6A Grading
+Vendor lists a Refurb B laptop
+Grade B badge appears on listing, condition filters work
+6A Grading
+Admin reviews a Grade C listing
+Listing is inactive until admin approves
+6A Grading
+Customer filters by Refurb A+
+Only A+ listings shown in product grid
+6B Reviews
+Customer completes order and submits review
+Review appears on product page as "Verified B2B Buyer"
+6B Reviews
+Vendor opens a bid and sees customer trust score
+Gold/Silver/New badge displayed, no customer name leaked
+6C Token Pay
+Customer bids with 2% token option
+After vendor approval, Razorpay shows token amount only
+6C Token Pay
+Token paid, balance NOT paid by deadline
+Cron marks TOKEN_FORFEITED, stock released, customer notified
+6C Token Pay
+Balance paid on time
+Order moves to ORDER_PLACED, vendor notified, dispatch proceeds
+6D Pay Prefs
+Vendor sets minimum token 4%
+2% and 3% options are greyed out in bid modal for this product
+6D Pay Prefs
+Product detail page loads
+Payment method chips displayed (no vendor name)
+RENTFOXXY  ·  PRD Addendum v1.1 + Cursor Prompts  ·  Confidential

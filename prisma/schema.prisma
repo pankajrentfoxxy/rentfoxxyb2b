@@ -1,0 +1,452 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  CUSTOMER
+  VENDOR
+  ADMIN
+}
+
+enum BidStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  COUNTER_OFFERED
+  EXPIRED
+  PAID
+  CANCELLED
+}
+
+enum OrderStatus {
+  PAYMENT_PENDING
+  ORDER_PLACED
+  ORDER_CONFIRMED
+  PACKED
+  DISPATCHED
+  OUT_FOR_DELIVERY
+  DELIVERED
+  DELIVERY_CONFIRMED
+  PAYOUT_PENDING
+  PAYOUT_RELEASED
+  RETURN_REQUESTED
+  REFUNDED
+  CANCELLED
+  TOKEN_PAID
+  STOCK_RESERVED
+  BALANCE_OVERDUE
+  BALANCE_PAID
+  TOKEN_FORFEITED
+}
+
+enum ReviewType {
+  CUSTOMER_EXPERIENCE
+  VENDOR_CUSTOMER
+}
+
+enum PayoutStatus {
+  PENDING
+  PROCESSING
+  RELEASED
+  FAILED
+}
+
+enum InvoiceType {
+  PROFORMA
+  TAX
+  CREDIT_NOTE
+}
+
+enum VendorStatus {
+  PENDING_APPROVAL
+  ACTIVE
+  SUSPENDED
+}
+
+enum ProductCondition {
+  BRAND_NEW
+  REFURB_A_PLUS
+  REFURB_A
+  REFURB_B
+  REFURB_C
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model User {
+  id               String           @id @default(cuid())
+  name             String?
+  email            String           @unique
+  emailVerified    DateTime?
+  image            String?
+  accounts         Account[]
+  sessions         Session[]
+  phone            String?          @unique
+  passwordHash     String
+  role             Role             @default(CUSTOMER)
+  isVerified       Boolean          @default(false)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  vendorProfile    VendorProfile?
+  customerProfile  CustomerProfile?
+  addresses        Address[]
+  notifications    Notification[]
+  supportTickets   SupportTicket[]
+  reviewsWritten   Review[]         @relation("ReviewsWritten")
+}
+
+model VendorProfile {
+  id                       String           @id @default(cuid())
+  userId                   String           @unique
+  user                     User             @relation(fields: [userId], references: [id])
+  companyName              String
+  gstin                    String           @unique
+  pan                      String
+  bankAccount              String
+  ifscCode                 String
+  accountName              String
+  commissionRate           Float            @default(8.0)
+  status                   VendorStatus     @default(PENDING_APPROVAL)
+  approvedAt               DateTime?
+  avgRating                Float            @default(0)
+  reviewCount              Int              @default(0)
+  acceptedPaymentMethods   String[]         @default(["UPI", "NET_BANKING", "CARD", "RAZORPAY_LINK", "TOKEN_PAYMENT"])
+  requiresFullAdvance      Boolean          @default(false)
+  minOrderForRTGS          Float?
+  minTokenPercentage       Int              @default(2)
+  acceptsTokenPayment      Boolean          @default(true)
+  listings                 ProductListing[]
+  payouts                  Payout[]
+}
+
+model CustomerProfile {
+  id          String  @id @default(cuid())
+  userId      String  @unique
+  user        User    @relation(fields: [userId], references: [id])
+  companyName String?
+  gstin       String?
+  gstVerified Boolean @default(false)
+  avgRating   Float   @default(0)
+  reviewCount Int     @default(0)
+  bids        Bid[]
+  orders      Order[]
+  cart        Cart?
+}
+
+model Cart {
+  id          String          @id @default(cuid())
+  customerId  String          @unique
+  customer    CustomerProfile @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  items       Json            @default("[]")
+  updatedAt   DateTime        @updatedAt
+}
+
+model PendingRegistration {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  otpHash   String
+  expiresAt DateTime
+  passwordHash     String
+  role             Role
+  name             String?
+  phone            String?
+  companyName      String?
+  gstin            String?
+  pan              String?
+  bankAccount      String?
+  ifscCode         String?
+  accountName      String?
+  createdAt        DateTime @default(now())
+}
+
+model Address {
+  id        String  @id @default(cuid())
+  userId    String
+  user      User    @relation(fields: [userId], references: [id])
+  label     String
+  line1     String
+  line2     String?
+  city      String
+  state     String
+  pincode   String
+  isDefault Boolean @default(false)
+  orders    Order[]
+}
+
+model Category {
+  id       String    @id @default(cuid())
+  name     String
+  slug     String    @unique
+  icon     String?
+  products Product[]
+}
+
+model Product {
+  id          String           @id @default(cuid())
+  name        String
+  slug        String           @unique
+  description String           @db.Text
+  categoryId  String
+  category    Category         @relation(fields: [categoryId], references: [id])
+  brand       String
+  specs       Json
+  images      String[]
+  isFeatured  Boolean          @default(false)
+  isActive    Boolean          @default(true)
+  hsnCode     String           @default("8471")
+  createdAt   DateTime         @default(now())
+  listings    ProductListing[]
+}
+
+model ProductListing {
+  id                    String            @id @default(cuid())
+  productId             String
+  product               Product           @relation(fields: [productId], references: [id])
+  vendorId              String
+  vendor                VendorProfile     @relation(fields: [vendorId], references: [id])
+  sku                   String            @unique
+  unitPrice             Float
+  bulkPricing           Json?
+  stockQty              Int               @default(0)
+  minOrderQty           Int               @default(1)
+  minBidPrice           Float
+  isActive              Boolean           @default(true)
+  condition             ProductCondition  @default(BRAND_NEW)
+  batteryHealth         Int?
+  conditionNotes        String?
+  warrantyMonths        Int               @default(0)
+  warrantyType          String?
+  refurbImages          String[]          @default([])
+  requiresAdminApproval Boolean           @default(false)
+  bids                  Bid[]
+  orderItems            OrderItem[]
+}
+
+model Bid {
+  id                String          @id @default(cuid())
+  customerId        String
+  customer          CustomerProfile @relation(fields: [customerId], references: [id])
+  listingId         String
+  listing           ProductListing  @relation(fields: [listingId], references: [id])
+  quantity          Int
+  bidPricePerUnit   Float
+  totalBidAmount    Float
+  status            BidStatus       @default(PENDING)
+  vendorNote        String?
+  counterPrice      Float?
+  expiresAt         DateTime?
+  paymentOption     String          @default("FULL")
+  order             Order?
+  proformaInvoice   Invoice?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+}
+
+model Order {
+  id          String      @id @default(cuid())
+  orderNumber String      @unique
+  customerId  String
+  customer    CustomerProfile @relation(fields: [customerId], references: [id])
+  bidId       String?     @unique
+  bid         Bid?        @relation(fields: [bidId], references: [id])
+  addressId   String
+  address     Address     @relation(fields: [addressId], references: [id])
+  items       OrderItem[]
+  subtotal    Float
+  gstAmount   Float
+  totalAmount Float
+  status      OrderStatus @default(PAYMENT_PENDING)
+  adminNotes  String?     @db.Text
+  tokenAmount        Float?
+  tokenPercentage    Float?
+  tokenPaidAt        DateTime?
+  balanceDueAt       DateTime?
+  balancePaidAt      DateTime?
+  tokenForfeitedAt   DateTime?
+  isTokenForfeited   Boolean     @default(false)
+  balanceReminder12hSent Boolean @default(false)
+  balanceReminder2hSent  Boolean @default(false)
+  payments    Payment[]
+  reviews     Review[]
+  invoices    Invoice[]
+  shipment    Shipment?
+  payouts     Payout[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model OrderItem {
+  id        String         @id @default(cuid())
+  orderId   String
+  order     Order          @relation(fields: [orderId], references: [id])
+  listingId String
+  listing   ProductListing @relation(fields: [listingId], references: [id])
+  quantity  Int
+  unitPrice Float
+  subtotal  Float
+}
+
+model Payment {
+  id                String    @id @default(cuid())
+  orderId           String
+  order             Order     @relation(fields: [orderId], references: [id])
+  razorpayOrderId   String
+  razorpayPaymentId String?
+  amount            Float
+  currency          String    @default("INR")
+  status            String    @default("pending")
+  method            String?
+  paidAt            DateTime?
+  paymentPurpose    String    @default("FULL")
+
+  @@index([orderId])
+}
+
+model Invoice {
+  id                     String      @id @default(cuid())
+  orderId                String?
+  order                  Order?      @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  bidId                  String?     @unique
+  bid                    Bid?        @relation(fields: [bidId], references: [id], onDelete: SetNull)
+  referencesTaxInvoiceId String?
+  invoiceNumber          String      @unique
+  type                   InvoiceType @default(TAX)
+  fileUrl                String?     @db.Text
+  issuedAt               DateTime    @default(now())
+
+  @@unique([orderId, type])
+  @@index([orderId])
+}
+
+model Shipment {
+  id           String    @id @default(cuid())
+  orderId      String    @unique
+  order        Order     @relation(fields: [orderId], references: [id])
+  carrier      String
+  awbNumber    String
+  trackingUrl  String?
+  status       String    @default("dispatched")
+  dispatchedAt DateTime  @default(now())
+  deliveredAt  DateTime?
+  events       Json      @default("[]")
+}
+
+model Payout {
+  id               String       @id @default(cuid())
+  vendorId         String
+  vendor           VendorProfile @relation(fields: [vendorId], references: [id])
+  orderId          String
+  order            Order        @relation(fields: [orderId], references: [id])
+  grossAmount      Float
+  commissionRate   Float
+  commissionAmount Float
+  netAmount        Float
+  status           PayoutStatus @default(PENDING)
+  utrNumber        String?
+  releasedAt       DateTime?
+  createdAt        DateTime     @default(now())
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  type      String
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  link      String?
+  createdAt DateTime @default(now())
+}
+
+model SupportTicket {
+  id         String   @id @default(cuid())
+  raisedById String
+  raisedBy   User     @relation(fields: [raisedById], references: [id])
+  orderId    String?
+  subject    String
+  status     String   @default("open")
+  messages   Json     @default("[]")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model PlatformSettings {
+  id                  String @id @default("singleton")
+  companyName         String @default("Rentfoxxy Technology Pvt. Ltd.")
+  companyPhone        String @default("")
+  companyEmail        String @default("")
+  gstin               String @default("")
+  pan                 String @default("")
+  address             String @default("")
+  companyState        String @default("Karnataka")
+  defaultCommission   Float  @default(8.0)
+  razorpayKeyId       String @default("")
+  razorpayKeySecret   String @default("")
+  invoicePrefix       String @default("RFX-INV")
+  proformaPrefix      String @default("RFX-PRO")
+  creditNotePrefix    String @default("RFX-CN")
+  orderPrefix         String @default("RFX-ORD")
+  webhookPublicUrl    String @default("")
+  invoiceCounterYear  Int    @default(0)
+  invoiceCounterValue Int    @default(0)
+  tokenForfeitVendorShare Float @default(30.0)
+}
+
+model Review {
+  id           String     @id @default(cuid())
+  type         ReviewType
+  orderId      String
+  order        Order      @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  reviewerId   String
+  reviewer     User       @relation("ReviewsWritten", fields: [reviewerId], references: [id])
+  subjectId    String
+  rating       Int
+  comment      String?    @db.Text
+  tags         String[]   @default([])
+  isPublic     Boolean    @default(true)
+  isVerified   Boolean    @default(true)
+  adminFlagged Boolean    @default(false)
+  createdAt    DateTime   @default(now())
+
+  @@unique([orderId, reviewerId, type])
+  @@index([subjectId, type])
+}
