@@ -4,13 +4,20 @@ import { getToken } from "next-auth/jwt";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
+/** Must match Auth.js cookie names: `__Secure-authjs.session-token` on HTTPS, plain prefix on HTTP (local dev). */
+function authUsesSecureCookies(req: NextRequest): boolean {
+  const forwarded = req.headers.get("x-forwarded-proto");
+  return forwarded === "https" || req.nextUrl.protocol === "https:";
+}
+
 export async function middleware(req: NextRequest) {
   const supabaseRes = await updateSupabaseSession(req);
   const path = req.nextUrl.pathname;
   const secret = process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET;
   if (!secret) return supabaseRes;
 
-  const token = await getToken({ req, secret });
+  const secureCookie = authUsesSecureCookies(req);
+  const token = await getToken({ req, secret, secureCookie });
 
   const redirectSignin = () => {
     const url = new URL("/auth/login", req.nextUrl.origin);
