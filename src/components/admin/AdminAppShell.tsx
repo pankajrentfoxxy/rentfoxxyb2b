@@ -16,6 +16,10 @@ import {
   FileText,
   LineChart,
   Settings,
+  Warehouse,
+  RefreshCw,
+  ShieldCheck,
+  UserCog,
   X,
 } from "lucide-react";
 import Link from "next/link";
@@ -32,6 +36,10 @@ const nav = [
   { href: "/admin/payouts", label: "Payouts", icon: IndianRupee },
   { href: "/admin/invoices", label: "Invoices", icon: FileText },
   { href: "/admin/reports", label: "Reports", icon: LineChart },
+  { href: "/admin/lots", label: "Lot sales", icon: Warehouse },
+  { href: "/admin/asas", label: "AsAs", icon: RefreshCw },
+  { href: "/admin/verifications", label: "Verifications", icon: ShieldCheck },
+  { href: "/admin/inspectors", label: "Inspectors", icon: UserCog },
   { href: "/admin/settings", label: "Settings", icon: Settings },
 ];
 
@@ -46,6 +54,7 @@ export function AdminAppShell({
 }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+  const links = role === "INSPECTION_MANAGER" ? nav.filter((i) => i.href.startsWith("/admin/verifications")) : nav;
 
   const linkCls = (href: string) =>
     cn(
@@ -80,7 +89,7 @@ export function AdminAppShell({
           </button>
         </div>
         <nav className="space-y-1 p-3">
-          {nav.map((item) => (
+          {links.map((item) => (
             <Link key={item.href} href={item.href} className={linkCls(item.href)} onClick={() => setOpen(false)}>
               <item.icon className="h-4 w-4 shrink-0" />
               {item.label}

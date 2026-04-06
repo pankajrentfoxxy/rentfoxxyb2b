@@ -11,6 +11,8 @@ export async function sendEmail(input: {
   subject: string;
   react: React.ReactElement;
   attachments?: EmailAttachment[];
+  /** When true, failures propagate (e.g. registration OTP). Default: fire-and-forget. */
+  throwOnError?: boolean;
 }) {
   if (!process.env.RESEND_API_KEY || !input.to) return;
   try {
@@ -23,8 +25,9 @@ export async function sendEmail(input: {
       html,
       attachments: input.attachments,
     });
-  } catch {
-    /* optional channel */
+  } catch (err) {
+    console.error("[sendEmail] failed:", input.to, err);
+    if (input.throwOnError) throw err;
   }
 }
 

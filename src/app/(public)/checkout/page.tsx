@@ -1,5 +1,6 @@
 "use client";
 
+import { RazorpayTestBanner } from "@/components/checkout/RazorpayTestBanner";
 import { gstBreakdown } from "@/lib/gst";
 import { useCartStore } from "@/store/cart-store";
 import type { Address } from "@prisma/client";
@@ -341,6 +342,7 @@ export default function CheckoutPage() {
 
         {step === 3 && (
           <div className="mt-8 space-y-4">
+            <RazorpayTestBanner />
             <p className="text-slate-800">
               Pay <strong>₹{gst.total.toLocaleString("en-IN")}</strong> with Razorpay Checkout (test or live keys from
               your dashboard).

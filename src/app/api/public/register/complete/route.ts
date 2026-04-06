@@ -1,5 +1,5 @@
+import { verifyOTP } from "@/lib/otp";
 import { prisma } from "@/lib/prisma";
-import bcrypt from "bcryptjs";
 import { NextRequest, NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
@@ -17,9 +17,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid or expired code" }, { status: 400 });
   }
 
-  const valid = await bcrypt.compare(otp, pending.otpHash);
+  const valid = await verifyOTP(email, otp);
   if (!valid) {
-    return NextResponse.json({ error: "Invalid code" }, { status: 400 });
+    return NextResponse.json({ error: "Invalid code or too many attempts" }, { status: 400 });
   }
 
   if (pending.role === "ADMIN") {

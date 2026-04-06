@@ -1,5 +1,6 @@
 "use client";
 
+import { RazorpayTestBanner } from "@/components/checkout/RazorpayTestBanner";
 import { getPaymentOptionConfig, parsePaymentOption } from "@/constants/payment-options";
 import { gstBreakdown } from "@/lib/gst";
 import { useRouter } from "next/navigation";
@@ -125,6 +126,7 @@ export function BidPaymentClient({
   return (
     <>
       <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
+      <RazorpayTestBanner />
       <div className="rounded-xl border border-slate-200 bg-surface p-4">
         <label className="block text-sm font-medium text-slate-800">Ship to</label>
         <select

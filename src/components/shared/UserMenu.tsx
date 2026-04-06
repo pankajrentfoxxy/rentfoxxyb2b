@@ -24,7 +24,11 @@ export function UserMenu({
       ? "/customer/dashboard"
       : role === "VENDOR"
         ? "/vendor/dashboard"
-        : "/admin/dashboard";
+        : role === "INSPECTOR"
+          ? "/inspector/dashboard"
+          : role === "INSPECTION_MANAGER"
+            ? "/admin/verifications"
+            : "/admin/dashboard";
 
   return (
     <DropdownMenu>

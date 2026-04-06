@@ -39,20 +39,44 @@ export default async function CustomerBidsPage({
   const tab = (searchParams.tab ?? "all") as Tab;
   const statusIn = tabFilter(tab);
 
-  const bids = await prisma.bid.findMany({
-    where: {
-      customerId: profile.id,
-      ...(statusIn ? { status: { in: statusIn } } : {}),
-    },
-    orderBy: { createdAt: "desc" },
-    include: {
-      listing: {
-        include: {
-          product: { select: { name: true, slug: true, images: true } },
+  const [bids, lotBids, asAsBids] = await Promise.all([
+    prisma.bid.findMany({
+      where: {
+        customerId: profile.id,
+        ...(statusIn ? { status: { in: statusIn } } : {}),
+      },
+      orderBy: { createdAt: "desc" },
+      include: {
+        listing: {
+          include: {
+            product: { select: { name: true, slug: true, images: true } },
+          },
         },
       },
-    },
-  });
+    }),
+    prisma.lotBid.findMany({
+      where: {
+        customerId: profile.id,
+        ...(statusIn ? { status: { in: statusIn } } : {}),
+      },
+      orderBy: { createdAt: "desc" },
+      include: { lot: { select: { id: true, title: true, pricePerLot: true } } },
+    }),
+    prisma.asAsBid.findMany({
+      where: {
+        customerId: profile.id,
+        ...(statusIn ? { status: { in: statusIn } } : {}),
+      },
+      orderBy: { createdAt: "desc" },
+      include: { asas: { select: { id: true, title: true, avgUnitPrice: true } } },
+    }),
+  ]);
+
+  const unified = [
+    ...bids.map((b) => ({ kind: "product" as const, createdAt: b.createdAt, data: b })),
+    ...lotBids.map((b) => ({ kind: "lot" as const, createdAt: b.createdAt, data: b })),
+    ...asAsBids.map((b) => ({ kind: "asas" as const, createdAt: b.createdAt, data: b })),
+  ].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 
   const tabs: { id: Tab; label: string }[] = [
     { id: "all", label: "All" },
@@ -68,7 +92,9 @@ export default async function CustomerBidsPage({
     <div className="mx-auto max-w-6xl space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-slate-900">Bids</h1>
-        <p className="mt-1 text-sm text-muted">Track requests and complete payment when approved.</p>
+        <p className="mt-1 text-sm text-muted">
+          Product bids, lot negotiations, and AsAs offers — pay when approved.
+        </p>
       </div>
 
       <div className="flex flex-wrap gap-2 border-b border-slate-200 pb-2">
@@ -86,44 +112,153 @@ export default async function CustomerBidsPage({
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {bids.length === 0 ? (
+        {unified.length === 0 ? (
           <p className="col-span-full py-12 text-center text-sm text-muted">No bids in this view.</p>
         ) : (
-          bids.map((b) => {
-            const raw = b.listing.product.images[0];
-            const img = raw ? normalizePublicImagePath(raw) : placeholder;
-            const listMu = b.listing.unitPrice;
-            const saving = Math.max(0, listMu - b.bidPricePerUnit);
-            const highlight =
-              b.status === "APPROVED" && (!b.expiresAt || b.expiresAt > now);
+          unified.map((row) => {
+            if (row.kind === "product") {
+              const b = row.data;
+              const raw = b.listing.product.images[0];
+              const img = raw ? normalizePublicImagePath(raw) : placeholder;
+              const listMu = b.listing.unitPrice;
+              const saving = Math.max(0, listMu - b.bidPricePerUnit);
+              const highlight =
+                b.status === "APPROVED" && (!b.expiresAt || b.expiresAt > now);
+              return (
+                <div
+                  key={`p-${b.id}`}
+                  className={`flex flex-col overflow-hidden rounded-xl border bg-white shadow-sm ${
+                    highlight ? "border-amber-400 ring-2 ring-amber-200" : "border-slate-200"
+                  }`}
+                >
+                  <div className="relative aspect-video w-full bg-slate-100">
+                    <Image
+                      src={img}
+                      alt=""
+                      fill
+                      className="object-cover"
+                      unoptimized={img.startsWith("data:")}
+                    />
+                  </div>
+                  <div className="flex flex-1 flex-col p-4">
+                    <span className="mb-1 w-fit rounded bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-700">
+                      Product
+                    </span>
+                    <h2 className="font-semibold text-slate-900">{b.listing.product.name}</h2>
+                    <p className="mt-1 text-sm text-muted">Qty {b.quantity}</p>
+                    <p className="mt-2 text-sm">
+                      Your bid:{" "}
+                      <strong>₹{b.bidPricePerUnit.toLocaleString("en-IN")}</strong>/unit · Total ₹
+                      {b.totalBidAmount.toLocaleString("en-IN")}
+                    </p>
+                    <p className="text-xs text-muted">
+                      Reference list ₹{listMu.toLocaleString("en-IN")}/unit
+                      {saving > 0 ? (
+                        <span className="text-emerald-700"> · Save ~₹{saving.toLocaleString("en-IN")}/unit</span>
+                      ) : null}
+                    </p>
+                    <p className="mt-2">
+                      <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium capitalize">
+                        {b.status.toLowerCase().replace(/_/g, " ")}
+                      </span>
+                    </p>
+                    {b.status === "APPROVED" && b.expiresAt && b.expiresAt > now ? (
+                      <p className="mt-2 text-xs text-orange-800">
+                        Pay within <BidCountdown expiresAt={b.expiresAt.toISOString()} />
+                      </p>
+                    ) : null}
+                    <Link
+                      href={`/customer/bids/${b.id}`}
+                      className={`mt-4 inline-flex justify-center rounded-lg py-2 text-center text-sm font-semibold text-white ${
+                        highlight ? "bg-amber-600 hover:bg-amber-700" : "bg-primary hover:bg-primary-light"
+                      }`}
+                    >
+                      {highlight ? "Proceed to payment" : "View details"}
+                    </Link>
+                  </div>
+                </div>
+              );
+            }
+            if (row.kind === "lot") {
+              const b = row.data;
+              const listPl = b.lot.pricePerLot;
+              const saving = Math.max(0, listPl - b.bidPricePerLot);
+              const highlight = b.status === "APPROVED";
+              return (
+                <div
+                  key={`l-${b.id}`}
+                  className={`flex flex-col overflow-hidden rounded-xl border bg-white shadow-sm ${
+                    highlight ? "border-amber-400 ring-2 ring-amber-200" : "border-slate-200"
+                  }`}
+                >
+                  <div className="flex aspect-video w-full items-center justify-center bg-gradient-to-br from-primary/20 to-accent/20">
+                    <span className="rounded-full bg-white/90 px-4 py-2 text-sm font-bold text-primary">
+                      Lot negotiation
+                    </span>
+                  </div>
+                  <div className="flex flex-1 flex-col p-4">
+                    <span className="mb-1 w-fit rounded bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-900">
+                      Lot
+                    </span>
+                    <h2 className="font-semibold text-slate-900">{b.lot.title}</h2>
+                    <p className="mt-1 text-sm text-muted">{b.lotsCount} lot(s)</p>
+                    <p className="mt-2 text-sm">
+                      Your offer:{" "}
+                      <strong>₹{b.bidPricePerLot.toLocaleString("en-IN")}</strong>/lot · Total ₹
+                      {b.totalBidAmount.toLocaleString("en-IN")}
+                    </p>
+                    <p className="text-xs text-muted">
+                      Reference ₹{listPl.toLocaleString("en-IN")}/lot
+                      {saving > 0 ? (
+                        <span className="text-emerald-700"> · Below list ~₹{saving.toLocaleString("en-IN")}/lot</span>
+                      ) : null}
+                    </p>
+                    <p className="mt-2">
+                      <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium capitalize">
+                        {b.status.toLowerCase().replace(/_/g, " ")}
+                      </span>
+                    </p>
+                    <Link
+                      href={`/sales/lots/${b.lot.id}`}
+                      className="mt-4 inline-flex justify-center rounded-lg bg-primary py-2 text-center text-sm font-semibold text-white hover:bg-primary-light"
+                    >
+                      View lot
+                    </Link>
+                  </div>
+                </div>
+              );
+            }
+            const b = row.data;
+            const listU = b.asas.avgUnitPrice;
+            const saving = Math.max(0, listU - b.bidPricePerUnit);
+            const highlight = b.status === "APPROVED";
             return (
               <div
-                key={b.id}
+                key={`a-${b.id}`}
                 className={`flex flex-col overflow-hidden rounded-xl border bg-white shadow-sm ${
                   highlight ? "border-amber-400 ring-2 ring-amber-200" : "border-slate-200"
                 }`}
               >
-                <div className="relative aspect-video w-full bg-slate-100">
-                  <Image
-                    src={img}
-                    alt=""
-                    fill
-                    className="object-cover"
-                    unoptimized={img.startsWith("data:")}
-                  />
+                <div className="flex aspect-video w-full items-center justify-center bg-gradient-to-br from-purple-200 to-indigo-200">
+                  <span className="rounded-full bg-white/90 px-4 py-2 text-sm font-bold text-purple-800">
+                    AsAs offer
+                  </span>
                 </div>
                 <div className="flex flex-1 flex-col p-4">
-                  <h2 className="font-semibold text-slate-900">{b.listing.product.name}</h2>
-                  <p className="mt-1 text-sm text-muted">Qty {b.quantity}</p>
+                  <span className="mb-1 w-fit rounded bg-purple-100 px-2 py-0.5 text-xs font-medium text-purple-900">
+                    AsAs
+                  </span>
+                  <h2 className="font-semibold text-slate-900">{b.asas.title}</h2>
+                  <p className="mt-1 text-sm text-muted">{b.quantity} units</p>
                   <p className="mt-2 text-sm">
-                    Your bid:{" "}
+                    Your offer:{" "}
                     <strong>₹{b.bidPricePerUnit.toLocaleString("en-IN")}</strong>/unit · Total ₹
                     {b.totalBidAmount.toLocaleString("en-IN")}
                   </p>
                   <p className="text-xs text-muted">
-                    Reference list ₹{listMu.toLocaleString("en-IN")}/unit
+                    Reference ~₹{listU.toLocaleString("en-IN")}/unit
                     {saving > 0 ? (
-                      <span className="text-emerald-700"> · Save ~₹{saving.toLocaleString("en-IN")}/unit</span>
+                      <span className="text-emerald-700"> · Below ref ~₹{saving.toLocaleString("en-IN")}/unit</span>
                     ) : null}
                   </p>
                   <p className="mt-2">
@@ -131,18 +266,11 @@ export default async function CustomerBidsPage({
                       {b.status.toLowerCase().replace(/_/g, " ")}
                     </span>
                   </p>
-                  {b.status === "APPROVED" && b.expiresAt && b.expiresAt > now ? (
-                    <p className="mt-2 text-xs text-orange-800">
-                      Pay within <BidCountdown expiresAt={b.expiresAt.toISOString()} />
-                    </p>
-                  ) : null}
                   <Link
-                    href={`/customer/bids/${b.id}`}
-                    className={`mt-4 inline-flex justify-center rounded-lg py-2 text-center text-sm font-semibold text-white ${
-                      highlight ? "bg-amber-600 hover:bg-amber-700" : "bg-primary hover:bg-primary-light"
-                    }`}
+                    href={`/asas/listings/${b.asas.id}`}
+                    className="mt-4 inline-flex justify-center rounded-lg bg-purple-600 py-2 text-center text-sm font-semibold text-white hover:bg-purple-700"
                   >
-                    {highlight ? "Proceed to payment" : "View details"}
+                    View listing
                   </Link>
                 </div>
               </div>

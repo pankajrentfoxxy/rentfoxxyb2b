@@ -1,10 +1,12 @@
 import { auth } from "@/lib/auth";
 import { getPaymentOptionConfig, parsePaymentOption, roundMoney } from "@/constants/payment-options";
 import { ensureTaxInvoiceForOrder } from "@/lib/invoice-generator";
+import { sendTokenPaymentConfirmationMail } from "@/lib/order-emails";
 import { notifyOrderPlaced } from "@/lib/orders-notify";
 import { createNotification, NOTIFICATION_TYPES } from "@/lib/notifications";
 import { allowInstantPaymentBypass, isRazorpayConfigured } from "@/lib/payment-env";
 import { prisma } from "@/lib/prisma";
+import { verifyAsAsPurchasePayment, verifyLotPurchasePayment } from "@/lib/verify-lot-asas-payment";
 import crypto from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -15,12 +17,51 @@ export async function POST(req: NextRequest) {
   }
 
   const body = (await req.json()) as {
-    orderId: string;
+    orderId?: string;
+    purchaseType?: "LOT" | "ASAS";
+    lotPurchaseId?: string;
+    asasPurchaseId?: string;
     razorpay_order_id?: string;
     razorpay_payment_id?: string;
     razorpay_signature?: string;
     devBypass?: boolean;
   };
+
+  if (body.purchaseType === "LOT" && body.lotPurchaseId) {
+    const r = await verifyLotPurchasePayment(body.lotPurchaseId, {
+      userId: session.user.id,
+      razorpay_order_id: body.razorpay_order_id,
+      razorpay_payment_id: body.razorpay_payment_id,
+      razorpay_signature: body.razorpay_signature,
+      devBypass: body.devBypass,
+    });
+    if ("error" in r && r.error) {
+      return NextResponse.json({ error: r.error }, { status: Number(r.httpStatus) || 400 });
+    }
+    const { httpStatus: _h, ...rest } = r;
+    void _h;
+    return NextResponse.json(rest);
+  }
+
+  if (body.purchaseType === "ASAS" && body.asasPurchaseId) {
+    const r = await verifyAsAsPurchasePayment(body.asasPurchaseId, {
+      userId: session.user.id,
+      razorpay_order_id: body.razorpay_order_id,
+      razorpay_payment_id: body.razorpay_payment_id,
+      razorpay_signature: body.razorpay_signature,
+      devBypass: body.devBypass,
+    });
+    if ("error" in r && r.error) {
+      return NextResponse.json({ error: r.error }, { status: Number(r.httpStatus) || 400 });
+    }
+    const { httpStatus: _h2, ...rest } = r;
+    void _h2;
+    return NextResponse.json(rest);
+  }
+
+  if (!body.orderId) {
+    return NextResponse.json({ error: "orderId or marketplace purchase required" }, { status: 400 });
+  }
 
   const order = await prisma.order.findFirst({
     where: {
@@ -239,6 +280,7 @@ export async function POST(req: NextRequest) {
         message: `Pay balance ₹${bal.toLocaleString("en-IN")} by ${(o.balanceDueAt ?? new Date()).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}.`,
         link: `/customer/orders/${o.id}`,
       });
+      void sendTokenPaymentConfirmationMail(o.id);
     }
   }
 

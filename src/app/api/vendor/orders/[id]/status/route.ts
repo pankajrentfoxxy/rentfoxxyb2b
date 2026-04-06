@@ -1,5 +1,7 @@
 import { getAppBaseUrl } from "@/lib/app-url";
+import { OrderDeliveredEmail } from "@/emails/OrderDeliveredEmail";
 import { OrderDispatched } from "@/emails/OrderDispatched";
+import { OrderPackedEmail } from "@/emails/OrderPackedEmail";
 import { sendEmail } from "@/lib/email";
 import { createNotification, NOTIFICATION_TYPES } from "@/lib/notifications";
 import { getVendorContext } from "@/lib/vendor-auth";
@@ -77,11 +79,12 @@ export async function PUT(req: NextRequest, route: { params: Promise<{ id: strin
     if (order.status !== "PACKED") {
       return NextResponse.json({ error: "Order must be packed first" }, { status: 400 });
     }
-    const carrier = body.carrier?.trim();
+    const carrierName = body.carrier?.trim();
     const awb = body.awbNumber?.trim();
-    if (!carrier || !awb) {
+    if (!carrierName || !awb) {
       return NextResponse.json({ error: "carrier and awbNumber required" }, { status: 400 });
     }
+    const carrier = carrierName;
     nextStatus = "DISPATCHED";
     await prisma.$transaction([
       prisma.shipment.upsert({
@@ -111,7 +114,7 @@ export async function PUT(req: NextRequest, route: { params: Promise<{ id: strin
         userId: full.customer.userId,
         type: NOTIFICATION_TYPES.ORDER_DISPATCHED,
         title: "Order dispatched",
-        message: `Logistics Partner — AWB ${awb}`,
+        message: `${carrierName} — AWB ${awb}`,
         link: `/customer/tracking/${orderId}`,
       });
       const em = full.customer.user.email;
@@ -124,7 +127,7 @@ export async function PUT(req: NextRequest, route: { params: Promise<{ id: strin
           react: React.createElement(OrderDispatched, {
             customerName: full.customer.user.name ?? em,
             orderNumber: full.orderNumber,
-            carrier: "Logistics Partner",
+            carrier: carrierName,
             awb,
             trackingUrl: body.trackingUrl?.trim() || full.shipment?.trackingUrl || null,
             estimatedDelivery: estDate,
@@ -168,11 +171,57 @@ export async function PUT(req: NextRequest, route: { params: Promise<{ id: strin
       });
     }
 
+    const deliveredFull = await prisma.order.findUnique({
+      where: { id: orderId },
+      include: { customer: { include: { user: true } } },
+    });
+    const dem = deliveredFull?.customer.user.email;
+    if (dem && deliveredFull) {
+      const base = getAppBaseUrl();
+      void sendEmail({
+        to: dem,
+        subject: `Delivered: ${deliveredFull.orderNumber}`,
+        react: React.createElement(OrderDeliveredEmail, {
+          customerName: deliveredFull.customer.user.name ?? dem,
+          orderNumber: deliveredFull.orderNumber,
+          orderUrl: `${base}/customer/orders/${orderId}`,
+        }),
+      });
+    }
+
     return NextResponse.json({ ok: true, status: nextStatus });
   }
 
   if (nextStatus) {
     await prisma.order.update({ where: { id: orderId }, data: { status: nextStatus } });
+    if (action === "mark_packed") {
+      const packed = await prisma.order.findUnique({
+        where: { id: orderId },
+        include: { customer: { include: { user: true } } },
+      });
+      if (packed) {
+        await createNotification({
+          userId: packed.customer.userId,
+          type: NOTIFICATION_TYPES.ORDER_PACKED,
+          title: "Order packed",
+          message: `${packed.orderNumber} is packed and will ship soon.`,
+          link: `/customer/orders/${orderId}`,
+        });
+        const pem = packed.customer.user.email;
+        if (pem) {
+          const base = getAppBaseUrl();
+          void sendEmail({
+            to: pem,
+            subject: `Packed: ${packed.orderNumber}`,
+            react: React.createElement(OrderPackedEmail, {
+              customerName: packed.customer.user.name ?? pem,
+              orderNumber: packed.orderNumber,
+              trackUrl: `${base}/customer/orders/${orderId}`,
+            }),
+          });
+        }
+      }
+    }
     return NextResponse.json({ ok: true, status: nextStatus });
   }
 

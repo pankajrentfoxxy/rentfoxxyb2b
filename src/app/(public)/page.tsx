@@ -1,9 +1,11 @@
+import { HomeAsAsDeals } from "@/components/storefront/HomeAsAsDeals";
 import { HowItWorks } from "@/components/storefront/HowItWorks";
 import { HomeCategories } from "@/components/storefront/HomeCategories";
 import { HomeCTA } from "@/components/storefront/HomeCTA";
 import { HomeFeatured } from "@/components/storefront/HomeFeatured";
 import { HomeFeatures } from "@/components/storefront/HomeFeatures";
 import { HomeHero } from "@/components/storefront/HomeHero";
+import { HomeLotSales } from "@/components/storefront/HomeLotSales";
 import { mapProductPublic, STOREFRONT_LISTING_WHERE } from "@/lib/public-api";
 import { prisma } from "@/lib/prisma";
 
@@ -88,6 +90,8 @@ export default async function HomePage() {
       ) : null}
       <HomeHero />
       <HomeCategories categories={categories} />
+      <HomeLotSales />
+      <HomeAsAsDeals />
       <HomeFeatured products={featured} />
       <HowItWorks />
       <HomeFeatures />

@@ -36,6 +36,20 @@ export async function updateSupabaseSession(request: NextRequest): Promise<NextR
     },
   });
 
-  await supabase.auth.getUser();
+  // Avoid hanging the whole app if Supabase URL/key are wrong or the network stalls.
+  const supabaseTimeoutMs = Math.min(
+    15000,
+    Math.max(2000, Number(process.env.SUPABASE_MIDDLEWARE_TIMEOUT_MS) || 5000),
+  );
+  try {
+    await Promise.race([
+      supabase.auth.getUser(),
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("supabase_middleware_timeout")), supabaseTimeoutMs),
+      ),
+    ]);
+  } catch {
+    /* continue without refreshing Supabase session */
+  }
   return supabaseResponse;
 }

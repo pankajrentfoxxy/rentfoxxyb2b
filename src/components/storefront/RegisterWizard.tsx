@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import type { Role } from "@prisma/client";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type Tab = Extract<Role, "CUSTOMER" | "VENDOR">;
 
@@ -17,7 +17,9 @@ export function RegisterWizard({ className }: { className?: string }) {
   const [step, setStep] = useState<1 | 2>(1);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [otp, setOtp] = useState("");
+  const [otpDigits, setOtpDigits] = useState(["", "", "", "", "", ""]);
+  const otpInputsRef = useRef<(HTMLInputElement | null)[]>([]);
+  const [resendIn, setResendIn] = useState(0);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [companyName, setCompanyName] = useState("");
@@ -35,8 +37,13 @@ export function RegisterWizard({ className }: { className?: string }) {
     if (intent === "buyer") setTab("CUSTOMER");
   }, [intent]);
 
-  async function submitRequest(e: React.FormEvent) {
-    e.preventDefault();
+  useEffect(() => {
+    if (resendIn <= 0) return;
+    const t = setInterval(() => setResendIn((s) => (s <= 1 ? 0 : s - 1)), 1000);
+    return () => clearInterval(t);
+  }, [resendIn]);
+
+  async function sendOtpCode(advanceStep: boolean) {
     setError(null);
     setLoading(true);
     try {
@@ -69,14 +76,26 @@ export function RegisterWizard({ className }: { className?: string }) {
         return;
       }
       if (data.devOtp) setDevOtp(data.devOtp as string);
-      setStep(2);
+      setOtpDigits(["", "", "", "", "", ""]);
+      setResendIn(60);
+      if (advanceStep) setStep(2);
     } finally {
       setLoading(false);
     }
   }
 
+  async function submitRequest(e: React.FormEvent) {
+    e.preventDefault();
+    await sendOtpCode(true);
+  }
+
   async function submitComplete(e: React.FormEvent) {
     e.preventDefault();
+    const otp = otpDigits.join("");
+    if (otp.length !== 6) {
+      setError("Enter the complete 6-digit code");
+      return;
+    }
     setError(null);
     setLoading(true);
     try {
@@ -303,26 +322,52 @@ export function RegisterWizard({ className }: { className?: string }) {
       ) : (
         <form onSubmit={submitComplete} className="space-y-4">
           <p className="text-sm text-slate-700">
-            Enter the code we sent to <strong>{email}</strong>.
+            We sent a 6-digit code to <strong>{email}</strong>.
           </p>
           {devOtp ? (
             <p className="rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-900">
               Dev mode — your code: <strong>{devOtp}</strong>
             </p>
           ) : null}
-          <div>
-            <label htmlFor="reg-otp" className="block text-sm font-medium text-slate-700">
-              Verification code
-            </label>
-            <input
-              id="reg-otp"
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              required
-              value={otp}
-              onChange={(e) => setOtp(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none ring-accent/30 focus:ring-2"
-            />
+          <div className="flex justify-center gap-2">
+            {otpDigits.map((digit, i) => (
+              <input
+                key={i}
+                ref={(el) => {
+                  otpInputsRef.current[i] = el;
+                }}
+                inputMode="numeric"
+                autoComplete={i === 0 ? "one-time-code" : "off"}
+                maxLength={1}
+                value={digit}
+                aria-label={`Digit ${i + 1}`}
+                onChange={(e) => {
+                  const v = e.target.value.replace(/\D/g, "").slice(-1);
+                  setOtpDigits((prev) => {
+                    const next = [...prev];
+                    next[i] = v;
+                    return next;
+                  });
+                  if (v && i < 5) otpInputsRef.current[i + 1]?.focus();
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Backspace" && !otpDigits[i] && i > 0) {
+                    otpInputsRef.current[i - 1]?.focus();
+                  }
+                }}
+                onPaste={(e) => {
+                  const t = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
+                  if (t.length) {
+                    e.preventDefault();
+                    const next = [...otpDigits];
+                    for (let j = 0; j < 6; j++) next[j] = t[j] ?? "";
+                    setOtpDigits(next);
+                    otpInputsRef.current[Math.min(t.length, 5)]?.focus();
+                  }
+                }}
+                className="h-12 w-10 rounded-lg border border-slate-200 text-center text-lg font-semibold outline-none ring-accent/30 focus:ring-2"
+              />
+            ))}
           </div>
           {error ? (
             <p className="text-sm text-danger" role="alert">
@@ -338,10 +383,18 @@ export function RegisterWizard({ className }: { className?: string }) {
           </button>
           <button
             type="button"
-            className="w-full text-sm font-medium text-accent hover:underline"
+            disabled={loading || resendIn > 0}
+            className="w-full text-sm font-medium text-accent hover:underline disabled:text-slate-400 disabled:no-underline"
+            onClick={() => void sendOtpCode(false)}
+          >
+            {resendIn > 0 ? `Resend code in ${resendIn}s` : "Resend OTP"}
+          </button>
+          <button
+            type="button"
+            className="w-full text-sm font-medium text-slate-600 hover:underline"
             onClick={() => {
               setStep(1);
-              setOtp("");
+              setOtpDigits(["", "", "", "", "", ""]);
               setError(null);
               setDevOtp(null);
             }}

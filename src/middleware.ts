@@ -47,7 +47,22 @@ export async function middleware(req: NextRequest) {
 
   if (path.startsWith("/admin")) {
     if (!token) return redirectSignin();
-    if (token.role !== "ADMIN") {
+    if (token.role === "INSPECTION_MANAGER") {
+      if (!path.startsWith("/admin/verifications")) {
+        const res = NextResponse.redirect(new URL("/admin/verifications", req.nextUrl.origin));
+        copyCookies(supabaseRes, res);
+        return res;
+      }
+    } else if (token.role !== "ADMIN") {
+      const res = NextResponse.redirect(new URL("/", req.nextUrl.origin));
+      copyCookies(supabaseRes, res);
+      return res;
+    }
+  }
+
+  if (path.startsWith("/inspector")) {
+    if (!token) return redirectSignin();
+    if (token.role !== "INSPECTOR") {
       const res = NextResponse.redirect(new URL("/", req.nextUrl.origin));
       copyCookies(supabaseRes, res);
       return res;

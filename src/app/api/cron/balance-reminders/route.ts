@@ -1,3 +1,7 @@
+import {
+  sendBalanceReminderMail,
+  sendTokenForfeitedMail,
+} from "@/lib/order-emails";
 import { createNotification, NOTIFICATION_TYPES } from "@/lib/notifications";
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
@@ -46,6 +50,18 @@ export async function GET(req: NextRequest) {
         message: `Pay ₹${balance.toLocaleString("en-IN")} for ${order.orderNumber} to keep your reservation.`,
         link: `/customer/orders/${order.id}`,
       });
+      const email = order.customer.user.email;
+      if (email) {
+        void sendBalanceReminderMail(
+          order.id,
+          "12h",
+          order.orderNumber,
+          email,
+          order.customer.user.name,
+          balance,
+          due,
+        );
+      }
       reminders12++;
     } else if (!order.balanceReminder2hSent && due <= in2h && due > now) {
       await prisma.order.update({
@@ -59,6 +75,18 @@ export async function GET(req: NextRequest) {
         message: `Complete ₹${balance.toLocaleString("en-IN")} for ${order.orderNumber} or your token may be forfeited.`,
         link: `/customer/orders/${order.id}`,
       });
+      const email2 = order.customer.user.email;
+      if (email2) {
+        void sendBalanceReminderMail(
+          order.id,
+          "2h",
+          order.orderNumber,
+          email2,
+          order.customer.user.name,
+          balance,
+          due,
+        );
+      }
       reminders2++;
     }
   }
@@ -114,6 +142,8 @@ export async function GET(req: NextRequest) {
         link: `/vendor/orders`,
       });
     }
+
+    void sendTokenForfeitedMail(order.id);
 
     forfeited++;
   }

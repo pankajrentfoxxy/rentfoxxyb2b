@@ -12,6 +12,9 @@ import {
   Package,
   IndianRupee,
   User,
+  Layers,
+  RefreshCw,
+  ClipboardList,
   X,
 } from "lucide-react";
 import Link from "next/link";
@@ -21,6 +24,9 @@ import { useState } from "react";
 const nav = [
   { href: "/vendor/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/vendor/products", label: "Products", icon: Package },
+  { href: "/vendor/lots", label: "Lot sales", icon: Layers },
+  { href: "/vendor/asas/new", label: "New AsAs", icon: RefreshCw },
+  { href: "/vendor/listings/verifications", label: "Verifications", icon: ClipboardList },
   { href: "/vendor/bids", label: "Bids", icon: Gavel },
   { href: "/vendor/orders", label: "Orders", icon: Package },
   { href: "/vendor/payouts", label: "Payouts", icon: IndianRupee },

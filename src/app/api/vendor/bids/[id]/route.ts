@@ -1,10 +1,9 @@
 import { getAppBaseUrl } from "@/lib/app-url";
-import { BidApproved } from "@/emails/BidApproved";
 import { BidCounterOffer } from "@/emails/BidCounterOffer";
 import { BidRejected } from "@/emails/BidRejected";
 import { createProformaInvoiceForBid } from "@/lib/invoice-generator";
 import { sendEmail } from "@/lib/email";
-import { gstBreakdown } from "@/lib/gst";
+import { notifyBidApproved } from "@/lib/notify";
 import { NOTIFICATION_TYPES } from "@/lib/notifications";
 import { parsePaymentOption } from "@/constants/payment-options";
 import { getVendorContext } from "@/lib/vendor-auth";
@@ -57,51 +56,29 @@ export async function PUT(req: NextRequest, ctx: { params: Promise<{ id: string 
     const hours = Math.min(168, Math.max(1, Math.floor(Number(hoursRaw) || 48)));
     const expiresAt = new Date(Date.now() + hours * 3600 * 1000);
 
-    await prisma.$transaction([
-      prisma.bid.update({
-        where: { id },
-        data: {
-          status: "APPROVED",
-          expiresAt,
-          counterPrice: null,
-        },
-      }),
-      prisma.notification.create({
-        data: {
-          userId: bid.customer.userId,
-          type: NOTIFICATION_TYPES.BID_APPROVED,
-          title: "Bid approved",
-          message: `Your bid was approved. Pay within ${hours}h to secure stock.`,
-          link: `/customer/bids/${id}`,
-        },
-      }),
-    ]);
+    await prisma.bid.update({
+      where: { id },
+      data: {
+        status: "APPROVED",
+        expiresAt,
+        counterPrice: null,
+      },
+    });
 
     void createProformaInvoiceForBid(id).catch(() => undefined);
 
-    const email = bid.customer.user.email;
-    if (email) {
-      const base = getAppBaseUrl();
-      const gst = gstBreakdown(bid.totalBidAmount);
-      const sym = "₹";
-      const savePerUnit = bid.listing.unitPrice - bid.bidPricePerUnit;
-      const savingsPerUnit =
-        savePerUnit > 0.01 ? `${sym}${savePerUnit.toLocaleString("en-IN", { maximumFractionDigits: 2 })}` : null;
-      void sendEmail({
-        to: email,
-        subject: "Your price request was approved",
-        react: React.createElement(BidApproved, {
-          customerName: bid.customer.user.name ?? email,
-          productName: bid.listing.product.name,
-          quantity: bid.quantity,
-          approvedPricePerUnit: `${sym}${bid.bidPricePerUnit.toLocaleString("en-IN", { maximumFractionDigits: 2 })}`,
-          totalAmount: `${sym}${gst.total.toLocaleString("en-IN", { maximumFractionDigits: 2 })}`,
-          savingsPerUnit,
-          expiresAt: expiresAt.toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" }),
-          paymentLink: `${base}/customer/bids/${id}`,
-        }),
-      });
-    }
+    void notifyBidApproved({
+      customerEmail: bid.customer.user.email ?? "",
+      customerName: bid.customer.user.name ?? bid.customer.user.email ?? "Customer",
+      customerUserId: bid.customer.userId,
+      bidId: id,
+      productName: bid.listing.product.name,
+      quantity: bid.quantity,
+      bidPricePerUnit: bid.bidPricePerUnit,
+      totalBidAmount: bid.totalBidAmount,
+      unitPrice: bid.listing.unitPrice,
+      expiresAt,
+    });
 
     return NextResponse.json({ ok: true, status: "APPROVED", expiresAt: expiresAt.toISOString() });
   }

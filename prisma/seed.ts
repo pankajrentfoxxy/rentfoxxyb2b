@@ -1,6 +1,6 @@
 import "dotenv/config";
 
-import { ProductCondition, Role, VendorStatus } from "@prisma/client";
+import { LotItemCondition, ProductCondition, Role, VendorStatus } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { prisma } from "../src/lib/prisma";
 
@@ -9,6 +9,17 @@ async function hash(password: string) {
 }
 
 async function main() {
+  await prisma.lotBid.deleteMany();
+  await prisma.asAsBid.deleteMany();
+  await prisma.lotPurchase.deleteMany();
+  await prisma.asAsPurchase.deleteMany();
+  await prisma.lotInventoryItem.deleteMany();
+  await prisma.lotListing.deleteMany();
+  await prisma.asAsInventoryItem.deleteMany();
+  await prisma.asAsListing.deleteMany();
+  await prisma.verificationTask.deleteMany();
+  await prisma.inspector.deleteMany();
+  await prisma.otpVerification.deleteMany();
   await prisma.review.deleteMany();
   await prisma.orderItem.deleteMany();
   await prisma.payout.deleteMany();
@@ -144,6 +155,99 @@ async function main() {
 
   const v1 = vendor1User.vendorProfile!;
   const v2 = vendor2User.vendorProfile!;
+
+  const asasTotalUnits = 60;
+  const asasTotalValue = 35 * 15_500 + 25 * 19_500;
+
+  await prisma.lotListing.create({
+    data: {
+      vendorId: v1.id,
+      title: "Spring corporate refresh — Dell & HP mix",
+      description: "Demo LIVE lot for storefront (Addendum v1.3 seed).",
+      totalQuantity: 60,
+      lotSize: 10,
+      totalLots: 6,
+      lotsSold: 2,
+      pricePerLot: 195_000,
+      status: "LIVE",
+      liveAt: new Date(),
+      items: {
+        create: [
+          {
+            brand: "Dell",
+            model: "Latitude 5540",
+            generation: "13th Gen",
+            processor: "Intel Core i5-1335U",
+            ramGb: 16,
+            storageGb: 512,
+            storageType: "SSD",
+            displayInch: 15.6,
+            os: "Windows 11 Pro",
+            condition: LotItemCondition.REFURB_A,
+            count: 30,
+            unitPrice: 18_500,
+          },
+          {
+            brand: "HP",
+            model: "EliteBook 840 G10",
+            generation: null,
+            processor: "Intel Core i7-1355U",
+            ramGb: 16,
+            storageGb: 512,
+            storageType: "SSD",
+            displayInch: 14,
+            os: "Windows 11 Pro",
+            condition: LotItemCondition.REFURB_A_PLUS,
+            count: 30,
+            unitPrice: 21_500,
+          },
+        ],
+      },
+    },
+  });
+
+  await prisma.asAsListing.create({
+    data: {
+      vendorId: v2.id,
+      title: "Verified business laptop fleet — Lenovo & Dell",
+      description: "Demo LIVE AsAs listing for storefront (Addendum v1.3 seed).",
+      highlights: ["Mixed grades", "B2B pricing", "Fast verification path"],
+      totalUnits: asasTotalUnits,
+      unitsSold: 10,
+      avgUnitPrice: asasTotalValue / asasTotalUnits,
+      totalValue: asasTotalValue,
+      allowBidding: true,
+      status: "LIVE",
+      items: {
+        create: [
+          {
+            brand: "Lenovo",
+            model: "ThinkPad L14",
+            generation: "Gen 4",
+            processor: "AMD Ryzen 5 7530U",
+            ramGb: 8,
+            storageGb: 256,
+            storageType: "SSD",
+            condition: LotItemCondition.REFURB_B,
+            count: 35,
+            estimatedValue: 15_500,
+          },
+          {
+            brand: "Dell",
+            model: "Latitude 5440",
+            generation: null,
+            processor: "Intel Core i5-1335U",
+            ramGb: 16,
+            storageGb: 512,
+            storageType: "SSD",
+            condition: LotItemCondition.REFURB_A,
+            count: 25,
+            estimatedValue: 19_500,
+          },
+        ],
+      },
+    },
+  });
 
   const categories = await prisma.$transaction([
     prisma.category.create({ data: { name: "Laptops", slug: "laptops", icon: "laptop" } }),

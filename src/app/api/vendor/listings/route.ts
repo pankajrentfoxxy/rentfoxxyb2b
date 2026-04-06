@@ -1,3 +1,4 @@
+import { createVerificationTask, productListingNeedsVerification } from "@/lib/verification";
 import { getVendorContext } from "@/lib/vendor-auth";
 import {
   defaultRefurbFieldsForBrandNew,
@@ -151,6 +152,14 @@ export async function POST(req: NextRequest) {
     },
     include: { product: { select: { name: true, slug: true } } },
   });
+
+  if (productListingNeedsVerification(condition)) {
+    await createVerificationTask({
+      listingType: "PRODUCT_LISTING",
+      listingId: listing.id,
+      vendorId: ctx.vendorId,
+    });
+  }
 
   return NextResponse.json({
     listing: {

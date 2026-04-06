@@ -12,15 +12,44 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Menu, ShoppingCart, UserRound, X } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 
-const navLinks = [
+const primaryNav = [
   { href: "/products", label: "Products" },
+  { href: "/sales/lots", label: "Sales", badge: "Hot" as const },
+  { href: "/asas/listings", label: "AsAs", badge: "Deals" as const },
   { href: "/products?tab=categories", label: "Categories" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
 ];
+
+function NavLink({ href, label, badge }: { href: string; label: string; badge?: "Hot" | "Deals" }) {
+  const pathname = usePathname();
+  const active = pathname === href || (href !== "/" && pathname.startsWith(href.split("?")[0]!));
+  return (
+    <Link
+      href={href}
+      className={cn(
+        "inline-flex items-center gap-1.5 text-sm font-medium transition",
+        active ? "text-accent" : "text-slate-700 hover:text-accent",
+      )}
+    >
+      {label}
+      {badge === "Hot" ? (
+        <span className="rounded bg-orange-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-orange-800">
+          Hot
+        </span>
+      ) : null}
+      {badge === "Deals" ? (
+        <span className="rounded bg-purple-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-purple-800">
+          Deals
+        </span>
+      ) : null}
+    </Link>
+  );
+}
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
@@ -50,15 +79,9 @@ export function Navbar() {
           <Logo size="md" variant="dark" />
         </Link>
 
-        <nav className="hidden items-center gap-8 md:flex">
-          {navLinks.map((l) => (
-            <Link
-              key={l.href}
-              href={l.href}
-              className="text-sm font-medium text-slate-700 transition hover:text-accent"
-            >
-              {l.label}
-            </Link>
+        <nav className="hidden flex-wrap items-center gap-x-6 gap-y-2 lg:flex">
+          {primaryNav.map((l) => (
+            <NavLink key={l.href} href={l.href} label={l.label} badge={l.badge} />
           ))}
         </nav>
 
@@ -131,7 +154,7 @@ export function Navbar() {
 
           <button
             type="button"
-            className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-slate-800 md:hidden"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-slate-800 lg:hidden"
             onClick={() => setOpen((v) => !v)}
             aria-expanded={open}
             aria-label={open ? "Close menu" : "Open menu"}
@@ -142,9 +165,9 @@ export function Navbar() {
       </div>
 
       {open && (
-        <div className="border-t border-slate-200 bg-white px-4 py-4 md:hidden">
+        <div className="border-t border-slate-200 bg-white px-4 py-4 lg:hidden">
           <nav className="flex flex-col gap-2">
-            {navLinks.map((l) => (
+            {primaryNav.map((l) => (
               <Link
                 key={l.href}
                 href={l.href}
@@ -152,6 +175,7 @@ export function Navbar() {
                 onClick={() => setOpen(false)}
               >
                 {l.label}
+                {l.badge ? ` · ${l.badge}` : ""}
               </Link>
             ))}
             {!session?.user && (

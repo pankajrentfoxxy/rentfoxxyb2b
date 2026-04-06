@@ -1,8 +1,11 @@
-import { fromEmail, getResend } from "@/lib/resend";
+import { VerificationOtpEmail } from "@/emails/VerificationOtpEmail";
+import { sendEmail } from "@/lib/email";
+import { saveOTP } from "@/lib/otp";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { Role } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
+import * as React from "react";
 
 export const dynamic = "force-dynamic";
 
@@ -44,6 +47,8 @@ export async function POST(req: NextRequest) {
   const otpHash = await bcrypt.hash(otp, 10);
   const passwordHash = await bcrypt.hash(password, 12);
 
+  await saveOTP(email, otp);
+
   await prisma.pendingRegistration.upsert({
     where: { email },
     create: {
@@ -79,17 +84,22 @@ export async function POST(req: NextRequest) {
 
   if (process.env.RESEND_API_KEY) {
     try {
-      const resend = getResend();
-      await resend.emails.send({
-        from: fromEmail(),
+      await sendEmail({
         to: email,
         subject: "Your Rentfoxxy verification code",
-        html: `<p>Your verification code is <strong>${otp}</strong></p><p>It expires in 15 minutes.</p>`,
+        react: React.createElement(VerificationOtpEmail, { otp }),
+        throwOnError: true,
       });
     } catch {
       return NextResponse.json({ error: "Could not send email" }, { status: 502 });
     }
   } else {
+    if (process.env.NODE_ENV === "production") {
+      return NextResponse.json(
+        { error: "Email verification is not configured (RESEND_API_KEY)." },
+        { status: 503 },
+      );
+    }
     console.info(`[dev] OTP for ${email}: ${otp}`);
   }
 

@@ -1,5 +1,6 @@
 "use client";
 
+import { RazorpayTestBanner } from "@/components/checkout/RazorpayTestBanner";
 import { roundMoney } from "@/constants/payment-options";
 import { useRouter } from "next/navigation";
 import Script from "next/script";
@@ -120,6 +121,7 @@ export function OrderPayBalanceClient({
   return (
     <>
       <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
+      <RazorpayTestBanner />
       <div className="rounded-xl border border-amber-300 bg-gradient-to-br from-amber-50 to-orange-50 p-4 text-amber-950 shadow-sm">
         <p className="text-sm font-semibold">Stock reserved — balance due</p>
         <p className="mt-2 text-sm">

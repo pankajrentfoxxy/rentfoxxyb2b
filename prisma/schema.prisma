@@ -13,6 +13,48 @@ enum Role {
   CUSTOMER
   VENDOR
   ADMIN
+  INSPECTOR
+  INSPECTION_MANAGER
+}
+
+enum LotStatus {
+  DRAFT
+  PENDING_VERIFICATION
+  VERIFIED
+  LIVE
+  SOLD_OUT
+  DISPATCHED
+  CANCELLED
+}
+
+enum LotItemCondition {
+  BRAND_NEW
+  REFURB_A_PLUS
+  REFURB_A
+  REFURB_B
+  REFURB_C
+}
+
+enum InspectorType {
+  INHOUSE
+  OUTSOURCED
+}
+
+enum VerificationStatus {
+  PENDING_ASSIGNMENT
+  ASSIGNED
+  SLOT_PROPOSED
+  SCHEDULED
+  INSPECTION_COMPLETE
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+enum ListingType {
+  PRODUCT_LISTING
+  LOT
+  ASAS
 }
 
 enum BidStatus {
@@ -133,6 +175,7 @@ model User {
   notifications    Notification[]
   supportTickets   SupportTicket[]
   reviewsWritten   Review[]         @relation("ReviewsWritten")
+  inspector        Inspector?
 }
 
 model VendorProfile {
@@ -157,6 +200,9 @@ model VendorProfile {
   acceptsTokenPayment      Boolean          @default(true)
   listings                 ProductListing[]
   payouts                  Payout[]
+  lots                     LotListing[]
+  asasListings             AsAsListing[]
+  verificationTasks        VerificationTask[]
 }
 
 model CustomerProfile {
@@ -171,6 +217,10 @@ model CustomerProfile {
   bids        Bid[]
   orders      Order[]
   cart        Cart?
+  lotPurchases   LotPurchase[]
+  asasPurchases  AsAsPurchase[]
+  lotBids        LotBid[]
+  asAsBids       AsAsBid[]
 }
 
 model Cart {
@@ -182,10 +232,10 @@ model Cart {
 }
 
 model PendingRegistration {
-  id           String   @id @default(cuid())
-  email        String   @unique
-  otpHash   String
-  expiresAt DateTime
+  id               String   @id @default(cuid())
+  email            String   @unique
+  otpHash          String
+  expiresAt        DateTime
   passwordHash     String
   role             Role
   name             String?
@@ -199,6 +249,247 @@ model PendingRegistration {
   createdAt        DateTime @default(now())
 }
 
+model OtpVerification {
+  email     String   @id
+  otp       String
+  expiresAt DateTime
+  attempts  Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+model LotListing {
+  id             String             @id @default(cuid())
+  vendorId       String
+  vendor         VendorProfile      @relation(fields: [vendorId], references: [id])
+  title          String
+  description    String?            @db.Text
+  coverImage     String?
+  totalQuantity  Int
+  lotSize        Int
+  totalLots      Int
+  lotsSold       Int                @default(0)
+  pricePerLot    Float
+  status         LotStatus          @default(DRAFT)
+  csvRawUrl      String?
+  csvCleanUrl    String?
+  verificationId String?
+  liveAt         DateTime?
+  dispatchedAt   DateTime?
+  items          LotInventoryItem[]
+  purchases      LotPurchase[]
+  lotBids        LotBid[]
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+
+  @@index([vendorId])
+  @@index([status])
+}
+
+model LotBid {
+  id              String            @id @default(cuid())
+  customerId      String
+  customer        CustomerProfile   @relation(fields: [customerId], references: [id])
+  lotId           String
+  lot             LotListing        @relation(fields: [lotId], references: [id])
+  lotsCount       Int
+  bidPricePerLot  Float
+  totalBidAmount  Float
+  paymentOption   String            @default("FULL")
+  note            String?           @db.Text
+  status          BidStatus         @default(PENDING)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@index([customerId])
+  @@index([lotId])
+}
+
+model LotInventoryItem {
+  id          String           @id @default(cuid())
+  lotId       String
+  lot         LotListing       @relation(fields: [lotId], references: [id], onDelete: Cascade)
+  brand       String
+  model       String
+  generation  String?
+  processor   String
+  ramGb       Int
+  storageGb   Int
+  storageType String
+  displayInch Float
+  os          String
+  condition   LotItemCondition
+  count       Int
+  unitPrice   Float
+  notes       String?
+
+  @@index([lotId])
+}
+
+model LotPurchase {
+  id              String          @id @default(cuid())
+  reference       String?         @unique
+  lotId           String
+  lot             LotListing      @relation(fields: [lotId], references: [id])
+  customerId      String
+  customer        CustomerProfile @relation(fields: [customerId], references: [id])
+  addressId       String?
+  address         Address?        @relation(fields: [addressId], references: [id])
+  lotsCount       Int
+  totalUnits      Int
+  amountPaid      Float           @default(0)
+  paymentId       String?
+  status          String          @default("PAID")
+  paymentOption   String          @default("FULL")
+  subtotal        Float?
+  gstAmount       Float?
+  grandTotal      Float?
+  tokenAmount     Float?
+  balanceDueAt    DateTime?
+  balancePaidAt   DateTime?
+  razorpayOrderId String?
+  customerGstin   String?
+  manifest        Json?
+  createdAt       DateTime        @default(now())
+
+  @@index([lotId])
+  @@index([customerId])
+  @@index([razorpayOrderId])
+}
+
+model AsAsListing {
+  id              String              @id @default(cuid())
+  vendorId        String
+  vendor          VendorProfile       @relation(fields: [vendorId], references: [id])
+  title           String
+  description     String?             @db.Text
+  highlights      String[]            @default([])
+  totalUnits      Int
+  unitsSold       Int                 @default(0)
+  avgUnitPrice    Float
+  totalValue      Float
+  allowBidding    Boolean             @default(true)
+  allowMultiBuyer Boolean             @default(false)
+  aiSuggestedLots Int?
+  status          LotStatus           @default(DRAFT)
+  csvRawUrl       String?
+  csvCleanUrl     String?
+  verificationId  String?
+  items           AsAsInventoryItem[]
+  purchases       AsAsPurchase[]
+  asAsBids        AsAsBid[]
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+
+  @@index([vendorId])
+  @@index([status])
+}
+
+model AsAsBid {
+  id              String          @id @default(cuid())
+  customerId      String
+  customer        CustomerProfile @relation(fields: [customerId], references: [id])
+  asasId          String
+  asas            AsAsListing     @relation(fields: [asasId], references: [id])
+  quantity        Int
+  bidPricePerUnit Float
+  totalBidAmount  Float
+  paymentOption   String          @default("FULL")
+  note            String?         @db.Text
+  status          BidStatus       @default(PENDING)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@index([customerId])
+  @@index([asasId])
+}
+
+model AsAsInventoryItem {
+  id             String           @id @default(cuid())
+  asasId         String
+  asas           AsAsListing      @relation(fields: [asasId], references: [id], onDelete: Cascade)
+  brand          String
+  model          String
+  generation     String?
+  processor      String
+  ramGb          Int
+  storageGb      Int
+  storageType    String
+  condition      LotItemCondition
+  count          Int
+  estimatedValue Float
+
+  @@index([asasId])
+}
+
+model AsAsPurchase {
+  id              String          @id @default(cuid())
+  reference       String?         @unique
+  asasId          String
+  asas            AsAsListing     @relation(fields: [asasId], references: [id])
+  customerId      String
+  customer        CustomerProfile @relation(fields: [customerId], references: [id])
+  addressId       String?
+  address         Address?        @relation(fields: [addressId], references: [id])
+  quantity        Int
+  amountPaid      Float           @default(0)
+  paymentId       String?
+  status          String          @default("PAID")
+  paymentOption   String          @default("FULL")
+  subtotal        Float?
+  gstAmount       Float?
+  grandTotal      Float?
+  tokenAmount     Float?
+  balanceDueAt    DateTime?
+  balancePaidAt   DateTime?
+  razorpayOrderId String?
+  customerGstin   String?
+  manifest        Json?
+  createdAt       DateTime        @default(now())
+
+  @@index([asasId])
+  @@index([customerId])
+  @@index([razorpayOrderId])
+}
+
+model Inspector {
+  id        String             @id @default(cuid())
+  userId    String             @unique
+  user      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      InspectorType      @default(INHOUSE)
+  name      String
+  phone     String?
+  cityZones String[]           @default([])
+  isActive  Boolean            @default(true)
+  tasks     VerificationTask[]
+
+  @@index([isActive])
+}
+
+model VerificationTask {
+  id              String             @id @default(cuid())
+  listingType     ListingType
+  listingId       String
+  vendorId        String
+  vendor          VendorProfile      @relation(fields: [vendorId], references: [id])
+  inspectorId     String?
+  inspector       Inspector?         @relation(fields: [inspectorId], references: [id])
+  status          VerificationStatus @default(PENDING_ASSIGNMENT)
+  proposedSlots   Json               @default("[]")
+  confirmedSlot   Json?
+  vendorAddress   String?            @db.Text
+  inspectorNotes  String?            @db.Text
+  report          Json?
+  photos          String[]           @default([])
+  rejectionReason String?            @db.Text
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  @@index([vendorId])
+  @@index([listingType, listingId])
+  @@index([status])
+  @@index([inspectorId])
+}
+
 model Address {
   id        String  @id @default(cuid())
   userId    String
@@ -210,7 +501,9 @@ model Address {
   state     String
   pincode   String
   isDefault Boolean @default(false)
-  orders    Order[]
+  orders        Order[]
+  lotPurchases  LotPurchase[]
+  asAsPurchases AsAsPurchase[]
 }
 
 model Category {

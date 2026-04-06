@@ -6,5 +6,10 @@ export function getResend() {
   return new Resend(key);
 }
 
-export const fromEmail = () =>
-  process.env.FROM_EMAIL ?? "noreply@rentfoxxy.com";
+/** Use a verified domain in production. Until then Resend allows onboarding@resend.dev. */
+export const fromEmail = () => {
+  const name = process.env.FROM_NAME?.trim() || "Rentfoxxy";
+  const f = process.env.FROM_EMAIL?.trim();
+  if (f) return `${name} <${f}>`;
+  return `${name} <onboarding@resend.dev>`;
+};
