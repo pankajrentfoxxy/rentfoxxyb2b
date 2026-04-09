@@ -5,7 +5,18 @@ import { redirect } from "next/navigation";
 
 export default async function InspectorLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
-  if (!session?.user) redirect("/auth/login");
+  if (!session?.user) redirect("/inspector/login");
+  if (session.user.role === "INSPECTION_MANAGER") {
+    return (
+      <InspectorAppShell
+        email={session.user.email ?? ""}
+        name="Inspection manager"
+        role={session.user.role}
+      >
+        {children}
+      </InspectorAppShell>
+    );
+  }
   if (session.user.role !== "INSPECTOR") {
     redirect(session.user.role === "ADMIN" ? "/admin/dashboard" : "/");
   }

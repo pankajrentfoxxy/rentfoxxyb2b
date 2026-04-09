@@ -1,5 +1,10 @@
 import { AsAsCard } from "@/components/storefront/AsAsCard";
-import { asasUnitsAvailable } from "@/lib/asas-inventory";
+import {
+  asasInventoryCap,
+  asasPublicLotProgress,
+  asasUnitsAvailableFromPurchases,
+  asasUnitsSoldFromPurchases,
+} from "@/lib/asas-inventory";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 
@@ -8,16 +13,17 @@ export async function HomeAsAsDeals() {
   try {
     rows = await prisma.asAsListing.findMany({
       where: { status: "LIVE" },
-      take: 4,
+      take: 8,
       orderBy: { createdAt: "desc" },
       include: {
         items: { select: { brand: true, condition: true, count: true } },
+        purchases: { select: { quantity: true, status: true } },
       },
     });
   } catch {
     return null;
   }
-  if (rows.length === 0) return null;
+  if (!rows.length) return null;
 
   return (
     <section className="border-b border-slate-100 bg-slate-50/80 py-12">
@@ -35,6 +41,10 @@ export async function HomeAsAsDeals() {
           {rows.map((l) => {
             const brands = Array.from(new Set(l.items.map((i) => i.brand))).slice(0, 3);
             const conditions = Array.from(new Set(l.items.map((i) => i.condition)));
+            const cap = asasInventoryCap(l, l.items);
+            const unitsSold = asasUnitsSoldFromPurchases(l.purchases);
+            const unitsAvailable = asasUnitsAvailableFromPurchases(l, l.items, l.purchases);
+            const lot = asasPublicLotProgress(l, cap, unitsSold);
             return (
               <AsAsCard
                 key={l.id}
@@ -43,9 +53,15 @@ export async function HomeAsAsDeals() {
                 description={l.description}
                 brands={brands}
                 conditions={conditions}
-                unitsAvailable={asasUnitsAvailable(l, l.items)}
+                unitsAvailable={unitsAvailable}
                 avgUnitPrice={l.avgUnitPrice}
                 allowBidding={l.allowBidding}
+                isLotMode={lot.isLotMode}
+                totalLots={lot.totalLots}
+                lotsSold={lot.lotsSold}
+                lotsRemaining={lot.lotsRemaining}
+                lotSize={lot.lotSize}
+                percentSold={lot.percentSold}
               />
             );
           })}

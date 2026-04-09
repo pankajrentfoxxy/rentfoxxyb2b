@@ -47,10 +47,11 @@ async function main() {
     update: {},
   });
 
-  const [adminPass, vendorPass, customerPass] = await Promise.all([
+  const [adminPass, vendorPass, customerPass, inspectorPass] = await Promise.all([
     hash("Admin@1234"),
     hash("Vendor@1234"),
     hash("Customer@1234"),
+    hash("Inspector@1234"),
   ]);
 
   await prisma.user.create({
@@ -150,6 +151,32 @@ async function main() {
           },
         ],
       },
+    },
+  });
+
+  const inspectorUser = await prisma.user.create({
+    data: {
+      email: "inspector@rentfoxxy.com",
+      passwordHash: inspectorPass,
+      role: Role.INSPECTOR,
+      isVerified: true,
+    },
+  });
+  await prisma.inspector.create({
+    data: {
+      userId: inspectorUser.id,
+      name: "Demo Field Inspector",
+      type: "INHOUSE",
+      isActive: true,
+    },
+  });
+
+  await prisma.user.create({
+    data: {
+      email: "inspection.manager@rentfoxxy.com",
+      passwordHash: inspectorPass,
+      role: Role.INSPECTION_MANAGER,
+      isVerified: true,
     },
   });
 
@@ -421,6 +448,7 @@ async function main() {
   console.log("  admin@rentfoxxy.com / Admin@1234");
   console.log("  vendor1@test.com, vendor2@test.com / Vendor@1234");
   console.log("  customer@test.com / Customer@1234");
+  console.log("  inspector@rentfoxxy.com, inspection.manager@rentfoxxy.com / Inspector@1234");
 }
 
 main()

@@ -16,6 +16,56 @@ export function asasInventoryCap(
   return Math.max(0, Math.floor(Number(listing.totalUnits) || 0));
 }
 
+/** Units sold from confirmed AsAs purchases (authoritative vs stale `listing.unitsSold`). */
+export function asasUnitsSoldFromPurchases(purchases: { quantity: number; status: string }[]): number {
+  return purchases
+    .filter((p) => p.status !== "PENDING_PAYMENT")
+    .reduce((s, p) => s + Math.max(0, Math.floor(Number(p.quantity) || 0)), 0);
+}
+
+export function asasUnitsAvailableFromPurchases(
+  listing: { totalUnits: number },
+  items: { count: number }[] | undefined,
+  purchases: { quantity: number; status: string }[],
+): number {
+  const cap = asasInventoryCap(listing, items);
+  const sold = asasUnitsSoldFromPurchases(purchases);
+  return Math.max(0, cap - sold);
+}
+
+export function asasPublicLotProgress(
+  listing: {
+    totalUnits: number;
+    allowMultiBuyer: boolean;
+    aiSuggestedLots: number | null;
+  },
+  cap: number,
+  unitsSold: number,
+) {
+  const isLotMode = listing.allowMultiBuyer && !!listing.aiSuggestedLots && listing.aiSuggestedLots > 0;
+  const totalLots = isLotMode ? listing.aiSuggestedLots! : null;
+  const lotSize =
+    isLotMode && totalLots && totalLots > 0 ? Math.max(1, Math.round(cap / totalLots)) : null;
+  const lotsSold =
+    lotSize && totalLots != null ? Math.min(totalLots, Math.floor(unitsSold / lotSize)) : null;
+  const lotsRemaining =
+    totalLots != null && lotsSold != null ? Math.max(0, totalLots - lotsSold) : null;
+  const percentSold =
+    totalLots != null && totalLots > 0 && lotsSold != null
+      ? Math.round((lotsSold / totalLots) * 100)
+      : cap > 0
+        ? Math.min(100, Math.round((unitsSold / cap) * 100))
+        : 0;
+  return {
+    isLotMode,
+    totalLots,
+    lotSize,
+    lotsSold,
+    lotsRemaining,
+    percentSold,
+  };
+}
+
 export function asasUnitsAvailable(
   listing: { totalUnits: number; unitsSold: number },
   items?: { count: number }[],

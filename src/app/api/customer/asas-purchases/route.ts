@@ -1,5 +1,5 @@
 import { getPaymentOptionConfig, type PaymentOptionId } from "@/constants/payment-options";
-import { asasInventoryCap, asasUnitsAvailable } from "@/lib/asas-inventory";
+import { asasInventoryCap, asasUnitsAvailableFromPurchases } from "@/lib/asas-inventory";
 import { auth } from "@/lib/auth";
 import {
   asAsPurchasePricing,
@@ -17,11 +17,14 @@ export const dynamic = "force-dynamic";
 async function demoComplete(profileId: string, asasId: string, quantity: number): Promise<NextResponse> {
   const listing = await prisma.asAsListing.findFirst({
     where: { id: asasId, status: "LIVE" },
-    include: { items: { select: { count: true } } },
+    include: {
+      items: { select: { count: true } },
+      purchases: { select: { quantity: true, status: true } },
+    },
   });
   if (!listing) return NextResponse.json({ error: "Listing not available" }, { status: 400 });
   const cap = asasInventoryCap(listing, listing.items);
-  const remaining = asasUnitsAvailable(listing, listing.items);
+  const remaining = asasUnitsAvailableFromPurchases(listing, listing.items, listing.purchases);
   if (quantity > remaining) return NextResponse.json({ error: "Not enough units" }, { status: 400 });
 
   const gst = asAsPurchasePricing(listing.avgUnitPrice, quantity);
@@ -88,11 +91,14 @@ export async function POST(req: NextRequest) {
 
   const listing = await prisma.asAsListing.findFirst({
     where: { id: asasId, status: "LIVE" },
-    include: { items: { select: { count: true } } },
+    include: {
+      items: { select: { count: true } },
+      purchases: { select: { quantity: true, status: true } },
+    },
   });
   if (!listing) return NextResponse.json({ error: "Listing not available" }, { status: 400 });
 
-  const remaining = asasUnitsAvailable(listing, listing.items);
+  const remaining = asasUnitsAvailableFromPurchases(listing, listing.items, listing.purchases);
   if (quantity > remaining) {
     return NextResponse.json({ error: "Not enough units" }, { status: 400 });
   }

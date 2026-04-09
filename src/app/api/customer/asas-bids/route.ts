@@ -1,4 +1,4 @@
-import { asasUnitsAvailable } from "@/lib/asas-inventory";
+import { asasUnitsAvailableFromPurchases } from "@/lib/asas-inventory";
 import { auth } from "@/lib/auth";
 import { createNotification, NOTIFICATION_TYPES } from "@/lib/notifications";
 import { prisma } from "@/lib/prisma";
@@ -36,7 +36,10 @@ export async function POST(req: NextRequest) {
 
   const listing = await prisma.asAsListing.findFirst({
     where: { id: asasId, status: "LIVE" },
-    include: { items: { select: { count: true } } },
+    include: {
+      items: { select: { count: true } },
+      purchases: { select: { quantity: true, status: true } },
+    },
   });
   if (!listing) return NextResponse.json({ error: "Listing not available" }, { status: 400 });
 
@@ -44,7 +47,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Bidding not enabled for this listing" }, { status: 400 });
   }
 
-  const remaining = asasUnitsAvailable(listing, listing.items);
+  const remaining = asasUnitsAvailableFromPurchases(listing, listing.items, listing.purchases);
   if (quantity > remaining) {
     return NextResponse.json({ error: "Not enough units available" }, { status: 400 });
   }

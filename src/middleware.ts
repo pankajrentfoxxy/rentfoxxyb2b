@@ -19,6 +19,14 @@ export async function middleware(req: NextRequest) {
   const secureCookie = authUsesSecureCookies(req);
   const token = await getToken({ req, secret, secureCookie });
 
+  const redirectInspectorLogin = () => {
+    const url = new URL("/inspector/login", req.nextUrl.origin);
+    url.searchParams.set("callbackUrl", path);
+    const res = NextResponse.redirect(url);
+    copyCookies(supabaseRes, res);
+    return res;
+  };
+
   const redirectSignin = () => {
     const url = new URL("/auth/login", req.nextUrl.origin);
     url.searchParams.set("callbackUrl", path);
@@ -26,6 +34,19 @@ export async function middleware(req: NextRequest) {
     copyCookies(supabaseRes, res);
     return res;
   };
+
+  if (path === "/inspector/login") {
+    if (
+      token &&
+      (token.role === "INSPECTOR" || token.role === "INSPECTION_MANAGER")
+    ) {
+      const target = req.nextUrl.searchParams.get("callbackUrl") || "/inspector/dashboard";
+      const res = NextResponse.redirect(new URL(target, req.nextUrl.origin));
+      copyCookies(supabaseRes, res);
+      return res;
+    }
+    return supabaseRes;
+  }
 
   if (path.startsWith("/customer")) {
     if (!token) return redirectSignin();
@@ -61,8 +82,8 @@ export async function middleware(req: NextRequest) {
   }
 
   if (path.startsWith("/inspector")) {
-    if (!token) return redirectSignin();
-    if (token.role !== "INSPECTOR") {
+    if (!token) return redirectInspectorLogin();
+    if (token.role !== "INSPECTOR" && token.role !== "INSPECTION_MANAGER") {
       const res = NextResponse.redirect(new URL("/", req.nextUrl.origin));
       copyCookies(supabaseRes, res);
       return res;
@@ -74,10 +95,6 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
   matcher: [
-    /*
-     * Run Supabase session refresh + auth on all non-static routes.
-     * Static/image assets are excluded.
-     */
     "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };

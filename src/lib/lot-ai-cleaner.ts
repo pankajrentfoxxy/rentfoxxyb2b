@@ -358,6 +358,59 @@ function heuristicLotClean(raw: string): {
   };
 }
 
+export type LotNameAiResult = { name: string; description: string; highlights: string[] };
+
+export async function generateLotName(items: LotCSVRow[]): Promise<LotNameAiResult> {
+  const model = getModel();
+  const totalUnits = items.reduce((s, i) => s + Math.max(0, Math.floor(i.count)), 0);
+  const brands = [...new Set(items.map((i) => i.brand))];
+  const conditions = [...new Set(items.map((i) => lotConditionToLabel(toLotItemCondition(i.condition))))];
+  const avgPrice =
+    totalUnits > 0
+      ? Math.round(items.reduce((s, i) => s + i.unitPrice * Math.max(0, Math.floor(i.count)), 0) / totalUnits)
+      : 0;
+
+  if (!model || totalUnits <= 0) {
+    return {
+      name: `${brands.slice(0, 2).join(" & ")} Laptop Lot — ${totalUnits} Units`,
+      description: `Verified bulk lot of ${totalUnits} laptops. ${conditions.join(", ")} grade. GST invoice included.`,
+      highlights: ["Verified by Rentfoxxy team", `${brands.slice(0, 2).join(" + ")} mix`, "GST invoice included"],
+    };
+  }
+
+  const prompt = `You are naming a bulk laptop lot listing for Rentfoxxy, a B2B marketplace.
+Generate a professional, concise listing title and description.
+Inventory summary:
+- Total units: ${totalUnits}
+- Brands: ${brands.join(", ")}
+- Conditions: ${conditions.join(", ")}
+- Average unit price: ₹${avgPrice.toLocaleString("en-IN")}
+- Full breakdown: ${JSON.stringify(items.slice(0, 20))}
+Rules:
+- Title: max 70 chars. Format: "[Brands] Business Laptop Lot — [Units] units, [Condition range]"
+- Description: 1-2 sentences max, 120 chars max. Factual, professional, B2B tone.
+- Highlights: 3 strings max, each under 40 chars.
+Return ONLY valid JSON (no markdown):
+{ "name": "...", "description": "...", "highlights": ["...", "...", "..."] }`;
+
+  const result = await model.generateContent(prompt);
+  const text = stripJsonFence(result.response.text());
+  try {
+    const p = JSON.parse(text) as LotNameAiResult;
+    return {
+      name: p.name,
+      description: p.description,
+      highlights: Array.isArray(p.highlights) ? p.highlights.slice(0, 5) : [],
+    };
+  } catch {
+    return {
+      name: `${brands.slice(0, 2).join(" & ")} Business Laptop Lot — ${totalUnits} Units, ${conditions[0] ?? "Mixed"} to ${conditions[conditions.length - 1] ?? "Mixed"}`,
+      description: `Verified bulk lot of ${totalUnits} laptops. ${conditions.join(", ")} grade. GST invoice included.`,
+      highlights: ["Verified by Rentfoxxy team", `${brands.slice(0, 2).join(" + ")} mix`, "GST invoice included"],
+    };
+  }
+}
+
 export async function generateAsAsName(items: AsAsInventoryInput[]): Promise<AsAsNameResult> {
   const model = getModel();
   const totalUnits = items.reduce((s, i) => s + Math.max(0, Math.floor(i.count)), 0);

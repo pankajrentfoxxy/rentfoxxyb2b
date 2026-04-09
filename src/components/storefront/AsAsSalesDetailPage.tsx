@@ -102,22 +102,47 @@ export function AsAsSalesDetailPage() {
                 </ul>
               </div>
               <div className="grid grid-cols-2 gap-4 border-t p-4 sm:grid-cols-4">
-                <div>
-                  <div className="text-xs text-muted">Units</div>
-                  <div className="font-bold">{listing.totalUnits}</div>
-                </div>
-                <div>
-                  <div className="text-xs text-muted">Available</div>
-                  <div className="font-bold">{listing.unitsAvailable}</div>
-                </div>
-                <div>
-                  <div className="text-xs text-muted">Avg / unit</div>
-                  <div className="font-bold">~₹{listing.avgUnitPrice.toLocaleString("en-IN")}</div>
-                </div>
-                <div>
-                  <div className="text-xs text-muted">Bidding</div>
-                  <div className="font-bold">{listing.allowBidding ? "Open" : "Closed"}</div>
-                </div>
+                {listing.isLotMode && listing.totalLots ? (
+                  <>
+                    <div>
+                      <div className="text-xs text-muted">Lots</div>
+                      <div className="font-bold">
+                        {listing.lotsSold ?? 0} / {listing.totalLots} sold
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-muted">Lots left</div>
+                      <div className="font-bold">{listing.lotsRemaining ?? 0}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-muted">Units in catalogue</div>
+                      <div className="font-bold">{listing.totalUnits}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-muted">~Units / lot</div>
+                      <div className="font-bold">{listing.lotSize ?? "—"}</div>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div>
+                      <div className="text-xs text-muted">Units</div>
+                      <div className="font-bold">{listing.totalUnits}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-muted">Available</div>
+                      <div className="font-bold">{listing.unitsAvailable}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-muted">Avg / unit</div>
+                      <div className="font-bold">~₹{listing.avgUnitPrice.toLocaleString("en-IN")}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-muted">Bidding</div>
+                      <div className="font-bold">{listing.allowBidding ? "Open" : "Closed"}</div>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
 

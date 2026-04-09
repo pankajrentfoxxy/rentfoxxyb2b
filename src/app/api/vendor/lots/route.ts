@@ -25,6 +25,7 @@ export async function POST(req: NextRequest) {
   const body = (await req.json()) as {
     title?: string;
     description?: string | null;
+    highlights?: string[];
     lotSize?: number;
     coverImage?: string | null;
     items?: LotCSVRow[];
@@ -50,11 +51,16 @@ export async function POST(req: NextRequest) {
   const valueSum = items.reduce((s, r) => s + Number(r.unitPrice) * Math.max(0, Math.floor(r.count)), 0);
   const pricePerLot = (valueSum / totalQuantity) * lotSize;
 
+  const highlights = Array.isArray(body.highlights)
+    ? body.highlights.map((h) => String(h).trim()).filter(Boolean).slice(0, 10)
+    : [];
+
   const lot = await prisma.lotListing.create({
     data: {
       vendorId: ctx.vendorId,
       title,
       description: body.description ?? null,
+      highlights,
       coverImage: body.coverImage ?? null,
       totalQuantity,
       lotSize,

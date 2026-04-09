@@ -1,5 +1,6 @@
 "use client";
 
+import { MegaMenu, MegaMenuDrawerSection } from "@/components/storefront/MegaMenu";
 import Logo from "@/components/ui/Logo";
 import { useCartStore } from "@/store/cart-store";
 import { cn } from "@/lib/utils";
@@ -17,10 +18,8 @@ import { signOut, useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 
 const primaryNav = [
-  { href: "/products", label: "Products" },
   { href: "/sales/lots", label: "Sales", badge: "Hot" as const },
   { href: "/asas/listings", label: "AsAs", badge: "Deals" as const },
-  { href: "/products?tab=categories", label: "Categories" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
 ];
@@ -80,6 +79,7 @@ export function Navbar() {
         </Link>
 
         <nav className="hidden flex-wrap items-center gap-x-6 gap-y-2 lg:flex">
+          <MegaMenu />
           {primaryNav.map((l) => (
             <NavLink key={l.href} href={l.href} label={l.label} badge={l.badge} />
           ))}
@@ -167,6 +167,7 @@ export function Navbar() {
       {open && (
         <div className="border-t border-slate-200 bg-white px-4 py-4 lg:hidden">
           <nav className="flex flex-col gap-2">
+            <MegaMenuDrawerSection onNavigate={() => setOpen(false)} />
             {primaryNav.map((l) => (
               <Link
                 key={l.href}

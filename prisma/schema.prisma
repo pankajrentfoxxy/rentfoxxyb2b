@@ -263,6 +263,7 @@ model LotListing {
   vendor         VendorProfile      @relation(fields: [vendorId], references: [id])
   title          String
   description    String?            @db.Text
+  highlights     String[]           @default([])
   coverImage     String?
   totalQuantity  Int
   lotSize        Int
@@ -305,22 +306,26 @@ model LotBid {
 }
 
 model LotInventoryItem {
-  id          String           @id @default(cuid())
-  lotId       String
-  lot         LotListing       @relation(fields: [lotId], references: [id], onDelete: Cascade)
-  brand       String
-  model       String
-  generation  String?
-  processor   String
-  ramGb       Int
-  storageGb   Int
-  storageType String
-  displayInch Float
-  os          String
-  condition   LotItemCondition
-  count       Int
-  unitPrice   Float
-  notes       String?
+  id                  String            @id @default(cuid())
+  lotId               String
+  lot                 LotListing        @relation(fields: [lotId], references: [id], onDelete: Cascade)
+  brand               String
+  model               String
+  generation          String?
+  processor           String
+  ramGb               Int
+  storageGb           Int
+  storageType         String
+  displayInch         Float
+  os                  String
+  condition           LotItemCondition
+  count               Int
+  unitPrice           Float
+  notes               String?
+  inspectorCondition  LotItemCondition?
+  inspectorCount      Int?
+  isVerified          Boolean           @default(false)
+  inspectorItemNotes  String?           @db.Text
 
   @@index([lotId])
 }
@@ -404,19 +409,23 @@ model AsAsBid {
 }
 
 model AsAsInventoryItem {
-  id             String           @id @default(cuid())
-  asasId         String
-  asas           AsAsListing      @relation(fields: [asasId], references: [id], onDelete: Cascade)
-  brand          String
-  model          String
-  generation     String?
-  processor      String
-  ramGb          Int
-  storageGb      Int
-  storageType    String
-  condition      LotItemCondition
-  count          Int
-  estimatedValue Float
+  id                 String            @id @default(cuid())
+  asasId             String
+  asas               AsAsListing       @relation(fields: [asasId], references: [id], onDelete: Cascade)
+  brand              String
+  model              String
+  generation         String?
+  processor          String
+  ramGb              Int
+  storageGb          Int
+  storageType        String
+  condition          LotItemCondition
+  count              Int
+  estimatedValue     Float
+  inspectorCondition LotItemCondition?
+  inspectorCount     Int?
+  isVerified         Boolean           @default(false)
+  inspectorItemNotes String?           @db.Text
 
   @@index([asasId])
 }
@@ -478,11 +487,15 @@ model VerificationTask {
   confirmedSlot   Json?
   vendorAddress   String?            @db.Text
   inspectorNotes  String?            @db.Text
-  report          Json?
-  photos          String[]           @default([])
-  rejectionReason String?            @db.Text
-  createdAt       DateTime           @default(now())
-  updatedAt       DateTime           @updatedAt
+  report               Json?
+  photos               String[]           @default([])
+  rejectionReason      String?            @db.Text
+  correctedTitle       String?            @db.Text
+  correctedDescription String?            @db.Text
+  correctedHighlights  String[]           @default([])
+  originalItemsJson    Json?
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
 
   @@index([vendorId])
   @@index([listingType, listingId])

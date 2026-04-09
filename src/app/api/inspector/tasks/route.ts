@@ -9,10 +9,10 @@ export async function GET() {
   if (!ctx) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const tasks = await prisma.verificationTask.findMany({
-    where: { inspectorId: ctx.inspectorId },
+    where: ctx.isManager ? {} : { inspectorId: ctx.inspectorId },
     orderBy: { updatedAt: "desc" },
-    include: { vendor: { select: { companyName: true } } },
-    take: 50,
+    include: { vendor: { select: { companyName: true, gstin: true } } },
+    take: 100,
   });
 
   return NextResponse.json({ tasks });

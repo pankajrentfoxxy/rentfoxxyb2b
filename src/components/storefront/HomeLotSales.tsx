@@ -13,7 +13,7 @@ export async function HomeLotSales() {
   try {
     lots = await prisma.lotListing.findMany({
       where: { status: "LIVE" },
-      take: 4,
+      take: 8,
       orderBy: [{ lotsSold: "desc" }, { createdAt: "desc" }],
       include: {
         items: { select: { brand: true, condition: true } },
@@ -46,7 +46,7 @@ export async function HomeLotSales() {
                 key={l.id}
                 id={l.id}
                 title={l.title}
-                coverImage={l.coverImage}
+                description={l.description}
                 brands={brands}
                 conditions={conditions}
                 totalLots={l.totalLots}
