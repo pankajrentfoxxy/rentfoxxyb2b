@@ -3,11 +3,10 @@
 import { AlertCircle, ClipboardCheck, Loader2 } from "lucide-react";
 import { getSession, signIn, signOut } from "next-auth/react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useState } from "react";
 
-export default function InspectorLoginPage() {
-  const router = useRouter();
+function InspectorLoginForm() {
   const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -28,6 +27,7 @@ export default function InspectorLoginPage() {
         setError("Invalid email or password.");
         return;
       }
+
       const session = await getSession();
       const r = session?.user?.role as string | undefined;
       if (r !== "INSPECTOR" && r !== "INSPECTION_MANAGER") {
@@ -35,9 +35,12 @@ export default function InspectorLoginPage() {
         setError("Access denied. This portal is for inspectors only.");
         return;
       }
+
       const cb = searchParams.get("callbackUrl");
-      router.push(cb?.startsWith("/") ? cb : "/inspector/dashboard");
-      router.refresh();
+      const target = cb?.startsWith("/") ? cb : "/inspector/dashboard";
+
+      // Full navigation so the JWT cookie is visible to middleware and RSC on Vercel
+      window.location.assign(target);
     } finally {
       setLoading(false);
     }
@@ -100,5 +103,24 @@ export default function InspectorLoginPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+function LoginFallback() {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-teal-900 to-indigo-900 p-4">
+      <div className="flex items-center gap-3 rounded-2xl bg-white/95 px-8 py-6 shadow-xl">
+        <Loader2 className="h-8 w-8 animate-spin text-teal-700" />
+        <p className="text-sm font-medium text-slate-800">Loading inspector login…</p>
+      </div>
+    </div>
+  );
+}
+
+export default function InspectorLoginPage() {
+  return (
+    <Suspense fallback={<LoginFallback />}>
+      <InspectorLoginForm />
+    </Suspense>
   );
 }
