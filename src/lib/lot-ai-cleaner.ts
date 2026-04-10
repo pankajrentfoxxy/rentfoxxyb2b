@@ -363,8 +363,10 @@ export type LotNameAiResult = { name: string; description: string; highlights: s
 export async function generateLotName(items: LotCSVRow[]): Promise<LotNameAiResult> {
   const model = getModel();
   const totalUnits = items.reduce((s, i) => s + Math.max(0, Math.floor(i.count)), 0);
-  const brands = [...new Set(items.map((i) => i.brand))];
-  const conditions = [...new Set(items.map((i) => lotConditionToLabel(toLotItemCondition(i.condition))))];
+  const brands = Array.from(new Set(items.map((i) => i.brand)));
+  const conditions = Array.from(
+    new Set(items.map((i) => lotConditionToLabel(toLotItemCondition(i.condition)))),
+  );
   const avgPrice =
     totalUnits > 0
       ? Math.round(items.reduce((s, i) => s + i.unitPrice * Math.max(0, Math.floor(i.count)), 0) / totalUnits)
