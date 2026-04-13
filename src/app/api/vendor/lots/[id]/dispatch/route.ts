@@ -19,9 +19,19 @@ function simpleManifest(
   return out;
 }
 
-export async function POST(_req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
+export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   const vctx = await getVendorContext();
   if (!vctx) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const body = (await req.json().catch(() => ({}))) as {
+    dispatchCarrier?: string;
+    dispatchAwb?: string;
+  };
+  const dispatchCarrier = body.dispatchCarrier?.trim();
+  const dispatchAwb = body.dispatchAwb?.trim();
+  if (!dispatchCarrier || !dispatchAwb) {
+    return NextResponse.json({ error: "dispatchCarrier and dispatchAwb required" }, { status: 400 });
+  }
 
   const { id } = await ctx.params;
   const lot = await prisma.lotListing.findFirst({
@@ -37,6 +47,7 @@ export async function POST(_req: NextRequest, ctx: { params: Promise<{ id: strin
     );
   }
 
+  const dispatchedAt = new Date();
   const manifest = simpleManifest(
     lot.purchases.map((p) => ({
       id: p.id,
@@ -51,12 +62,17 @@ export async function POST(_req: NextRequest, ctx: { params: Promise<{ id: strin
     for (const p of lot.purchases) {
       await tx.lotPurchase.update({
         where: { id: p.id },
-        data: { manifest: manifest[p.id] ?? {} },
+        data: {
+          manifest: manifest[p.id] ?? {},
+          dispatchCarrier,
+          dispatchAwb,
+          dispatchedAt,
+        },
       });
     }
     await tx.lotListing.update({
       where: { id: lot.id },
-      data: { status: "DISPATCHED", dispatchedAt: new Date() },
+      data: { status: "DISPATCHED", dispatchedAt },
     });
   });
 

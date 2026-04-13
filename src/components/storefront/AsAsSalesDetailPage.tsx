@@ -7,7 +7,7 @@ import { PaymentFlowModal } from "@/components/shared/PaymentFlowModal";
 import { ConditionBadge } from "@/components/shared/ConditionBadge";
 import { PAYMENT_OPTIONS, type PaymentOptionId } from "@/constants/payment-options";
 import { asAsPurchasePricing, lotPayNowAmount } from "@/lib/lot-asas-checkout";
-import { Cpu, HardDrive, MessageSquare, ShoppingCart } from "lucide-react";
+import { Cpu, Download, HardDrive, MessageSquare, ShoppingCart } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
@@ -31,7 +31,6 @@ export function AsAsSalesDetailPage() {
   const { status } = useSession();
   const [listing, setListing] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [qty, setQty] = useState(1);
   const [payOption, setPayOption] = useState<PaymentOptionId>("FULL");
   const [showBid, setShowBid] = useState(false);
   const [showPay, setShowPay] = useState(false);
@@ -43,16 +42,9 @@ export function AsAsSalesDetailPage() {
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
         setListing(data && !data.error ? data : null);
-        if (data?.unitsAvailable) setQty(1);
       })
       .finally(() => setLoading(false));
   }, [id]);
-
-  useEffect(() => {
-    if (listing?.unitsAvailable) {
-      setQty((q) => Math.min(q, listing.unitsAvailable));
-    }
-  }, [listing]);
 
   if (loading) return <LotDetailSkeleton />;
   if (!listing) {
@@ -66,6 +58,7 @@ export function AsAsSalesDetailPage() {
     );
   }
 
+  const qty = Math.max(0, listing.unitsAvailable ?? 0);
   const subtotal = listing.avgUnitPrice * qty;
   const gst = subtotal * 0.18;
   const grandTotal = subtotal + gst;
@@ -269,26 +262,30 @@ export function AsAsSalesDetailPage() {
                 <div className="text-2xl font-bold">~₹{listing.avgUnitPrice.toLocaleString("en-IN")}</div>
                 <div className="text-sm text-muted">per unit (avg) · {listing.unitsAvailable} left</div>
               </div>
-              <div>
-                <label className="text-sm font-semibold">Units</label>
-                <div className="mt-2 flex items-center gap-2">
-                  <button
-                    type="button"
-                    className="h-10 w-10 rounded-lg border"
-                    onClick={() => setQty((q) => Math.max(1, q - 1))}
-                  >
-                    −
-                  </button>
-                  <span className="text-xl font-bold">{qty}</span>
-                  <button
-                    type="button"
-                    className="h-10 w-10 rounded-lg border"
-                    onClick={() => setQty((q) => Math.min(listing.unitsAvailable, q + 1))}
-                  >
-                    +
-                  </button>
-                </div>
+              <div className="rounded-lg border border-purple-100 bg-purple-50/80 px-3 py-2 text-sm text-purple-950">
+                <p className="font-semibold">Whole listing only</p>
+                <p className="mt-0.5 text-xs text-purple-900/90">
+                  You purchase all {qty} remaining unit{qty === 1 ? "" : "s"} in this catalogue (single-buyer flow).
+                </p>
               </div>
+              <a
+                href={`/api/public/asas/${listing.id}/download-csv`}
+                download
+                className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-purple-200 py-2.5 text-sm font-semibold text-purple-800 hover:bg-purple-50"
+              >
+                <Download className="h-4 w-4" />
+                Download catalogue CSV
+              </a>
+              {listing.hasUploadedCsv ? (
+                <a
+                  href={`/api/public/asas/${listing.id}/uploaded-csv`}
+                  download
+                  className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-slate-50 py-2.5 text-sm font-medium text-slate-800 hover:bg-slate-100"
+                >
+                  <Download className="h-4 w-4" />
+                  Download original upload
+                </a>
+              ) : null}
               <div className="max-h-40 space-y-2 overflow-y-auto">
                 {PAYMENT_OPTIONS.map((opt) => (
                   <label
@@ -322,17 +319,19 @@ export function AsAsSalesDetailPage() {
               </div>
               <button
                 type="button"
+                disabled={qty <= 0}
                 onClick={() => {
+                  if (qty <= 0) return;
                   if (status !== "authenticated") {
                     router.push(`/auth/login?callbackUrl=${encodeURIComponent(`/asas/listings/${listing.id}`)}`);
                     return;
                   }
                   setShowPay(true);
                 }}
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-purple-600 py-3 font-bold text-white"
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-purple-600 py-3 font-bold text-white disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <ShoppingCart className="h-5 w-5" />
-                Buy now
+                {qty <= 0 ? "Sold out" : "Buy now"}
               </button>
               {listing.allowBidding ? (
                 <button

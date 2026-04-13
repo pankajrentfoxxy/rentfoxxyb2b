@@ -20,13 +20,6 @@ const placeholder =
 
 type Listing = PublicProductCard["listings"][number] & { bestValue?: boolean };
 
-function warrantyCell(l: Listing) {
-  if (l.condition === "BRAND_NEW") return "—";
-  const t = l.warrantyType ?? "—";
-  if (!l.warrantyMonths) return t;
-  return `${l.warrantyMonths} mo · ${t}`;
-}
-
 type ProductDetailInitial = Omit<PublicProductCard, "listings"> & { listings: Listing[] };
 
 export function ProductDetailView({
@@ -143,8 +136,6 @@ export function ProductDetailView({
                   <tr>
                     <th className="px-3 py-2">Option</th>
                     <th className="px-3 py-2">Condition</th>
-                    <th className="px-3 py-2">Battery</th>
-                    <th className="px-3 py-2">Warranty</th>
                     <th className="px-3 py-2">Price</th>
                     <th className="px-3 py-2">Stock</th>
                     <th className="px-3 py-2">MOQ</th>
@@ -177,10 +168,6 @@ export function ProductDetailView({
                             {g.dot} {g.label}
                           </span>
                         </td>
-                        <td className="px-3 py-2 text-muted">
-                          {l.condition === "BRAND_NEW" ? "—" : l.batteryHealth != null ? `${l.batteryHealth}%` : "—"}
-                        </td>
-                        <td className="px-3 py-2 text-muted">{warrantyCell(l)}</td>
                         <td className="px-3 py-2 font-bold text-primary">
                           ₹{l.unitPrice.toLocaleString("en-IN")}
                         </td>
@@ -198,10 +185,10 @@ export function ProductDetailView({
                 ✓ All conditions certified by Rentfoxxy
               </p>
             </div>
-            {listing?.condition === "REFURB_C" ? (
+            {listing?.condition === "REFURB_C" || listing?.condition === "REFURB_D" ? (
               <p className="mt-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900">
-                <strong>Sold as-is:</strong> Grade C items are cosmetically worn but functional. Warranty may be
-                limited — see option details.
+                <strong>Sold as-is:</strong> Lower-grade refurb options are cosmetically worn; inspect condition notes
+                before purchase.
               </p>
             ) : null}
           </div>

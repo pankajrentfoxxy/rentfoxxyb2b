@@ -17,6 +17,7 @@ type Row = {
   condition: string;
   count: number;
   estimatedValue: number;
+  notes?: string | null;
 };
 
 export function VendorAsAsWizard() {
@@ -32,6 +33,7 @@ export function VendorAsAsWizard() {
   const [totalValue, setTotalValue] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [uploadedCsvSnapshot, setUploadedCsvSnapshot] = useState("");
 
   async function runGenerate(data: Row[]) {
     setGenerating(true);
@@ -81,6 +83,7 @@ export function VendorAsAsWizard() {
           totalValue,
           aiSuggestedLots: suggestedLotCount,
           items: rows,
+          uploadedCsvSnapshot: uploadedCsvSnapshot.trim() || undefined,
         }),
       });
       const data = await res.json();
@@ -120,7 +123,7 @@ export function VendorAsAsWizard() {
             mode="asas"
             apiEndpoint="/api/vendor/asas/clean-csv"
             templateUrl="/templates/asas_upload_template.csv"
-            onConfirmed={(data) => {
+            onConfirmed={(data, snap) => {
               const r = data as AsAsCSVRow[];
               const normalized: Row[] = r.map((x) => ({
                 brand: x.brand,
@@ -133,12 +136,15 @@ export function VendorAsAsWizard() {
                 condition: String(x.condition),
                 count: x.count,
                 estimatedValue: x.estimatedValue,
+                notes: x.notes ?? null,
               }));
               setRows(normalized);
+              setUploadedCsvSnapshot(snap ?? "");
               void runGenerate(normalized);
             }}
             onReset={() => {
               setRows([]);
+              setUploadedCsvSnapshot("");
               setAiTitle("");
               setAiDescription("");
               setAiHighlights([]);

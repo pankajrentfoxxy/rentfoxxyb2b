@@ -16,6 +16,7 @@ import {
   RefreshCw,
   ClipboardList,
   X,
+  Truck,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -25,6 +26,7 @@ const nav = [
   { href: "/vendor/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/vendor/products", label: "Products", icon: Package },
   { href: "/vendor/lots", label: "Lot sales", icon: Layers },
+  { href: "/vendor/lots/orders", label: "Bulk fulfilment", icon: Truck },
   { href: "/vendor/asas/new", label: "New AsAs", icon: RefreshCw },
   { href: "/vendor/listings/verifications", label: "Verifications", icon: ClipboardList },
   { href: "/vendor/bids", label: "Bids", icon: Gavel },

@@ -39,7 +39,7 @@ export async function sendTokenPaymentConfirmationMail(orderId: string) {
 
 export async function sendBalanceReminderMail(
   orderId: string,
-  urgency: "12h" | "2h",
+  urgency: "48h" | "24h" | "2h",
   orderNumber: string,
   customerEmail: string,
   customerName: string | null,
@@ -52,7 +52,9 @@ export async function sendBalanceReminderMail(
     subject:
       urgency === "2h"
         ? `Urgent: pay balance for ${orderNumber} (deadline soon)`
-        : `Reminder: balance due soon — ${orderNumber}`,
+        : urgency === "24h"
+          ? `Reminder: balance due within 24 hours — ${orderNumber}`
+          : `Reminder: balance due within 48 hours — ${orderNumber}`,
     react: React.createElement(BalancePaymentReminderEmail, {
       customerName: customerName ?? customerEmail,
       orderNumber,

@@ -17,9 +17,6 @@ export type PublicListing = {
   minOrderQty: number;
   label: string;
   condition: ProductCondition;
-  batteryHealth: number | null;
-  warrantyMonths: number;
-  warrantyType: string | null;
 };
 
 export type PublicProductCard = {
@@ -47,17 +44,7 @@ export function optionLabel(index: number): string {
 
 type ListingSlice = Pick<
   ProductListing,
-  | "id"
-  | "unitPrice"
-  | "bulkPricing"
-  | "stockQty"
-  | "minOrderQty"
-  | "isActive"
-  | "condition"
-  | "batteryHealth"
-  | "warrantyMonths"
-  | "warrantyType"
-  | "requiresAdminApproval"
+  "id" | "unitPrice" | "bulkPricing" | "stockQty" | "minOrderQty" | "isActive" | "condition" | "requiresAdminApproval"
 >;
 
 export function mapListing(listing: ListingSlice, index: number): PublicListing {
@@ -69,9 +56,6 @@ export function mapListing(listing: ListingSlice, index: number): PublicListing 
     minOrderQty: listing.minOrderQty,
     label: optionLabel(index),
     condition: listing.condition,
-    batteryHealth: listing.batteryHealth,
-    warrantyMonths: listing.warrantyMonths,
-    warrantyType: listing.warrantyType,
   };
 }
 

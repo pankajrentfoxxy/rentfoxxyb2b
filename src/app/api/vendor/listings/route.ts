@@ -32,10 +32,7 @@ export async function POST(req: NextRequest) {
     bulkPricing?: unknown;
     isActive?: boolean;
     condition?: string;
-    batteryHealth?: number | null;
     conditionNotes?: string | null;
-    warrantyMonths?: number;
-    warrantyType?: string | null;
     refurbImages?: string[];
   };
 
@@ -73,9 +70,6 @@ export async function POST(req: NextRequest) {
 
   const fieldErr = validateListingConditionFields({
     condition,
-    batteryHealth: body.batteryHealth,
-    warrantyMonths: body.warrantyMonths,
-    warrantyType: body.warrantyType,
     conditionNotes: body.conditionNotes,
     refurbImages,
     unitPrice,
@@ -86,9 +80,9 @@ export async function POST(req: NextRequest) {
   }
 
   const brandNewDefaults = defaultRefurbFieldsForBrandNew();
-  const isGradeC = condition === "REFURB_C";
-  const requiresAdminApproval = isGradeC;
-  const isActive = isGradeC ? false : body.isActive !== false;
+  const isLowGrade = condition === "REFURB_C" || condition === "REFURB_D";
+  const requiresAdminApproval = isLowGrade;
+  const isActive = isLowGrade ? false : body.isActive !== false;
 
   let bulkPricingPayload: Prisma.InputJsonValue | typeof Prisma.JsonNull | undefined;
   if (body.bulkPricing !== undefined) {
@@ -134,18 +128,12 @@ export async function POST(req: NextRequest) {
       condition,
       ...(condition === "BRAND_NEW"
         ? {
-            batteryHealth: brandNewDefaults.batteryHealth,
             conditionNotes: brandNewDefaults.conditionNotes,
-            warrantyMonths: brandNewDefaults.warrantyMonths,
-            warrantyType: brandNewDefaults.warrantyType,
             refurbImages: brandNewDefaults.refurbImages,
             requiresAdminApproval: brandNewDefaults.requiresAdminApproval,
           }
         : {
-            batteryHealth: body.batteryHealth ?? null,
             conditionNotes: body.conditionNotes?.trim() || null,
-            warrantyMonths: Math.min(24, Math.max(0, Math.floor(Number(body.warrantyMonths ?? 0)))),
-            warrantyType: body.warrantyType?.trim() ?? null,
             refurbImages,
             requiresAdminApproval,
           }),

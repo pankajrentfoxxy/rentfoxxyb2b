@@ -14,9 +14,6 @@ const listingSelect = {
   isActive: true,
   requiresAdminApproval: true,
   condition: true,
-  batteryHealth: true,
-  warrantyMonths: true,
-  warrantyType: true,
 } satisfies Prisma.ProductListingSelect;
 
 export async function GET(

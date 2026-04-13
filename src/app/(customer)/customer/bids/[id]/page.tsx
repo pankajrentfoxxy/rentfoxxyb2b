@@ -1,3 +1,4 @@
+import { BidReviseSection } from "@/components/customer/BidReviseSection";
 import { BidProformaActions } from "@/components/customer/BidProformaActions";
 import { BidCountdown } from "@/components/customer/BidCountdown";
 import { BidPaymentClient } from "@/components/customer/BidPaymentClient";
@@ -121,9 +122,18 @@ export default async function CustomerBidDetailPage({
 
         {bid.status === "REJECTED" ? (
           <p className="mt-4 text-sm text-muted">
-            Unable to accommodate at this price. You may submit a new bid from the product page.
+            Unable to accommodate at this price. You can revise below or start a new bid from the product page.
           </p>
         ) : null}
+
+        <div className="mt-6">
+          <BidReviseSection
+            bidId={bid.id}
+            status={bid.status}
+            revisionCount={bid.revisionCount}
+            revisionHistory={bid.revisionHistory}
+          />
+        </div>
 
         {paidOrder ? (
           <p className="mt-4">

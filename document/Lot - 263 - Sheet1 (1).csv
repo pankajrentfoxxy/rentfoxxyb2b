@@ -1,0 +1,264 @@
+Grade,Make,Model,CPU,Generation,RAM,RAM Capacity,HDD,HDD Capacity,SSD Capacity,Front Panel(Bazel),Panel,Screen Size,Screen,Hinge,Hinge Cover,Power Panel,Touch Pad,Base,Keyboard,Status
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Minor Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Minor Scratch,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Minor Scratch,"13.3""",Colour Spread,Ok,Ok,Ok,Colour Fade,Ok,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Minor Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Ok,Ok,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Colour Fade,"13.3""",Colour Spread,Ok,Ok,Ok,Ok,Colour Fade,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Minor Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Minor Scratch,Colour Fade,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Minor Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Major Scratch,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Minor Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Minor Scratch,Not Checked,Power On
+D,LENOVO,ThinkPad X390,I5,8TH,Yes,16 GB,No,,,Ok,Minor Scratch,"13.3""",Broken,Ok,Ok,NA,Colour Fade,Colour Fade,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Minor Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Minor Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Major Scratch,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Ok,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Ok,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Minor Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Ok,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Major Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Minor Dent,Ok,Not Checked,Power On
+C,LENOVO,ThinkPad T490,I7,8TH,Yes,16 GB,No,,,Rubber Cut,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Major Broken,Major Broken,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Major Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Key Missing,Power On
+C,LENOVO,ThinkPad T490,I7,8TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Major Broken,Major Broken,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Major Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Ok,Not Checked,Power On
+C,LENOVO,ThinkPad X390,I5,8TH,Yes,16 GB,No,,,Ok,Minor Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Colour Fade,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Major Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Major Scratch,Colour Fade,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Minor Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Minor Scratch,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Ok,"13.3""",Colour Spread,Ok,Ok,NA,Ok,Colour Fade,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Ok,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Ok,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Ok,"13.3""",Colour Spread,Ok,Ok,NA,Ok,Ok,Ok,Power On
+C,LENOVO,ThinkPad X390,I7,8TH,Yes,16 GB,No,,,Ok,Minor Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Minor Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Not Checked,Power On
+C,LENOVO,ThinkPad X390,I5,8TH,Yes,16 GB,No,,,Minor Broken,Minor Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Minor Scratch,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Yellow Screen,Ok,Ok,NA,Ok,Ok,Colour Fade,Power On
+C,LENOVO,ThinkPad T490,I7,8TH,Yes,16 GB,No,,,Rubber Cut,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Major Broken,Major Broken,Not Checked,Power On
+E,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Not Checked,Ok,Ok,NA,Ok,Minor Scratch,Colour Fade,No Power/Power Cut(Motherboard)
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Ok,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Colour Fade,Colour Fade,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Major Broken,Minor Scratch,"14.0""",Yellow Screen,Ok,Ok,NA,Minor Scratch,Minor Scratch,Colour Fade,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Ok,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Minor Scratch,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Yellow Screen,Ok,Ok,NA,Ok,Ok,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Ok,"13.3""",Colour Spread,Ok,Ok,NA,Missing,Minor Scratch,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Yellow Screen,Ok,Ok,NA,Ok,Minor Scratch,Colour Fade,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Major Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Minor Scratch,Colour Fade,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Yellow Screen,Ok,Ok,NA,Ok,Minor Scratch,Colour Fade,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Minor Scratch,"13.3""","Major Patch,Colour Spread",Ok,Ok,NA,Colour Fade,Minor Scratch,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Yellow Screen,Ok,Ok,NA,Ok,Ok,Colour Fade,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Ok,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Colour Fade,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Ok,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Minor Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Minor Scratch,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Yellow Screen,Ok,Ok,NA,Ok,Minor Scratch,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Minor Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Minor Scratch,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Yellow Screen,Ok,Ok,NA,Ok,Ok,Colour Fade,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Minor Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Minor Scratch,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Yellow Screen,Ok,Ok,NA,Ok,Minor Scratch,Colour Fade,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Minor Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Colour Fade,Colour Fade,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Yellow Screen,Ok,Ok,NA,Colour Fade,Minor Scratch,Colour Fade,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Colour Fade,Colour Fade,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""","Minor Patch,Yellow Screen",Ok,Ok,NA,Ok,Minor Scratch,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Minor Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Colour Fade,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""","Major Patch,Colour Spread",Ok,Ok,NA,Ok,Minor Scratch,Colour Fade,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Minor Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Colour Fade,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Broken,Ok,Ok,NA,Ok,Minor Scratch,Colour Fade,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Minor Scratch,"13.3""","Colour Spread,Yellow Screen",Ok,Ok,NA,Colour Fade,Minor Scratch,Colour Fade,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Yellow Screen,Ok,Ok,NA,Ok,Ok,Colour Fade,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Minor Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Ok,Colour Fade,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Yellow Screen,Ok,Ok,NA,Ok,Minor Scratch,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Colour Fade,Major Scratch,Colour Fade,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Ok,Colour Fade,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Colour Fade,Minor Scratch,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Yellow Screen,Ok,Ok,NA,Ok,Minor Scratch,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Ok,"14.0""",Colour Spread,Ok,Ok,NA,Colour Fade,Minor Scratch,Colour Fade,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Ok,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Colour Fade,Minor Scratch,Colour Fade,Power On
+C,DELL,Latitude E3410,I5,10TH,Yes,4 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Major Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Minor Scratch,Minor Scratch,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Colour Fade,Colour Fade,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Colour Fade,"14.0""",Colour Spread,Ok,Ok,NA,Colour Fade,Colour Fade,Not Checked,Power On
+C,DELL,Latitude E3410,I5,10TH,Yes,4 GB,No,,,Ok,Ok,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Ok,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Ok,Not Checked,Power On
+D,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Ok,"14.0""",Broken,Ok,Ok,NA,Ok,Ok,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Colour Fade,Minor Scratch,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Minor Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Minor Dent,Minor Scratch,Colour Fade,Power On
+C,DELL,Latitude E3410,I5,10TH,Yes,4 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Major Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Major Scratch,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""","Minor Patch,Colour Spread",Ok,Ok,NA,Ok,Minor Scratch,Not Checked,Power On
+E,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Minor Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Ok,Ok,Not Checked,No Power/Power Cut(Motherboard)
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Ok,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Ok,Colour Fade,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Minor Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Major Scratch,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Ok,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Ok,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Minor Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Minor Scratch,Colour Fade,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Ok,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Minor Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Minor Scratch,Not Checked,Power On
+C,DELL,Latitude E3410,I5,10TH,Yes,4 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Minor Scratch,Minor Scratch,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Major Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Ok,Colour Fade,Power On
+C,DELL,Latitude E3410,I5,10TH,Yes,4 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Minor Scratch,Minor Scratch,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Major Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Major Scratch,Colour Fade,Power On
+C,DELL,Latitude E3410,I5,10TH,Yes,4 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Major Broken,Minor Scratch,Colour Fade,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Minor Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Minor Scratch,Colour Fade,Power On
+C,DELL,Latitude E3410,I5,10TH,Yes,4 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Ok,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Ok,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Major Broken,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Minor Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Ok,Not Checked,Power On
+D,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Broken,Ok,Ok,NA,Minor Scratch,Minor Scratch,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Ok,"13.3""",Colour Spread,Ok,Ok,NA,Ok,Ok,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Major Broken,Major Broken,Colour Fade,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Ok,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Ok,Colour Fade,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Major Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Major Scratch,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Ok,"13.3""",Colour Spread,Ok,Ok,NA,Ok,Ok,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Minor Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Minor Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Colour Fade,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Ok,"13.3""",Colour Spread,Ok,Ok,NA,Ok,Ok,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Major Scratch,"13.3""","Major Patch,Colour Spread",Ok,Ok,NA,Colour Fade,Minor Scratch,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Major Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Minor Scratch,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Ok,"13.3""",Colour Spread,Ok,Ok,NA,Ok,Ok,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""","Major Patch,Colour Spread",Ok,Ok,NA,Ok,Minor Scratch,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Major Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Major Scratch,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Minor Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Minor Scratch,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Ok,"13.3""",Colour Spread,Ok,Ok,NA,Ok,Ok,Colour Fade,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Colour Fade,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Minor Scratch,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Ok,"13.3""",Colour Spread,Ok,Ok,NA,Ok,Ok,Colour Fade,Power On
+C,LENOVO,ThinkPad X390,I5,8TH,Yes,16 GB,No,,,Ok,Minor Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Minor Scratch,Not Checked,Power On
+C,LENOVO,ThinkPad X390,I5,8TH,Yes,16 GB,No,,,Ok,Major Dent,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Minor Scratch,Not Checked,Power On
+C,LENOVO,ThinkPad X390,I5,8TH,Yes,16 GB,No,,,Ok,Minor Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Minor Scratch,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Minor Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Ok,Ok,Key Missing,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Minor Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Colour Fade,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Minor Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Ok,Key Missing,Power On
+C,LENOVO,ThinkPad T490,I7,8TH,Yes,16 GB,No,,,Rubber Cut,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Major Broken,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Major Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Major Scratch,Not Checked,Power On
+C,LENOVO,ThinkPad T490,I7,8TH,Yes,16 GB,No,,,Rubber Cut,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Broken,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Major Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Colour Fade,Not Checked,Power On
+C,LENOVO,ThinkPad T490,I7,8TH,Yes,16 GB,No,,,Major Broken,Major Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Broken,Not Checked,Power On
+C,LENOVO,ThinkPad X390,I5,8TH,Yes,16 GB,No,,,Ok,Minor Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Minor Scratch,Colour Fade,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Minor Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Minor Scratch,Key Missing,Power On
+C,LENOVO,ThinkPad X390,I5,8TH,Yes,16 GB,No,,,Ok,Minor Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Minor Scratch,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Minor Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Major Dent,Minor Scratch,Colour Fade,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Minor Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Minor Scratch,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Colour Fade,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Minor Scratch,Key Missing,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Minor Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Ok,Not Checked,Power On
+E,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Minor Scratch,"13.3""",Not Checked,Ok,Ok,NA,Ok,Major Scratch,Key Missing,No Display
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Minor Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Minor Scratch,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Colour Fade,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Colour Fade,Colour Fade,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Minor Scratch,"13.3""",Yellow Screen,Ok,Ok,NA,Colour Fade,Ok,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Colour Fade,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Major Scratch,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Minor Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Major Scratch,Key Missing,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Minor Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Minor Scratch,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Minor Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Ok,Ok,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Minor Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Minor Scratch,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Minor Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Ok,Ok,Not Checked,Power On
+C,LENOVO,ThinkPad T490,I7,8TH,Yes,16 GB,No,,,Rubber Cut,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Major Broken,Minor Scratch,Not Checked,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Minor Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Not Checked,Power On
+C,LENOVO,ThinkPad T490,I7,8TH,Yes,16 GB,No,,,Rubber Cut,Major Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Ok,Ok,Ok,NA,Ok,Minor Scratch,Not Checked,Power On
+C,LENOVO,ThinkPad T490,I7,8TH,Yes,16 GB,No,,,Rubber Cut,Major Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Major Broken,Minor Scratch,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Colour Fade,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Ok,Colour Fade,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Colour Fade,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""","Minor Patch,Colour Spread",Ok,Ok,NA,Ok,Minor Scratch,Colour Fade,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Major Broken,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Colour Fade,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Ok,Ok,Ok,NA,Ok,Minor Scratch,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Colour Fade,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Colour Fade,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Yellow Screen,Ok,Ok,NA,Ok,Minor Scratch,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Broken,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Dent,"14.0""",Ok,Ok,Ok,NA,Ok,Minor Scratch,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Colour Fade,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Ok,Ok,Ok,NA,Ok,Minor Scratch,Colour Fade,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Dent,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Colour Fade,Power On
+D,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Dent,"14.0""",Broken,Ok,Ok,NA,Ok,Minor Scratch,Colour Fade,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Yellow Screen,Ok,Ok,NA,Ok,Minor Scratch,Not Checked,Power On
+E,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Not Checked,Ok,Ok,NA,Ok,Minor Scratch,Colour Fade,No Display
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Major Broken,"14.0""",Yellow Screen,Ok,Ok,NA,Ok,Minor Scratch,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Ok,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Ok,Colour Fade,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Colour Fade,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Colour Fade,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Ok,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Ok,Not Checked,Power On
+D,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Dim Display,Ok,Ok,NA,Ok,Minor Scratch,Not Checked,Power On
+D,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Dim Display,Ok,Ok,NA,Ok,Minor Scratch,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Minor Scratch,Minor Scratch,Colour Fade,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Key Missing,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Colour Fade,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Colour Fade,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Missing,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Minor Scratch,Minor Broken,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Major Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Key Missing,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Colour Fade,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Dent,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""","Minor Patch,Colour Spread",Ok,Ok,NA,Ok,Minor Scratch,Colour Fade,Power On
+D,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Broken,Ok,Ok,NA,Minor Broken,Minor Scratch,Colour Fade,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Colour Fade,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Colour Fade,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Colour Fade,Minor Scratch,Colour Fade,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Not Checked,Power On
+E,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Dent,"14.0""","Minor Patch,Colour Spread",Ok,Ok,NA,Minor Dent,Minor Scratch,Not Checked,No Power/Power Cut(Motherboard)
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Colour Fade,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Dent,"14.0""",Colour Spread,Ok,Ok,NA,Minor Scratch,Minor Scratch,Colour Fade,Power On
+E,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Not Checked,Ok,Ok,NA,Ok,Minor Scratch,Not Checked,No Display
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Ok,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Ok,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Colour Fade,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Colour Fade,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Colour Fade,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Major Broken,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Colour Fade,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Colour Fade,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Colour Fade,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Ok,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Colour Fade,Key Missing,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Colour Fade,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Colour Fade,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Ok,Key Missing,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Ok,Ok,Ok,NA,Ok,Minor Scratch,Not Checked,Power On
+C,LENOVO,ThinkPad T470,I5,6TH,Yes,8 GB,No,,,Ok,Major Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Major Scratch,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Yellow Screen,Ok,Ok,NA,Ok,Minor Scratch,Colour Fade,Power On
+C,LENOVO,ThinkPad X390,I5,8TH,Yes,16 GB,No,,,Ok,Colour Fade,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Minor Scratch,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Yellow Screen,Ok,Ok,NA,Ok,Minor Scratch,Colour Fade,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Ok,"14.0""",Colour Spread,Ok,Ok,NA,Colour Fade,Ok,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Colour Fade,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Colour Fade,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Colour Fade,Colour Fade,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Ok,Ok,Ok,NA,Ok,Minor Scratch,Colour Fade,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Ok,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Colour Fade,Key Missing,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Yellow Screen,Ok,Ok,NA,Ok,Minor Scratch,Colour Fade,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Minor Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Ok,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Ok,Ok,Ok,NA,Ok,Minor Scratch,Colour Fade,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Ok,"13.3""",Colour Spread,Ok,Ok,NA,Ok,Ok,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Ok,Ok,Ok,NA,Ok,Minor Scratch,Colour Fade,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Colour Fade,Minor Scratch,Key Missing,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Ok,Ok,Ok,NA,Ok,Minor Scratch,Not Checked,Power On
+C,LENOVO,ThinkPad X390,I5,8TH,Yes,16 GB,No,,,Ok,Major Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Yellow Screen,Ok,Ok,NA,Major Broken,Minor Scratch,Not Checked,Power On
+C,LENOVO,ThinkPad X390,I5,8TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Colour Fade,Ok,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Key Missing,Power On
+C,LENOVO,ThinkPad X390,I5,8TH,Yes,8 GB,No,,,Ok,Ok,"14.0""",Colour Spread,Ok,Ok,NA,Colour Fade,Minor Scratch,Colour Fade,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Colour Fade,Power On
+C,LENOVO,ThinkPad X390,I5,8TH,Yes,16 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Yellow Screen,Ok,Ok,NA,Ok,Minor Scratch,Colour Fade,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Ok,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Ok,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Colour Fade,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Ok,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""","Minor Patch,Colour Spread",Ok,Ok,NA,Ok,Minor Scratch,Colour Fade,Power On
+C,LENOVO,ThinkPad T490,I7,8TH,Yes,16 GB,No,,,Rubber Cut,Ok,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Not Checked,Power On
+C,LENOVO,ThinkPad T480,I5,8TH,Yes,8 GB,No,,,Ok,Ok,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Dent,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Colour Fade,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Ok,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Ok,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Dent,"14.0""",Broken,Ok,Ok,NA,Ok,Minor Scratch,Key Missing,Power On
+C,LENOVO,ThinkPad X390,I5,8TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Colour Spread,Ok,Ok,NA,Colour Fade,Ok,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Ok,Ok,Ok,NA,Ok,Minor Scratch,Colour Fade,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Ok,"14.0""",Colour Spread,Ok,Ok,NA,Colour Fade,Minor Scratch,Key Missing,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Ok,Ok,Ok,NA,Ok,Minor Scratch,Colour Fade,Power On
+C,LENOVO,ThinkPad X390,I5,8TH,Yes,16 GB,No,,,Ok,Ok,"14.0""",Colour Spread,Ok,Ok,NA,"Minor Broken,Colour Fade",Minor Scratch,Not Checked,Power On
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Dent,"14.0""",Colour Spread,Ok,Ok,NA,Ok,Minor Scratch,Colour Fade,Power On
+E,LENOVO,ThinkPad X390,I5,8TH,Yes,16 GB,No,,,Ok,Minor Scratch,"13.3""",Not Checked,Ok,Ok,NA,Colour Fade,Colour Fade,Not Checked,No Display
+C,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Ok,Ok,Ok,NA,Ok,Minor Scratch,Colour Fade,Power On
+C,LENOVO,ThinkPad X13,I5,10TH,Yes,16 GB,No,,,Ok,Minor Scratch,"13.3""",Colour Spread,Ok,Ok,NA,Colour Fade,Minor Scratch,Not Checked,Power On
+D,DELL,Latitude E3420,I5,11TH,Yes,8 GB,No,,,Ok,Minor Scratch,"14.0""",Broken,Ok,Ok,NA,Major Dent,Minor Scratch,Colour Fade,Power On

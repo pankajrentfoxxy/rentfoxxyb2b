@@ -4,7 +4,6 @@ import { GRADE_CONFIG, GRADE_ORDER } from "@/constants/grading";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import * as Accordion from "@radix-ui/react-accordion";
-import * as Slider from "@radix-ui/react-slider";
 import type { ProductCondition } from "@prisma/client";
 import { useCallback, useEffect, useState } from "react";
 
@@ -31,10 +30,7 @@ export function VendorListingEditor({
     minOrderQty: number;
     bulkPricing: unknown;
     condition?: ProductCondition;
-    batteryHealth?: number | null;
     conditionNotes?: string | null;
-    warrantyMonths?: number;
-    warrantyType?: string | null;
     refurbImages?: string[];
     requiresAdminApproval?: boolean;
     isActive?: boolean;
@@ -53,11 +49,6 @@ export function VendorListingEditor({
     initial?.bulkPricing != null ? JSON.stringify(initial.bulkPricing, null, 2) : "",
   );
   const [condition, setCondition] = useState<ProductCondition>(initial?.condition ?? "BRAND_NEW");
-  const [batteryHealth, setBatteryHealth] = useState(
-    initial?.batteryHealth != null ? initial.batteryHealth : 85,
-  );
-  const [warrantyType, setWarrantyType] = useState(initial?.warrantyType ?? "Rentfoxxy-backed");
-  const [warrantyMonths, setWarrantyMonths] = useState(String(initial?.warrantyMonths ?? 6));
   const [conditionNotes, setConditionNotes] = useState(initial?.conditionNotes ?? "");
   const [refurbUrl1, setRefurbUrl1] = useState(initial?.refurbImages?.[0] ?? "");
   const [refurbUrl2, setRefurbUrl2] = useState(initial?.refurbImages?.[1] ?? "");
@@ -87,9 +78,6 @@ export function VendorListingEditor({
     if (condition === "BRAND_NEW") return base;
     return {
       ...base,
-      batteryHealth,
-      warrantyType,
-      warrantyMonths: Math.min(24, Math.max(0, Number(warrantyMonths) || 0)),
       conditionNotes: conditionNotes.slice(0, 200),
       refurbImages: refurbImagesPayload(),
     };
@@ -165,7 +153,7 @@ export function VendorListingEditor({
   }
 
   const showRefurbFields = condition !== "BRAND_NEW";
-  const gradeC = condition === "REFURB_C";
+  const gradeC = condition === "REFURB_C" || condition === "REFURB_D";
 
   return (
     <form onSubmit={submit} className="space-y-5 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -268,7 +256,7 @@ export function VendorListingEditor({
           />
           {gradeC ? (
             <p className="mt-1 text-xs text-amber-800">
-              Grade C: minimum bid must be at least <strong>15% below</strong> your list price.
+              Grade C/D: minimum bid must be at least <strong>15% below</strong> your list price.
             </p>
           ) : null}
         </div>
@@ -286,7 +274,7 @@ export function VendorListingEditor({
                 type="button"
                 onClick={() => setCondition(key)}
                 className={`rounded-xl border-2 p-4 text-left transition ${
-                  key === "REFURB_C" ? "sm:col-span-2" : ""
+                  key === "REFURB_C" || key === "REFURB_D" ? "sm:col-span-2" : ""
                 } ${sel ? "shadow-md" : "border-slate-200 hover:border-slate-300"}`}
                 style={{
                   borderColor: sel ? g.color : undefined,
@@ -304,7 +292,7 @@ export function VendorListingEditor({
         </div>
         {gradeC ? (
           <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
-            Grade C listings require Rentfoxxy admin review before going live. Your listing will be submitted for
+            Grade C/D listings require Rentfoxxy admin review before going live. Your listing will be submitted for
             approval.
           </div>
         ) : null}
@@ -313,50 +301,6 @@ export function VendorListingEditor({
       {showRefurbFields ? (
         <div className="space-y-4 rounded-xl border border-slate-100 bg-surface p-4">
           <p className="text-sm font-semibold text-slate-800">Additional refurbishment details</p>
-          <div>
-            <p className="text-sm text-slate-700">Battery health: {batteryHealth}%</p>
-            <Slider.Root
-              className="relative mt-3 flex h-5 touch-none select-none items-center"
-              value={[batteryHealth]}
-              onValueChange={(v) => setBatteryHealth(v[0] ?? 50)}
-              min={50}
-              max={100}
-              step={5}
-            >
-              <Slider.Track className="relative h-1.5 flex-1 rounded-full bg-slate-200">
-                <Slider.Range className="absolute h-full rounded-full bg-accent" />
-              </Slider.Track>
-              <Slider.Thumb
-                className="block h-4 w-4 rounded-full border border-slate-400 bg-white shadow focus:outline-none focus:ring-2 focus:ring-accent"
-                aria-label="Battery health"
-              />
-            </Slider.Root>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <label className="text-sm font-medium text-slate-700">Warranty type</label>
-              <select
-                className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
-                value={warrantyType}
-                onChange={(e) => setWarrantyType(e.target.value)}
-              >
-                <option value="Rentfoxxy-backed">Rentfoxxy-backed</option>
-                <option value="Manufacturer">Manufacturer</option>
-                <option value="As-Is">As-Is</option>
-              </select>
-            </div>
-            <div>
-              <label className="text-sm font-medium text-slate-700">Warranty duration (months)</label>
-              <input
-                type="number"
-                min={0}
-                max={24}
-                className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
-                value={warrantyMonths}
-                onChange={(e) => setWarrantyMonths(e.target.value)}
-              />
-            </div>
-          </div>
           <div>
             <label className="text-sm font-medium text-slate-700">Condition notes (max 200)</label>
             <textarea

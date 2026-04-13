@@ -14,7 +14,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
-async function demoComplete(profileId: string, asasId: string, quantity: number): Promise<NextResponse> {
+async function demoComplete(profileId: string, asasId: string): Promise<NextResponse> {
   const listing = await prisma.asAsListing.findFirst({
     where: { id: asasId, status: "LIVE" },
     include: {
@@ -25,7 +25,8 @@ async function demoComplete(profileId: string, asasId: string, quantity: number)
   if (!listing) return NextResponse.json({ error: "Listing not available" }, { status: 400 });
   const cap = asasInventoryCap(listing, listing.items);
   const remaining = asasUnitsAvailableFromPurchases(listing, listing.items, listing.purchases);
-  if (quantity > remaining) return NextResponse.json({ error: "Not enough units" }, { status: 400 });
+  const quantity = remaining;
+  if (quantity <= 0) return NextResponse.json({ error: "Listing sold out" }, { status: 400 });
 
   const gst = asAsPurchasePricing(listing.avgUnitPrice, quantity);
   const amountPaid = gst.total;
@@ -83,7 +84,6 @@ export async function POST(req: NextRequest) {
   };
 
   const asasId = body.asasId?.trim();
-  const quantity = Math.max(1, Math.floor(Number(body.quantity ?? 1)));
   const checkout = body.checkout === true;
   const paymentOption: PaymentOptionId = parsePayOpt(body.paymentOption);
 
@@ -96,18 +96,22 @@ export async function POST(req: NextRequest) {
       purchases: { select: { quantity: true, status: true } },
     },
   });
-  if (!listing) return NextResponse.json({ error: "Listing not available" }, { status: 400 });
+  if (!listing) {
+    return NextResponse.json({ error: "Listing not available" }, { status: 400 });
+  }
 
   const remaining = asasUnitsAvailableFromPurchases(listing, listing.items, listing.purchases);
-  if (quantity > remaining) {
-    return NextResponse.json({ error: "Not enough units" }, { status: 400 });
+  /** Addendum v1.6: single-buyer flow — purchase the entire remaining stock only */
+  const quantity = remaining;
+  if (quantity <= 0) {
+    return NextResponse.json({ error: "Listing sold out" }, { status: 400 });
   }
 
   if (!checkout) {
     if (process.env.NODE_ENV === "production" && !allowInstantPaymentBypass()) {
       return NextResponse.json({ error: "Use checkout flow (checkout: true)." }, { status: 400 });
     }
-    return demoComplete(profile.id, asasId, quantity);
+    return demoComplete(profile.id, asasId);
   }
 
   if (!body.addressId?.trim()) {
@@ -129,23 +133,29 @@ export async function POST(req: NextRequest) {
   const bypass = allowInstantPaymentBypass();
   const reference = checkoutReference("AS");
 
-  const purchase = await prisma.asAsPurchase.create({
-    data: {
-      reference,
-      asasId: listing.id,
-      customerId: profile.id,
-      addressId: address.id,
-      quantity,
-      amountPaid: 0,
-      status: "PENDING_PAYMENT",
-      paymentOption,
-      subtotal: gst.subtotal,
-      gstAmount: gst.gstAmount,
-      grandTotal: gst.total,
-      tokenAmount: paymentOption !== "FULL" ? chargeTotal : null,
-      balanceDueAt,
-      customerGstin: body.customerGstin?.trim() || undefined,
-    },
+  const purchase = await prisma.$transaction(async (tx) => {
+    await tx.asAsListing.update({
+      where: { id: listing.id },
+      data: { status: "RESERVED" },
+    });
+    return tx.asAsPurchase.create({
+      data: {
+        reference,
+        asasId: listing.id,
+        customerId: profile.id,
+        addressId: address.id,
+        quantity,
+        amountPaid: 0,
+        status: "PENDING_PAYMENT",
+        paymentOption,
+        subtotal: gst.subtotal,
+        gstAmount: gst.gstAmount,
+        grandTotal: gst.total,
+        tokenAmount: paymentOption !== "FULL" ? chargeTotal : null,
+        balanceDueAt,
+        customerGstin: body.customerGstin?.trim() || undefined,
+      },
+    });
   });
 
   if (!configured && bypass) {
@@ -165,7 +175,10 @@ export async function POST(req: NextRequest) {
   }
 
   if (!configured) {
-    await prisma.asAsPurchase.delete({ where: { id: purchase.id } });
+    await prisma.$transaction([
+      prisma.asAsPurchase.delete({ where: { id: purchase.id } }),
+      prisma.asAsListing.update({ where: { id: listing.id }, data: { status: "LIVE" } }),
+    ]);
     return NextResponse.json(
       { error: "Configure Razorpay keys or PAYMENT_DEV_BYPASS=true locally." },
       { status: 503 },

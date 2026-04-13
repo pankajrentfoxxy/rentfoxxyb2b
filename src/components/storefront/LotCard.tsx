@@ -24,6 +24,7 @@ function conditionChipClass(label: string): string {
     "Refurb A": "bg-purple-100 text-purple-700",
     "Refurb B": "bg-yellow-100 text-yellow-700",
     "Refurb C": "bg-red-100 text-red-700",
+    "Refurb D": "bg-orange-100 text-orange-800",
   };
   return map[label] ?? "bg-slate-100 text-slate-700";
 }

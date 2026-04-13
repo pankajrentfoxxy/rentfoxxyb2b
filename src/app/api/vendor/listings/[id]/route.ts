@@ -33,10 +33,7 @@ export async function PATCH(req: NextRequest, route: { params: Promise<{ id: str
     isActive?: boolean;
     sku?: string;
     condition?: string;
-    batteryHealth?: number | null;
     conditionNotes?: string | null;
-    warrantyMonths?: number;
-    warrantyType?: string | null;
     refurbImages?: string[];
   };
 
@@ -105,17 +102,8 @@ export async function PATCH(req: NextRequest, route: { params: Promise<{ id: str
       ? body.refurbImages.filter((u) => typeof u === "string" && u.trim()).slice(0, 3)
       : undefined;
 
-  if (body.batteryHealth !== undefined) {
-    data.batteryHealth = body.batteryHealth;
-  }
   if (body.conditionNotes !== undefined) {
     data.conditionNotes = body.conditionNotes?.trim() || null;
-  }
-  if (body.warrantyMonths !== undefined) {
-    data.warrantyMonths = Math.min(24, Math.max(0, Math.floor(Number(body.warrantyMonths))));
-  }
-  if (body.warrantyType !== undefined) {
-    data.warrantyType = body.warrantyType?.trim() || null;
   }
   if (refurbImages !== undefined) {
     data.refurbImages = refurbImages;
@@ -123,21 +111,21 @@ export async function PATCH(req: NextRequest, route: { params: Promise<{ id: str
 
   if (nextCondition === "BRAND_NEW") {
     const d = defaultRefurbFieldsForBrandNew();
-    data.batteryHealth = null;
     data.conditionNotes = null;
-    data.warrantyMonths = d.warrantyMonths;
-    data.warrantyType = null;
     data.refurbImages = [];
     data.requiresAdminApproval = false;
+    void d;
   }
 
-  const changedToGradeC =
+  const low = nextCondition === "REFURB_C" || nextCondition === "REFURB_D";
+  const changedToLow =
     body.condition !== undefined &&
-    parseProductCondition(body.condition) === "REFURB_C" &&
-    existing.condition !== "REFURB_C";
+    low &&
+    existing.condition !== "REFURB_C" &&
+    existing.condition !== "REFURB_D";
 
-  if (nextCondition === "REFURB_C") {
-    if (changedToGradeC) {
+  if (low) {
+    if (changedToLow) {
       data.requiresAdminApproval = true;
       data.isActive = false;
     } else if (existing.requiresAdminApproval) {
@@ -151,21 +139,12 @@ export async function PATCH(req: NextRequest, route: { params: Promise<{ id: str
     typeof data.unitPrice === "number" ? data.unitPrice : existing.unitPrice;
   const nextMinBid =
     typeof data.minBidPrice === "number" ? data.minBidPrice : existing.minBidPrice;
-  const nextBat =
-    body.batteryHealth !== undefined ? body.batteryHealth : existing.batteryHealth;
-  const nextWm =
-    body.warrantyMonths !== undefined ? Number(body.warrantyMonths) : existing.warrantyMonths;
-  const nextWt =
-    body.warrantyType !== undefined ? body.warrantyType : existing.warrantyType;
   const nextNotes =
     body.conditionNotes !== undefined ? body.conditionNotes : existing.conditionNotes;
   const nextRefurb = refurbImages ?? existing.refurbImages;
 
   const fieldErr = validateListingConditionFields({
     condition: nextCondition,
-    batteryHealth: nextBat,
-    warrantyMonths: nextWm,
-    warrantyType: nextWt,
     conditionNotes: nextNotes,
     refurbImages: [...nextRefurb],
     unitPrice: nextUnit,

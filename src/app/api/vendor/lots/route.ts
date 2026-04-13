@@ -6,6 +6,14 @@ import { NextRequest, NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
+const UPLOAD_SNAPSHOT_MAX = 1_500_000;
+
+function trimUploadSnapshot(raw: string | null | undefined): string | undefined {
+  const s = raw?.trim();
+  if (!s) return undefined;
+  return s.length > UPLOAD_SNAPSHOT_MAX ? s.slice(0, UPLOAD_SNAPSHOT_MAX) : s;
+}
+
 export async function GET() {
   const ctx = await getVendorContext();
   if (!ctx) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -29,6 +37,7 @@ export async function POST(req: NextRequest) {
     lotSize?: number;
     coverImage?: string | null;
     items?: LotCSVRow[];
+    uploadedCsvSnapshot?: string | null;
   };
 
   const title = body.title?.trim();
@@ -62,6 +71,7 @@ export async function POST(req: NextRequest) {
       description: body.description ?? null,
       highlights,
       coverImage: body.coverImage ?? null,
+      uploadedCsvSnapshot: trimUploadSnapshot(body.uploadedCsvSnapshot ?? undefined),
       totalQuantity,
       lotSize,
       totalLots,
@@ -82,7 +92,16 @@ export async function POST(req: NextRequest) {
           condition: toLotItemCondition(r.condition),
           count: Math.max(0, Math.floor(Number(r.count))),
           unitPrice: Math.max(0, Number(r.unitPrice)),
-          notes: r.notes ? String(r.notes).slice(0, 500) : null,
+          notes: r.notes ? String(r.notes).slice(0, 8000) : null,
+          cosmeticSummary: r.cosmeticSummary ? String(r.cosmeticSummary).slice(0, 4000) : null,
+          functionalCount:
+            r.functionalCount != null && Number.isFinite(Number(r.functionalCount))
+              ? Math.max(0, Math.floor(Number(r.functionalCount)))
+              : null,
+          nonFunctionalCount:
+            r.nonFunctionalCount != null && Number.isFinite(Number(r.nonFunctionalCount))
+              ? Math.max(0, Math.floor(Number(r.nonFunctionalCount)))
+              : null,
         })),
       },
     },

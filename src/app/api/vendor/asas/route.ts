@@ -6,6 +6,14 @@ import { NextRequest, NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
+const UPLOAD_SNAPSHOT_MAX = 1_500_000;
+
+function trimUploadSnapshot(raw: string | null | undefined): string | undefined {
+  const s = raw?.trim();
+  if (!s) return undefined;
+  return s.length > UPLOAD_SNAPSHOT_MAX ? s.slice(0, UPLOAD_SNAPSHOT_MAX) : s;
+}
+
 type Row = {
   brand: string;
   model: string;
@@ -17,6 +25,7 @@ type Row = {
   condition: string;
   count: number;
   estimatedValue: number;
+  notes?: string | null;
 };
 
 export async function GET() {
@@ -43,6 +52,7 @@ export async function POST(req: NextRequest) {
     allowMultiBuyer?: boolean;
     aiSuggestedLots?: number | null;
     items?: Row[];
+    uploadedCsvSnapshot?: string | null;
   };
 
   const items = Array.isArray(body.items) ? body.items : [];
@@ -69,6 +79,7 @@ export async function POST(req: NextRequest) {
       allowBidding: body.allowBidding !== false,
       allowMultiBuyer: body.allowMultiBuyer === true,
       aiSuggestedLots: body.aiSuggestedLots ?? null,
+      uploadedCsvSnapshot: trimUploadSnapshot(body.uploadedCsvSnapshot ?? undefined),
       status: "PENDING_VERIFICATION",
       items: {
         create: items.map((r) => ({
@@ -82,6 +93,7 @@ export async function POST(req: NextRequest) {
           condition: toLotItemCondition(r.condition),
           count: Math.max(0, Math.floor(Number(r.count))),
           estimatedValue: Math.max(0, Number(r.estimatedValue)),
+          notes: r.notes ? String(r.notes).slice(0, 8000) : null,
         })),
       },
     },

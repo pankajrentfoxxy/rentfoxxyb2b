@@ -1,52 +1,49 @@
-export type PaymentOptionId = "FULL" | "TOKEN_2" | "TOKEN_3" | "TOKEN_4" | "TOKEN_5";
+/** Addendum v1.6: only Full payment and 5% token (7-day / 168h balance window). */
+
+export type PaymentOptionId = "FULL" | "TOKEN_5";
+
+export const TOKEN_WINDOW_HOURS = 168; // 7 days
+export const TOKEN_PERCENTAGE = 5;
 
 export const PAYMENT_OPTIONS: {
   id: PaymentOptionId;
   label: string;
+  subtitle: string;
   tokenPct: number;
   windowHours: number;
+  windowLabel: string | null;
+  badge: string;
+  badgeColor: "green" | "amber";
   description: string;
 }[] = [
   {
     id: "FULL",
-    label: "Full payment",
+    label: "Full Payment",
+    subtitle: "Pay 100% now — fastest dispatch",
     tokenPct: 100,
     windowHours: 0,
+    windowLabel: null,
+    badge: "✓ Recommended",
+    badgeColor: "green",
     description: "Pay 100% now. Fastest dispatch once the supplier fulfils.",
   },
   {
-    id: "TOKEN_2",
-    label: "Pay 2% token now",
-    tokenPct: 2,
-    windowHours: 48,
-    description: "Lock stock with a small advance; pay the balance within 48 hours.",
-  },
-  {
-    id: "TOKEN_3",
-    label: "Pay 3% token now",
-    tokenPct: 3,
-    windowHours: 72,
-    description: "Lock stock with 3% advance; balance due within 72 hours.",
-  },
-  {
-    id: "TOKEN_4",
-    label: "Pay 4% token now",
-    tokenPct: 4,
-    windowHours: 96,
-    description: "Lock stock with 4% advance; balance due within 96 hours (4 days).",
-  },
-  {
     id: "TOKEN_5",
-    label: "Pay 5% token now",
+    label: "Pay 5% Token Now",
+    subtitle: "Lock stock now, pay balance within 7 days",
     tokenPct: 5,
-    windowHours: 120,
-    description: "Lock stock with 5% advance; balance due within 5 days.",
+    windowHours: TOKEN_WINDOW_HOURS,
+    windowLabel: "7 days",
+    badge: "🔒 Stock Locked",
+    badgeColor: "amber",
+    description: "Lock stock with 5% advance; balance due within 7 days (168 hours).",
   },
 ];
 
 export function parsePaymentOption(v: string | null | undefined): PaymentOptionId {
   if (!v || v === "FULL") return "FULL";
-  if (v === "TOKEN_2" || v === "TOKEN_3" || v === "TOKEN_4" || v === "TOKEN_5") return v;
+  // Legacy token options map to 5% / 7-day window
+  if (v === "TOKEN_2" || v === "TOKEN_3" || v === "TOKEN_4" || v === "TOKEN_5") return "TOKEN_5";
   return "FULL";
 }
 

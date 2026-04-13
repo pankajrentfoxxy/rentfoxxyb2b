@@ -12,6 +12,7 @@ export function VendorLotWizard() {
   const [lotSize, setLotSize] = useState(10);
   const [coverImage, setCoverImage] = useState("");
   const [cleaned, setCleaned] = useState<LotCSVRow[]>([]);
+  const [uploadedCsvSnapshot, setUploadedCsvSnapshot] = useState("");
   const [aiTitle, setAiTitle] = useState("");
   const [aiDescription, setAiDescription] = useState("");
   const [aiHighlights, setAiHighlights] = useState<string[]>([]);
@@ -57,6 +58,7 @@ export function VendorLotWizard() {
           lotSize,
           coverImage: coverImage.trim() || null,
           items: cleaned,
+          uploadedCsvSnapshot: uploadedCsvSnapshot.trim() || undefined,
         }),
       });
       const data = await res.json();
@@ -128,12 +130,16 @@ export function VendorLotWizard() {
             mode="lot"
             apiEndpoint="/api/vendor/lots/clean-csv"
             templateUrl="/templates/lot_upload_template.csv"
-            onConfirmed={(data) => {
+            onConfirmed={(data, snap) => {
               const rows = data as LotCSVRow[];
               setCleaned(rows);
+              setUploadedCsvSnapshot(snap ?? "");
               void generateName(rows);
             }}
-            onReset={() => setCleaned([])}
+            onReset={() => {
+              setCleaned([]);
+              setUploadedCsvSnapshot("");
+            }}
           />
           <button
             type="button"

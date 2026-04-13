@@ -65,6 +65,19 @@ export default async function VendorBidDetailPage({ params }: { params: Promise<
           >
             View storefront listing
           </Link>
+          <p className="mt-3 text-xs text-muted">Revisions so far: {bid.revisionCount}</p>
+          {Array.isArray(bid.revisionHistory) && (bid.revisionHistory as unknown[]).length > 0 ? (
+            <ul className="mt-2 space-y-1 text-xs text-slate-600">
+              {(bid.revisionHistory as { at: string; oldPrice: number; newPrice: number; actor: string }[]).map(
+                (h, i) => (
+                  <li key={i}>
+                    {new Date(h.at).toLocaleString("en-IN")}: ₹{h.oldPrice.toLocaleString("en-IN")} → ₹
+                    {h.newPrice.toLocaleString("en-IN")} ({h.actor})
+                  </li>
+                ),
+              )}
+            </ul>
+          ) : null}
         </div>
 
         <VendorBidTrustCard bidId={bid.id} />

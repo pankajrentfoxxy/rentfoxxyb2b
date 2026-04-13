@@ -15,13 +15,15 @@ function authCron(req: NextRequest) {
   return auth === `Bearer ${secret}`;
 }
 
+/** Reminder schedule for 7-day balance window: T-48h, T-24h, T-2h, then forfeiture at T-0 */
 export async function GET(req: NextRequest) {
   if (!authCron(req)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const now = new Date();
-  const in12h = new Date(now.getTime() + 12 * 3600 * 1000);
+  const in48h = new Date(now.getTime() + 48 * 3600 * 1000);
+  const in24h = new Date(now.getTime() + 24 * 3600 * 1000);
   const in2h = new Date(now.getTime() + 2 * 3600 * 1000);
 
   const tokenOrders = await prisma.order.findMany({
@@ -29,7 +31,8 @@ export async function GET(req: NextRequest) {
     include: { customer: { include: { user: true } } },
   });
 
-  let reminders12 = 0;
+  let reminders48 = 0;
+  let reminders24 = 0;
   let reminders2 = 0;
   let forfeited = 0;
 
@@ -38,23 +41,23 @@ export async function GET(req: NextRequest) {
     const token = order.tokenAmount ?? 0;
     const balance = Math.round((order.totalAmount - token) * 100) / 100;
 
-    if (!order.balanceReminder12hSent && due <= in12h && due > in2h) {
+    if (!order.balanceReminder48hSent && due <= in48h && due > in24h) {
       await prisma.order.update({
         where: { id: order.id },
-        data: { balanceReminder12hSent: true },
+        data: { balanceReminder48hSent: true },
       });
       await createNotification({
         userId: order.customer.userId,
         type: NOTIFICATION_TYPES.BALANCE_DUE_SOON,
-        title: "Balance due in less than 12 hours",
-        message: `Pay ₹${balance.toLocaleString("en-IN")} for ${order.orderNumber} to keep your reservation.`,
+        title: "Balance due in less than 48 hours",
+        message: `Pay ₹${balance.toLocaleString("en-IN")} for ${order.orderNumber} within 7 days of token payment.`,
         link: `/customer/orders/${order.id}`,
       });
       const email = order.customer.user.email;
       if (email) {
         void sendBalanceReminderMail(
           order.id,
-          "12h",
+          "48h",
           order.orderNumber,
           email,
           order.customer.user.name,
@@ -62,7 +65,32 @@ export async function GET(req: NextRequest) {
           due,
         );
       }
-      reminders12++;
+      reminders48++;
+    } else if (!order.balanceReminder24hSent && due <= in24h && due > in2h) {
+      await prisma.order.update({
+        where: { id: order.id },
+        data: { balanceReminder24hSent: true },
+      });
+      await createNotification({
+        userId: order.customer.userId,
+        type: NOTIFICATION_TYPES.BALANCE_DUE_SOON,
+        title: "Balance due in less than 24 hours",
+        message: `Pay ₹${balance.toLocaleString("en-IN")} for ${order.orderNumber} to keep your reservation.`,
+        link: `/customer/orders/${order.id}`,
+      });
+      const email2 = order.customer.user.email;
+      if (email2) {
+        void sendBalanceReminderMail(
+          order.id,
+          "24h",
+          order.orderNumber,
+          email2,
+          order.customer.user.name,
+          balance,
+          due,
+        );
+      }
+      reminders24++;
     } else if (!order.balanceReminder2hSent && due <= in2h && due > now) {
       await prisma.order.update({
         where: { id: order.id },
@@ -75,13 +103,13 @@ export async function GET(req: NextRequest) {
         message: `Complete ₹${balance.toLocaleString("en-IN")} for ${order.orderNumber} or your token may be forfeited.`,
         link: `/customer/orders/${order.id}`,
       });
-      const email2 = order.customer.user.email;
-      if (email2) {
+      const email3 = order.customer.user.email;
+      if (email3) {
         void sendBalanceReminderMail(
           order.id,
           "2h",
           order.orderNumber,
-          email2,
+          email3,
           order.customer.user.name,
           balance,
           due,
@@ -101,52 +129,30 @@ export async function GET(req: NextRequest) {
   });
 
   for (const order of overdue) {
-    await prisma.$transaction(async (tx) => {
-      for (const item of order.items) {
-        await tx.productListing.update({
-          where: { id: item.listingId },
-          data: { stockQty: { increment: item.quantity } },
-        });
-      }
-      await tx.order.update({
-        where: { id: order.id },
-        data: {
-          status: "TOKEN_FORFEITED",
-          isTokenForfeited: true,
-          tokenForfeitedAt: now,
-        },
-      });
-      if (order.bidId) {
-        await tx.bid.update({
-          where: { id: order.bidId },
-          data: { status: "CANCELLED" },
-        });
-      }
+    await prisma.order.update({
+      where: { id: order.id },
+      data: {
+        status: "TOKEN_FORFEITED",
+        isTokenForfeited: true,
+        tokenForfeitedAt: now,
+      },
     });
-
+    forfeited++;
+    void sendTokenForfeitedMail(order.id);
     await createNotification({
       userId: order.customer.userId,
       type: NOTIFICATION_TYPES.TOKEN_FORFEITED,
-      title: "Reservation expired",
-      message: `Balance for ${order.orderNumber} was not paid in time. Stock has been released.`,
+      title: "Token forfeited — balance not paid in 7 days",
+      message: `Order ${order.orderNumber}: the 5% token is non-refundable per policy.`,
       link: `/customer/orders/${order.id}`,
     });
-
-    const vendorUid = order.bid?.listing.vendor.userId;
-    if (vendorUid) {
-      await createNotification({
-        userId: vendorUid,
-        type: NOTIFICATION_TYPES.TOKEN_FORFEITED,
-        title: "Buyer defaulted on balance",
-        message: `Order ${order.orderNumber} — stock released after balance deadline.`,
-        link: `/vendor/orders`,
-      });
-    }
-
-    void sendTokenForfeitedMail(order.id);
-
-    forfeited++;
   }
 
-  return NextResponse.json({ ok: true, reminders12, reminders2, forfeited });
+  return NextResponse.json({
+    ok: true,
+    reminders48h: reminders48,
+    reminders24h: reminders24,
+    reminders2h: reminders2,
+    forfeited,
+  });
 }

@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { validateVendorBidPayment } from "@/lib/vendor-payment-rules";
 import { NextRequest, NextResponse } from "next/server";
 
-const ALLOWED_PAY: PaymentOptionId[] = ["FULL", "TOKEN_2", "TOKEN_3", "TOKEN_4", "TOKEN_5"];
+const ALLOWED_PAY: PaymentOptionId[] = ["FULL", "TOKEN_5"];
 
 export async function POST(req: NextRequest) {
   const session = await auth();

@@ -26,9 +26,6 @@ const listingSelect = {
   isActive: true,
   requiresAdminApproval: true,
   condition: true,
-  batteryHealth: true,
-  warrantyMonths: true,
-  warrantyType: true,
 } satisfies Prisma.ProductListingSelect;
 
 export default async function ProductDetailPage({ params }: PageProps) {

@@ -1,6 +1,6 @@
 "use client";
 
-import type { AsAsCSVRow, LotCSVRow } from "@/lib/lot-ai-cleaner";
+import type { AsAsCSVRow, LotCSVRow, NonFunctionalUnit } from "@/lib/lot-ai-cleaner";
 import { lotConditionToLabel, toLotItemCondition } from "@/lib/lot-ai-cleaner";
 import {
   AlertTriangle,
@@ -24,7 +24,7 @@ export interface CSVUploadCleanerProps {
   apiEndpoint: string;
   templateUrl: string;
   mode: CSVUploadMode;
-  onConfirmed: (data: LotCSVRow[] | AsAsCSVRow[]) => void;
+  onConfirmed: (data: LotCSVRow[] | AsAsCSVRow[], uploadedCsvSnapshot?: string) => void;
   onReset?: () => void;
   /** Runs after AI clean, before success UI (e.g. AsAs name generation). */
   beforeConfirm?: (data: LotCSVRow[] | AsAsCSVRow[]) => Promise<void>;
@@ -92,7 +92,9 @@ function conditionBadgeClass(mode: CSVUploadMode, conditionLabel: string): strin
   if (c === "Refurb A+") return "bg-blue-600 text-white";
   if (c === "Refurb A") return "bg-purple-600 text-white";
   if (c === "Refurb B") return "bg-yellow-600 text-white";
-  return "bg-red-500 text-white";
+  if (c === "Refurb C") return "bg-red-500 text-white";
+  if (c === "Refurb D") return "bg-orange-600 text-white";
+  return "bg-slate-600 text-white";
 }
 
 export function CSVUploadCleaner({
@@ -109,7 +111,16 @@ export function CSVUploadCleaner({
   const [cleanedLot, setCleanedLot] = useState<LotCSVRow[]>([]);
   const [cleanedAsAs, setCleanedAsAs] = useState<AsAsCSVRow[]>([]);
   const [issues, setIssues] = useState<string[]>([]);
-  const [stats, setStats] = useState({ total: 0, cleaned: 0, flagged: 0 });
+  const [stats, setStats] = useState<{
+    total: number;
+    cleaned: number;
+    flagged: number;
+    totalFunctional?: number;
+    totalNonFunctional?: number;
+    groupsCreated?: number;
+  }>({ total: 0, cleaned: 0, flagged: 0 });
+  const [csvFormat, setCsvFormat] = useState<"A" | "B" | null>(null);
+  const [nonFunctionalUnits, setNonFunctionalUnits] = useState<NonFunctionalUnit[]>([]);
   const [fileName, setFileName] = useState("");
   const [error, setError] = useState<string | null>(null);
 
@@ -121,6 +132,8 @@ export function CSVUploadCleaner({
     setCleanedAsAs([]);
     setIssues([]);
     setStats({ total: 0, cleaned: 0, flagged: 0 });
+    setCsvFormat(null);
+    setNonFunctionalUnits([]);
     setFileName("");
     setError(null);
     onReset?.();
@@ -169,13 +182,31 @@ export function CSVUploadCleaner({
         throw new Error(typeof data.error === "string" ? data.error : await res.text());
       }
       if (mode === "lot") {
-        setCleanedLot((data.cleaned ?? []) as LotCSVRow[]);
+        const lotData = data as {
+          cleaned?: LotCSVRow[];
+          issues?: string[];
+          stats?: {
+            total: number;
+            cleaned: number;
+            flagged: number;
+            totalFunctional?: number;
+            totalNonFunctional?: number;
+            groupsCreated?: number;
+          };
+          format?: "A" | "B";
+          nonFunctional?: NonFunctionalUnit[];
+        };
+        setCleanedLot((lotData.cleaned ?? []) as LotCSVRow[]);
+        setCsvFormat(lotData.format === "A" || lotData.format === "B" ? lotData.format : null);
+        setNonFunctionalUnits(Array.isArray(lotData.nonFunctional) ? lotData.nonFunctional : []);
       } else {
         setCleanedAsAs((data.cleaned ?? []) as AsAsCSVRow[]);
+        setCsvFormat(null);
+        setNonFunctionalUnits([]);
       }
       setIssues(Array.isArray(data.issues) ? data.issues : []);
       setStats(
-        data.stats ?? {
+        (mode === "lot" ? (data as { stats?: typeof stats }).stats : data.stats) ?? {
           total: (data.cleaned ?? []).length,
           cleaned: (data.cleaned ?? []).length,
           flagged: Array.isArray(data.issues) ? data.issues.length : 0,
@@ -198,8 +229,9 @@ export function CSVUploadCleaner({
         if (mode === "lot") await beforeConfirm(lot);
         else await beforeConfirm(as);
       }
-      if (mode === "lot") onConfirmed(lot);
-      else onConfirmed(as);
+      const snap = rawText.trim() ? rawText : undefined;
+      if (mode === "lot") onConfirmed(lot, snap);
+      else onConfirmed(as, snap);
       setStage("CONFIRMED");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not finalize");
@@ -208,6 +240,8 @@ export function CSVUploadCleaner({
   };
 
   const cleanedRows = mode === "lot" ? cleanedLot : cleanedAsAs;
+  const showCosmeticCol =
+    mode === "lot" && cleanedLot.some((r) => (r.cosmeticSummary ?? "").trim().length > 0);
 
   return (
     <div className="space-y-4">
@@ -332,11 +366,36 @@ export function CSVUploadCleaner({
 
       {stage === "DIFF_PREVIEW" ? (
         <div className="space-y-4">
+          {csvFormat === "A" ? (
+            <div className="rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-950">
+              <strong>Format A</strong> detected — rows include functional / non-functional splits where provided. Grade
+              E maps to <strong>Refurb D</strong> in our catalogue.
+            </div>
+          ) : null}
+          {csvFormat === "B" ? (
+            <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800">
+              <strong>Format B</strong> — standard line-item layout (no functional split columns in file).
+            </div>
+          ) : null}
           <div className="grid grid-cols-3 gap-3">
             <StatCard icon="📊" label="Total rows" value={stats.total} tone="blue" />
             <StatCard icon="✅" label="Cleaned" value={stats.cleaned} tone="green" />
             <StatCard icon="⚠️" label="Issues" value={stats.flagged} tone="amber" />
           </div>
+          {typeof stats.totalFunctional === "number" || typeof stats.totalNonFunctional === "number" ? (
+            <div className="grid grid-cols-2 gap-3 text-center text-sm">
+              {typeof stats.totalFunctional === "number" ? (
+                <div className="rounded-xl border border-emerald-100 bg-emerald-50/80 py-2 font-medium text-emerald-900">
+                  Functional units (est.): {stats.totalFunctional}
+                </div>
+              ) : null}
+              {typeof stats.totalNonFunctional === "number" ? (
+                <div className="rounded-xl border border-rose-100 bg-rose-50/80 py-2 font-medium text-rose-900">
+                  Non-functional units (est.): {stats.totalNonFunctional}
+                </div>
+              ) : null}
+            </div>
+          ) : null}
           {issues.length > 0 ? (
             <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
               <p className="mb-2 flex items-center gap-2 font-semibold text-amber-900">
@@ -351,6 +410,33 @@ export function CSVUploadCleaner({
               </ul>
             </div>
           ) : null}
+          {mode === "lot" && nonFunctionalUnits.length > 0 ? (
+            <div className="overflow-x-auto rounded-xl border border-rose-200 bg-rose-50/50">
+              <p className="border-b border-rose-100 px-3 py-2 text-sm font-semibold text-rose-950">
+                Non-functional units (detail)
+              </p>
+              <table className="w-full text-xs">
+                <thead className="bg-rose-100/80">
+                  <tr>
+                    <th className="px-3 py-2 text-left font-medium text-rose-950">Brand</th>
+                    <th className="px-3 py-2 text-left font-medium text-rose-950">Model</th>
+                    <th className="px-3 py-2 text-left font-medium text-rose-950">Count</th>
+                    <th className="px-3 py-2 text-left font-medium text-rose-950">Reason</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {nonFunctionalUnits.map((u, i) => (
+                    <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-rose-50/80"}>
+                      <td className="px-3 py-2">{u.brand}</td>
+                      <td className="px-3 py-2">{u.model}</td>
+                      <td className="px-3 py-2 font-medium">{u.count}</td>
+                      <td className="max-w-xs px-3 py-2 text-rose-900">{u.reason}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : null}
           <p className="text-sm font-semibold text-slate-700">AI-cleaned data</p>
           <div className="overflow-x-auto rounded-xl border border-emerald-200">
             <table className="w-full text-xs">
@@ -361,6 +447,9 @@ export function CSVUploadCleaner({
                   <th className="px-3 py-2 text-left font-medium text-emerald-900">Processor</th>
                   <th className="px-3 py-2 text-left font-medium text-emerald-900">RAM</th>
                   <th className="px-3 py-2 text-left font-medium text-emerald-900">Storage</th>
+                  {showCosmeticCol ? (
+                    <th className="px-3 py-2 text-left font-medium text-emerald-900">Cosmetic</th>
+                  ) : null}
                   <th className="px-3 py-2 text-left font-medium text-emerald-900">Condition</th>
                   <th className="px-3 py-2 text-left font-medium text-emerald-900">Count</th>
                   <th className="px-3 py-2 text-left font-medium text-emerald-900">
@@ -375,6 +464,7 @@ export function CSVUploadCleaner({
                     mode === "lot"
                       ? (row as LotCSVRow).unitPrice
                       : (row as AsAsCSVRow).estimatedValue;
+                  const lotRow = row as LotCSVRow;
                   return (
                     <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-emerald-50/50"}>
                       <td className="px-3 py-2">{row.brand}</td>
@@ -384,6 +474,11 @@ export function CSVUploadCleaner({
                       <td className="px-3 py-2">
                         {row.storageGb}GB {row.storageType}
                       </td>
+                      {showCosmeticCol ? (
+                        <td className="max-w-[140px] px-3 py-2 text-slate-700">
+                          {(lotRow.cosmeticSummary ?? "").trim() || "—"}
+                        </td>
+                      ) : null}
                       <td className="px-3 py-2">
                         <span
                           className={`rounded-full px-2 py-0.5 text-xs font-medium ${conditionBadgeClass(mode, condLabel)}`}

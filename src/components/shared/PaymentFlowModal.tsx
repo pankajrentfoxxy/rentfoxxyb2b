@@ -242,11 +242,12 @@ export function PaymentFlowModal({
               {payOption !== "FULL" ? (
                 <div className="rounded-xl bg-amber-50 p-3 text-sm text-amber-900">
                   <p className="font-semibold">
-                    Pay now (token {cfg.tokenPct}%): ₹
-                    {payNowAmount.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
+                    Pay {cfg.tokenPct}% now (₹{payNowAmount.toLocaleString("en-IN", { maximumFractionDigits: 0 })}) — balance{" "}
+                    {100 - cfg.tokenPct}% (₹{balanceLater.toLocaleString("en-IN", { maximumFractionDigits: 0 })}) due within{" "}
+                    {cfg.windowLabel ?? `${cfg.windowHours}h`} of token payment.
                   </p>
-                  <p className="mt-1 text-xs">
-                    Balance ₹{balanceLater.toLocaleString("en-IN")} within balance window.
+                  <p className="mt-1 text-xs text-amber-800">
+                    Seven-day window (168h) from token confirmation — same terms across lots, As-Is, and product bids.
                   </p>
                 </div>
               ) : null}

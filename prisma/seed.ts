@@ -372,36 +372,14 @@ async function main() {
     ProductCondition.REFURB_B,
     ProductCondition.REFURB_A,
     ProductCondition.REFURB_C,
+    ProductCondition.REFURB_D,
   ];
 
-  function listingConditionFields(condition: ProductCondition): {
-    batteryHealth: number | null;
-    warrantyMonths: number;
-    warrantyType: string;
-    conditionNotes: string | null;
-  } {
-    if (condition === ProductCondition.BRAND_NEW) {
-      return {
-        batteryHealth: null,
-        warrantyMonths: 12,
-        warrantyType: "Manufacturer (via supplier)",
-        conditionNotes: null,
-      };
+  function listingConditionNotes(condition: ProductCondition): { conditionNotes: string | null } {
+    if (condition === ProductCondition.REFURB_C || condition === ProductCondition.REFURB_D) {
+      return { conditionNotes: "Cosmetic wear; functionally tested by supplier." };
     }
-    if (condition === ProductCondition.REFURB_C) {
-      return {
-        batteryHealth: 82,
-        warrantyMonths: 3,
-        warrantyType: "Seller refurbishment — limited",
-        conditionNotes: "Cosmetic wear; functionally tested by supplier.",
-      };
-    }
-    return {
-      batteryHealth: 93 + (condition === ProductCondition.REFURB_A_PLUS ? 3 : 0),
-      warrantyMonths: 6,
-      warrantyType: "Seller refurbishment warranty",
-      conditionNotes: null,
-    };
+    return { conditionNotes: null };
   }
 
   for (let i = 0; i < productsData.length; i++) {
@@ -410,8 +388,8 @@ async function main() {
 
     const condA = condRot[i % condRot.length]!;
     const condB = condRot[(i + 2) % condRot.length]!;
-    const metaA = listingConditionFields(condA);
-    const metaB = listingConditionFields(condB);
+    const metaA = listingConditionNotes(condA);
+    const metaB = listingConditionNotes(condB);
 
     await prisma.productListing.create({
       data: {

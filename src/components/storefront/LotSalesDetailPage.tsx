@@ -12,6 +12,7 @@ import {
   ChevronUp,
   Clock,
   Cpu,
+  Download,
   HardDrive,
   MessageSquare,
   Monitor,
@@ -370,6 +371,26 @@ export function LotSalesDetailPage() {
                   </button>
                 </div>
                 <p className="mt-1 text-center text-xs text-muted">{lot.lotsRemaining} lots available</p>
+              </div>
+              <div className="space-y-2">
+                <a
+                  href={`/api/public/lots/${lot.id}/download-csv`}
+                  download
+                  className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-slate-200 py-2.5 text-sm font-semibold text-slate-800 hover:bg-slate-50"
+                >
+                  <Download className="h-4 w-4" />
+                  Download catalogue CSV
+                </a>
+                {lot.hasUploadedCsv ? (
+                  <a
+                    href={`/api/public/lots/${lot.id}/uploaded-csv`}
+                    download
+                    className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-slate-50 py-2.5 text-sm font-medium text-slate-800 hover:bg-slate-100"
+                  >
+                    <Download className="h-4 w-4" />
+                    Download original upload
+                  </a>
+                ) : null}
               </div>
               <div>
                 <label className="mb-2 block text-sm font-semibold">Payment</label>
