@@ -103,7 +103,7 @@ export default async function CustomerBidsPage({
             key={t.id}
             href={`/customer/bids?tab=${t.id}`}
             className={`rounded-full px-3 py-1.5 text-sm font-medium ${
-              tab === t.id ? "bg-accent text-white" : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+              tab === t.id ? "bg-navy text-white" : "bg-slate-100 text-slate-700 hover:bg-slate-200"
             }`}
           >
             {t.label}
@@ -170,7 +170,7 @@ export default async function CustomerBidsPage({
                     <Link
                       href={`/customer/bids/${b.id}`}
                       className={`mt-4 inline-flex justify-center rounded-lg py-2 text-center text-sm font-semibold text-white ${
-                        highlight ? "bg-amber-600 hover:bg-amber-700" : "bg-primary hover:bg-primary-light"
+                        highlight ? "bg-amber hover:bg-amber-dark" : "bg-navy hover:bg-navy-light"
                       }`}
                     >
                       {highlight ? "Proceed to payment" : "View details"}
@@ -191,8 +191,8 @@ export default async function CustomerBidsPage({
                     highlight ? "border-amber-400 ring-2 ring-amber-200" : "border-slate-200"
                   }`}
                 >
-                  <div className="flex aspect-video w-full items-center justify-center bg-gradient-to-br from-primary/20 to-accent/20">
-                    <span className="rounded-full bg-white/90 px-4 py-2 text-sm font-bold text-primary">
+                  <div className="flex aspect-video w-full items-center justify-center bg-gradient-to-br from-navy/20 to-lot/20">
+                    <span className="rounded-full bg-white/90 px-4 py-2 text-sm font-bold text-navy">
                       Lot negotiation
                     </span>
                   </div>
@@ -220,7 +220,7 @@ export default async function CustomerBidsPage({
                     </p>
                     <Link
                       href={`/sales/lots/${b.lot.id}`}
-                      className="mt-4 inline-flex justify-center rounded-lg bg-primary py-2 text-center text-sm font-semibold text-white hover:bg-primary-light"
+                      className="mt-4 inline-flex justify-center rounded-lg bg-navy py-2 text-center text-sm font-semibold text-white hover:bg-navy-light"
                     >
                       View lot
                     </Link>
@@ -239,13 +239,13 @@ export default async function CustomerBidsPage({
                   highlight ? "border-amber-400 ring-2 ring-amber-200" : "border-slate-200"
                 }`}
               >
-                <div className="flex aspect-video w-full items-center justify-center bg-gradient-to-br from-purple-200 to-indigo-200">
-                  <span className="rounded-full bg-white/90 px-4 py-2 text-sm font-bold text-purple-800">
+                <div className="flex aspect-video w-full items-center justify-center bg-gradient-to-br from-asas-bg to-asas-border">
+                  <span className="rounded-full bg-white/90 px-4 py-2 text-sm font-bold text-asas-text">
                     AsAs offer
                   </span>
                 </div>
                 <div className="flex flex-1 flex-col p-4">
-                  <span className="mb-1 w-fit rounded bg-purple-100 px-2 py-0.5 text-xs font-medium text-purple-900">
+                  <span className="mb-1 w-fit rounded bg-asas-bg px-2 py-0.5 text-xs font-medium text-asas-text">
                     AsAs
                   </span>
                   <h2 className="font-semibold text-slate-900">{b.asas.title}</h2>
@@ -268,7 +268,7 @@ export default async function CustomerBidsPage({
                   </p>
                   <Link
                     href={`/asas/listings/${b.asas.id}`}
-                    className="mt-4 inline-flex justify-center rounded-lg bg-purple-600 py-2 text-center text-sm font-semibold text-white hover:bg-purple-700"
+                    className="mt-4 inline-flex justify-center rounded-lg bg-asas py-2 text-center text-sm font-semibold text-white hover:bg-asas-dark"
                   >
                     View listing
                   </Link>

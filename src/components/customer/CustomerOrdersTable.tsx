@@ -1,6 +1,7 @@
 "use client";
 
 import { DataTable } from "@/components/shared/DataTable";
+import { getStatusBadge, statusBadgeLabel } from "@/lib/status-badge";
 import type { OrderStatus } from "@prisma/client";
 import type { ColumnDef } from "@tanstack/react-table";
 import Link from "next/link";
@@ -24,7 +25,7 @@ export function CustomerOrdersTable({ data }: { data: CustomerOrderRow[] }) {
         cell: ({ row }) => (
           <Link
             href={`/customer/orders/${row.original.id}`}
-            className="font-mono font-medium text-accent hover:underline"
+            className="font-mono font-medium text-lot hover:underline"
           >
             {row.original.orderNumber}
           </Link>
@@ -48,8 +49,10 @@ export function CustomerOrdersTable({ data }: { data: CustomerOrderRow[] }) {
         accessorKey: "status",
         header: "Status",
         cell: ({ row }) => (
-          <span className="capitalize">
-            {row.original.status.toLowerCase().replace(/_/g, " ")}
+          <span
+            className={`inline-flex rounded px-2 py-0.5 text-[10px] font-medium capitalize ${getStatusBadge(row.original.status)}`}
+          >
+            {statusBadgeLabel(row.original.status)}
           </span>
         ),
       },
@@ -57,7 +60,7 @@ export function CustomerOrdersTable({ data }: { data: CustomerOrderRow[] }) {
         id: "actions",
         header: "",
         cell: ({ row }) => (
-          <Link href={`/customer/orders/${row.original.id}`} className="text-sm text-accent hover:underline">
+          <Link href={`/customer/orders/${row.original.id}`} className="text-sm text-lot hover:underline">
             View
           </Link>
         ),

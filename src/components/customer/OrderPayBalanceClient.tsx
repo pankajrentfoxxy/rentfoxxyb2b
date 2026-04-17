@@ -31,15 +31,19 @@ export function OrderPayBalanceClient({
   const [tick, setTick] = useState(0);
 
   useEffect(() => {
-    const t = setInterval(() => setTick((c) => c + 1), 60000);
+    const t = setInterval(() => setTick((c) => c + 1), 1000);
     return () => clearInterval(t);
   }, []);
 
   const due = new Date(balanceDueAtIso);
   const msLeft = due.getTime() - Date.now();
-  const hoursLeft = Math.max(0, Math.floor(msLeft / 3600000));
-  const minsLeft = Math.max(0, Math.floor((msLeft % 3600000) / 60000));
   void tick;
+
+  const totalSecs = Math.max(0, Math.floor(msLeft / 1000));
+  const days = Math.floor(totalSecs / 86400);
+  const hours = Math.floor((totalSecs % 86400) / 3600);
+  const mins = Math.floor((totalSecs % 3600) / 60);
+  const secs = totalSecs % 60;
 
   async function pay() {
     setBusy(true);
@@ -122,18 +126,22 @@ export function OrderPayBalanceClient({
     <>
       <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
       <RazorpayTestBanner />
-      <div className="rounded-xl border border-amber-300 bg-gradient-to-br from-amber-50 to-orange-50 p-4 text-amber-950 shadow-sm">
-        <p className="text-sm font-semibold">Stock reserved — balance due</p>
-        <p className="mt-2 text-sm">
+      <div className="rounded-xl bg-gradient-to-r from-amber to-amber-dark p-5 text-navy shadow-sm">
+        <p className="text-[15px] font-semibold">⏰ Balance due before dispatch</p>
+        <p className="mt-2 text-[13px]">
           Pay <strong>₹{bal.toLocaleString("en-IN")}</strong> by{" "}
           {due.toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}
         </p>
-        <p className="mt-1 text-xs">
-          Time left: ~{hoursLeft}h {minsLeft}m · Token paid ₹{tokenAmount.toLocaleString("en-IN")} is
-          non-refundable if you miss the deadline.
+        <p className="mt-1 text-[12px] text-navy/70">
+          Deadline above — token ₹{tokenAmount.toLocaleString("en-IN")} is non-refundable if missed.
+        </p>
+        <p className="mt-3 font-mono text-[18px] font-bold tabular-nums">
+          {msLeft <= 0
+            ? "Deadline passed"
+            : `${days}d ${hours}h ${mins}m ${secs}s`}
         </p>
         {payError ? (
-          <p className="mt-3 rounded-lg border border-red-200 bg-red-800/10 px-3 py-2 text-sm text-red-950" role="alert">
+          <p className="mt-3 rounded-lg border border-red-200 bg-white/90 px-3 py-2 text-sm text-red-900" role="alert">
             {payError}
           </p>
         ) : null}
@@ -141,10 +149,13 @@ export function OrderPayBalanceClient({
           type="button"
           disabled={busy || msLeft <= 0}
           onClick={pay}
-          className="mt-4 w-full rounded-lg bg-amber-700 py-3 font-semibold text-white hover:bg-amber-800 disabled:opacity-50"
+          className="mt-4 w-full rounded-xl bg-white py-3 text-[15px] font-bold text-amber-dark shadow-sm hover:bg-amber-bg disabled:opacity-50"
         >
-          {busy ? "Processing…" : "Pay balance now"}
+          {busy ? "Processing…" : "Pay Balance Now"}
         </button>
+        <p className="mt-2 text-[10px] text-navy/50">
+          Missing the deadline may forfeit your token per policy.
+        </p>
       </div>
     </>
   );

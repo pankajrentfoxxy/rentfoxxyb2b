@@ -1,6 +1,6 @@
 import { CustomerOrderReviewForm } from "@/components/customer/CustomerOrderReviewForm";
 import { OrderPayBalanceClient } from "@/components/customer/OrderPayBalanceClient";
-import { OrderStatusStepper } from "@/components/customer/OrderStatusStepper";
+import { OrderTimeline } from "@/components/customer/OrderTimeline";
 import { ReturnRequestButton } from "@/components/customer/ReturnRequestButton";
 import { SupportTicketModal } from "@/components/customer/SupportTicketModal";
 import { roundMoney } from "@/constants/payment-options";
@@ -116,9 +116,9 @@ export default async function CustomerOrderDetailPage({
       ) : null}
 
       <div className="mt-8">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">Status</h2>
-        <div className="mt-3">
-          <OrderStatusStepper status={order.status} />
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">Order timeline</h2>
+        <div className="mt-4 animate-fade-in">
+          <OrderTimeline status={order.status} />
         </div>
       </div>
 

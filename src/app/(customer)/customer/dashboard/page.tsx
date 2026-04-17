@@ -1,4 +1,5 @@
 import { auth } from "@/lib/auth";
+import { getStatusBadge, statusBadgeLabel } from "@/lib/status-badge";
 import { prisma } from "@/lib/prisma";
 import { Package, Gavel, Clock, IndianRupee, ArrowRight, ShoppingBag } from "lucide-react";
 import Link from "next/link";
@@ -71,57 +72,43 @@ export default async function CustomerDashboardPage() {
       label: "Total orders",
       value: totalOrders,
       icon: Package,
-      color: "text-blue-600 bg-blue-50",
+      iconWrap: "bg-lot-bg text-lot",
     },
     {
       label: "Active bids",
       value: activeBids,
       icon: Gavel,
-      color: "text-amber-600 bg-amber-50",
+      iconWrap: "bg-amber-bg text-amber-dark",
     },
     {
       label: "Pending payments",
       value: pendingPayments,
       icon: Clock,
-      color: "text-orange-600 bg-orange-50",
+      iconWrap: "bg-orange-50 text-orange-700",
     },
     {
       label: "Total spend",
       value: `₹${totalSpend.toLocaleString("en-IN")}`,
       icon: IndianRupee,
-      color: "text-emerald-600 bg-emerald-50",
+      iconWrap: "bg-verified-bg text-verified-text",
     },
   ];
-
-  function statusBadge(status: string) {
-    const s = status.toLowerCase().replace(/_/g, " ");
-    return (
-      <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium capitalize text-slate-700">
-        {s}
-      </span>
-    );
-  }
 
   return (
     <div className="mx-auto max-w-6xl space-y-10">
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
-        <p className="mt-1 text-sm text-muted">Overview of your procurement activity.</p>
+        <h1 className="text-[22px] font-medium text-ink-primary">Dashboard</h1>
+        <p className="mt-1 text-[12px] text-ink-muted">Overview of your procurement activity.</p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
         {kpi.map((c) => (
-          <div
-            key={c.label}
-            className="flex items-center gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
-          >
-            <div className={`rounded-lg p-3 ${c.color}`}>
-              <c.icon className="h-6 w-6" />
+          <div key={c.label} className="rounded-xl border border-border bg-white p-4">
+            <div className={`flex h-9 w-9 items-center justify-center rounded-lg ${c.iconWrap}`}>
+              <c.icon className="h-4 w-4" />
             </div>
-            <div>
-              <p className="text-sm text-muted">{c.label}</p>
-              <p className="text-xl font-bold text-slate-900">{c.value}</p>
-            </div>
+            <p className="mt-2 text-[22px] font-medium text-ink-primary">{c.value}</p>
+            <p className="text-[12px] text-ink-muted">{c.label}</p>
           </div>
         ))}
       </div>
@@ -130,7 +117,7 @@ export default async function CustomerDashboardPage() {
         <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
           <div className="flex items-center justify-between">
             <h2 className="font-semibold text-slate-900">Recent orders</h2>
-            <Link href="/customer/orders" className="text-sm font-medium text-accent hover:underline">
+            <Link href="/customer/orders" className="text-sm font-medium text-lot hover:underline">
               View all
             </Link>
           </div>
@@ -141,7 +128,7 @@ export default async function CustomerDashboardPage() {
               recentOrders.map((o) => (
                 <li key={o.id} className="flex flex-wrap items-center justify-between gap-2 py-3 text-sm">
                   <div>
-                    <Link href={`/customer/orders/${o.id}`} className="font-mono font-medium text-accent hover:underline">
+                    <Link href={`/customer/orders/${o.id}`} className="font-mono font-medium text-lot hover:underline">
                       {o.orderNumber}
                     </Link>
                     <p className="text-muted">
@@ -149,7 +136,11 @@ export default async function CustomerDashboardPage() {
                       {o.totalAmount.toLocaleString("en-IN")}
                     </p>
                   </div>
-                  {statusBadge(o.status)}
+                  <span
+                    className={`inline-flex rounded px-2 py-0.5 text-[10px] font-medium capitalize ${getStatusBadge(o.status)}`}
+                  >
+                    {statusBadgeLabel(o.status)}
+                  </span>
                 </li>
               ))
             )}
@@ -159,7 +150,7 @@ export default async function CustomerDashboardPage() {
         <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
           <div className="flex items-center justify-between">
             <h2 className="font-semibold text-slate-900">Active bids</h2>
-            <Link href="/customer/bids" className="text-sm font-medium text-accent hover:underline">
+            <Link href="/customer/bids" className="text-sm font-medium text-lot hover:underline">
               View all
             </Link>
           </div>
@@ -171,7 +162,7 @@ export default async function CustomerDashboardPage() {
                 <li key={b.id} className="py-3 text-sm">
                   <div className="flex items-start justify-between gap-2">
                     <div>
-                      <Link href={`/customer/bids/${b.id}`} className="font-medium text-accent hover:underline">
+                      <Link href={`/customer/bids/${b.id}`} className="font-medium text-lot hover:underline">
                         {b.listing.product.name}
                       </Link>
                       <p className="text-muted">
@@ -181,17 +172,21 @@ export default async function CustomerDashboardPage() {
                     {b.status === "APPROVED" ? (
                       <Link
                         href={`/customer/bids/${b.id}`}
-                        className="shrink-0 rounded-lg bg-amber-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-amber-700"
+                        className="shrink-0 rounded-lg bg-amber px-3 py-1.5 text-xs font-semibold text-navy hover:bg-amber-dark"
                       >
                         Pay now
                       </Link>
                     ) : b.status === "PENDING" ? (
                       <span className="flex items-center gap-1 text-xs text-muted">
-                        <span className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-accent border-t-transparent" />
+                        <span className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-lot border-t-transparent" />
                         Under review
                       </span>
                     ) : (
-                      statusBadge(b.status)
+                      <span
+                        className={`inline-flex rounded px-2 py-0.5 text-[10px] font-medium capitalize ${getStatusBadge(b.status)}`}
+                      >
+                        {statusBadgeLabel(b.status)}
+                      </span>
                     )}
                   </div>
                   {b.status === "APPROVED" && b.expiresAt && b.expiresAt > now ? (

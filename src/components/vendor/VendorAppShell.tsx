@@ -17,23 +17,31 @@ import {
   ClipboardList,
   X,
   Truck,
+  ShoppingCart,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 const nav = [
   { href: "/vendor/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/vendor/products", label: "Products", icon: Package },
   { href: "/vendor/lots", label: "Lot sales", icon: Layers },
-  { href: "/vendor/lots/orders", label: "Bulk fulfilment", icon: Truck },
-  { href: "/vendor/asas/new", label: "New AsAs", icon: RefreshCw },
-  { href: "/vendor/listings/verifications", label: "Verifications", icon: ClipboardList },
+  { href: "/vendor/lots/orders", label: "Lot orders", icon: Truck },
+  { href: "/vendor/asas/new", label: "AsAs listing", icon: RefreshCw },
   { href: "/vendor/bids", label: "Bids", icon: Gavel },
-  { href: "/vendor/orders", label: "Orders", icon: Package },
+  { href: "/vendor/orders", label: "Orders", icon: ShoppingCart },
   { href: "/vendor/payouts", label: "Payouts", icon: IndianRupee },
   { href: "/vendor/profile", label: "Profile", icon: User },
 ];
+
+function pageTitle(pathname: string): string {
+  const hit = nav.find((n) => pathname === n.href || pathname.startsWith(`${n.href}/`));
+  if (hit) return hit.label;
+  if (pathname.includes("/listings/verifications")) return "Verifications";
+  if (pathname.includes("/notifications")) return "Notifications";
+  return "Vendor Portal";
+}
 
 export function VendorAppShell({
   children,
@@ -50,57 +58,71 @@ export function VendorAppShell({
 }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+  const title = useMemo(() => pageTitle(pathname), [pathname]);
 
   const linkCls = (href: string) =>
     cn(
-      "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition",
+      "flex items-center gap-3 border-l-2 border-transparent px-3 py-2.5 text-[12px] font-medium transition-colors",
       pathname === href || pathname.startsWith(`${href}/`)
-        ? "bg-teal-50 text-teal-800"
-        : "text-slate-700 hover:bg-teal-50/50",
+        ? "border-verified bg-verified/10 text-verified"
+        : "text-white/55 hover:bg-white/6 hover:text-white",
     );
 
   return (
-    <div className="min-h-screen bg-teal-50/30">
+    <div className="min-h-screen bg-surface">
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-40 w-64 border-r border-teal-100 bg-white transition-transform lg:translate-x-0",
+          "fixed inset-y-0 left-0 z-40 flex w-56 flex-col border-r border-white/10 bg-[#0A2618] transition-transform lg:translate-x-0",
           open ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
         )}
       >
-        <div className="flex h-16 items-center border-b border-teal-100 px-4">
-          <Link href="/" onClick={() => setOpen(false)}>
-            <Logo size="sm" variant="dark" />
-          </Link>
-          <button
-            type="button"
-            className="ml-auto rounded-lg p-2 lg:hidden"
-            onClick={() => setOpen(false)}
-            aria-label="Close sidebar"
-          >
-            <X className="h-5 w-5" />
-          </button>
+        <div className="border-b border-white/10 px-4 pb-4 pt-5">
+          <div className="flex items-start justify-between gap-2">
+            <Link href="/" onClick={() => setOpen(false)} className="block">
+              <Logo variant="nav" size="sm" />
+            </Link>
+            <button
+              type="button"
+              className="rounded-lg p-2 text-white/70 lg:hidden"
+              onClick={() => setOpen(false)}
+              aria-label="Close sidebar"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+          <p className="mt-3 text-[10px] font-medium uppercase tracking-widest text-white/40">Vendor Portal</p>
         </div>
-        <nav className="space-y-1 overflow-y-auto p-3 pb-28">
+
+        <nav className="flex-1 space-y-0.5 overflow-y-auto p-3 pb-24">
           {nav.map((item) => (
             <Link key={item.href} href={item.href} className={linkCls(item.href)} onClick={() => setOpen(false)}>
-              <item.icon className="h-4 w-4 shrink-0 text-[#0F766E]" />
+              <item.icon className="h-4 w-4 shrink-0" />
               {item.label}
             </Link>
           ))}
+          <Link
+            href="/vendor/listings/verifications"
+            className={linkCls("/vendor/listings/verifications")}
+            onClick={() => setOpen(false)}
+          >
+            <ClipboardList className="h-4 w-4 shrink-0" />
+            Verifications
+          </Link>
         </nav>
-        <div className="absolute bottom-0 left-0 right-0 border-t border-teal-100 p-4">
-          <p className="truncate text-sm font-semibold text-slate-900">{companyName}</p>
+
+        <div className="absolute bottom-0 left-0 right-0 border-t border-white/10 bg-black/20 px-4 py-3">
+          <p className="truncate text-[12px] font-medium text-white">{companyName}</p>
           <div className="mt-2">
             {status === "ACTIVE" ? (
-              <span className="inline-flex rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-800">
+              <span className="inline-flex rounded-full bg-verified/20 px-2 py-0.5 text-[10px] font-semibold text-verified">
                 Active
               </span>
             ) : status === "PENDING_APPROVAL" ? (
-              <span className="inline-flex rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-900">
+              <span className="inline-flex rounded-full bg-amber/20 px-2 py-0.5 text-[10px] font-semibold text-amber">
                 Pending approval
               </span>
             ) : (
-              <span className="inline-flex rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-800">
+              <span className="inline-flex rounded-full bg-red-500/20 px-2 py-0.5 text-[10px] font-semibold text-red-300">
                 Suspended
               </span>
             )}
@@ -108,26 +130,29 @@ export function VendorAppShell({
         </div>
       </aside>
 
-      {open && (
+      {open ? (
         <button
           type="button"
-          className="fixed inset-0 z-30 bg-slate-900/40 lg:hidden"
+          className="fixed inset-0 z-30 bg-black/40 lg:hidden"
           aria-label="Close overlay"
           onClick={() => setOpen(false)}
         />
-      )}
+      ) : null}
 
-      <div className="lg:pl-64">
-        <header className="sticky top-0 z-20 flex h-16 items-center justify-between gap-3 border-b border-teal-100 bg-white/90 px-4 backdrop-blur md:px-6">
-          <button
-            type="button"
-            className="rounded-lg p-2 lg:hidden"
-            onClick={() => setOpen(true)}
-            aria-label="Open sidebar"
-          >
-            <Menu className="h-6 w-6" />
-          </button>
-          <div className="ml-auto flex items-center gap-3">
+      <div className="lg:pl-56">
+        <header className="sticky top-0 z-20 flex min-h-14 items-center justify-between gap-3 border-b border-border bg-white px-4 py-3 md:px-6">
+          <div className="flex min-w-0 flex-1 items-center gap-3">
+            <button
+              type="button"
+              className="rounded-lg p-2 text-ink-secondary lg:hidden"
+              onClick={() => setOpen(true)}
+              aria-label="Open sidebar"
+            >
+              <Menu className="h-6 w-6" />
+            </button>
+            <h1 className="truncate text-[15px] font-medium text-ink-primary">{title}</h1>
+          </div>
+          <div className="flex shrink-0 items-center gap-2">
             <VendorLiveNotificationBell />
             <UserMenu email={email} role={role} />
           </div>

@@ -18,21 +18,21 @@ export function EmptyState({
   return (
     <div
       className={cn(
-        "flex flex-col items-center justify-center rounded-xl border border-dashed border-slate-200 bg-surface px-6 py-14 text-center",
+        "flex flex-col items-center justify-center py-16 text-center",
         className,
       )}
     >
-      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-accent-light text-accent">
-        <Icon className="h-7 w-7" aria-hidden />
+      <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl border border-border bg-surface text-ink-hint">
+        <Icon className="h-8 w-8" aria-hidden />
       </div>
-      <h2 className="mt-4 text-lg font-semibold text-slate-900">{title}</h2>
+      <h2 className="mb-2 text-[15px] font-medium text-ink-primary">{title}</h2>
       {description ? (
-        <p className="mt-2 max-w-sm text-sm text-muted">{description}</p>
+        <p className="mb-5 max-w-sm text-[13px] leading-relaxed text-ink-muted">{description}</p>
       ) : null}
       {cta ? (
         <Link
           href={cta.href}
-          className="mt-6 inline-flex h-10 items-center rounded-lg bg-primary px-4 text-sm font-semibold text-white hover:bg-primary-light"
+          className="rounded-lg bg-navy px-5 py-2.5 text-[12px] text-white transition-colors hover:bg-navy-light"
         >
           {cta.label}
         </Link>

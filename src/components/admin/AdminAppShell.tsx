@@ -24,7 +24,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 const nav = [
   { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -43,6 +43,11 @@ const nav = [
   { href: "/admin/settings", label: "Settings", icon: Settings },
 ];
 
+function pageTitle(pathname: string, links: typeof nav): string {
+  const hit = links.find((n) => pathname === n.href || pathname.startsWith(`${n.href}/`));
+  return hit?.label ?? "Admin";
+}
+
 export function AdminAppShell({
   children,
   email,
@@ -55,30 +60,29 @@ export function AdminAppShell({
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const links = role === "INSPECTION_MANAGER" ? nav.filter((i) => i.href.startsWith("/admin/verifications")) : nav;
+  const title = useMemo(() => pageTitle(pathname, links), [pathname, links]);
 
   const linkCls = (href: string) =>
     cn(
-      "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition",
+      "flex items-center gap-3 border-l-2 border-transparent px-3 py-2.5 text-[12px] font-medium transition-colors",
       pathname === href || pathname.startsWith(`${href}/`)
-        ? "bg-white/10 text-white"
-        : "text-slate-200 hover:bg-white/10 hover:text-white",
+        ? "border-amber bg-amber/10 text-amber"
+        : "text-white/55 hover:bg-white/6 hover:text-white",
     );
 
   return (
-    <div className="min-h-screen bg-slate-100">
+    <div className="min-h-screen bg-surface">
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-40 w-64 bg-primary transition-transform lg:translate-x-0",
+          "fixed inset-y-0 left-0 z-40 flex w-56 flex-col border-r border-white/8 bg-navy transition-transform lg:translate-x-0",
           open ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
         )}
       >
-        <div className="flex h-16 items-center gap-2 border-b border-white/10 px-4">
+        <div className="bg-amber px-4 py-2 text-center text-[10px] font-bold tracking-widest text-navy">RENTFOXXY ADMIN</div>
+        <div className="flex items-center gap-2 border-b border-white/8 px-4 py-4">
           <Link href="/" onClick={() => setOpen(false)} className="text-white">
-            <Logo size="sm" variant="light" />
+            <Logo variant="nav" size="sm" />
           </Link>
-          <span className="rounded-md bg-white/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
-            Admin
-          </span>
           <button
             type="button"
             className="ml-auto rounded-lg p-2 text-white lg:hidden"
@@ -88,7 +92,7 @@ export function AdminAppShell({
             <X className="h-5 w-5" />
           </button>
         </div>
-        <nav className="space-y-1 p-3">
+        <nav className="flex-1 space-y-0.5 overflow-y-auto p-3">
           {links.map((item) => (
             <Link key={item.href} href={item.href} className={linkCls(item.href)} onClick={() => setOpen(false)}>
               <item.icon className="h-4 w-4 shrink-0" />
@@ -98,26 +102,29 @@ export function AdminAppShell({
         </nav>
       </aside>
 
-      {open && (
+      {open ? (
         <button
           type="button"
-          className="fixed inset-0 z-30 bg-slate-900/40 lg:hidden"
+          className="fixed inset-0 z-30 bg-black/40 lg:hidden"
           aria-label="Close overlay"
           onClick={() => setOpen(false)}
         />
-      )}
+      ) : null}
 
-      <div className="lg:pl-64">
-        <header className="sticky top-0 z-20 flex h-16 items-center justify-between gap-3 border-b border-slate-200 bg-white px-4 shadow-sm md:px-6">
-          <button
-            type="button"
-            className="rounded-lg p-2 text-slate-800 lg:hidden"
-            onClick={() => setOpen(true)}
-            aria-label="Open sidebar"
-          >
-            <Menu className="h-6 w-6" />
-          </button>
-          <div className="ml-auto flex items-center gap-3">
+      <div className="lg:pl-56">
+        <header className="sticky top-0 z-20 flex min-h-14 items-center justify-between gap-3 border-b border-border bg-white px-4 py-3 md:px-6">
+          <div className="flex min-w-0 flex-1 items-center gap-3">
+            <button
+              type="button"
+              className="rounded-lg p-2 text-ink-secondary lg:hidden"
+              onClick={() => setOpen(true)}
+              aria-label="Open sidebar"
+            >
+              <Menu className="h-6 w-6" />
+            </button>
+            <h1 className="truncate text-[15px] font-medium text-ink-primary">{title}</h1>
+          </div>
+          <div className="flex shrink-0 items-center gap-2">
             <AdminLiveNotificationBell />
             <UserMenu email={email} role={role} />
           </div>

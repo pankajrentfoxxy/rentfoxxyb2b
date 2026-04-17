@@ -65,7 +65,7 @@ export default async function CustomerOrdersPage({
             key={t.id}
             href={`/customer/orders?tab=${t.id}${q ? `&q=${encodeURIComponent(q)}` : ""}`}
             className={`rounded-full px-3 py-1.5 text-sm font-medium ${
-              tab === t.id ? "bg-accent text-white" : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+              tab === t.id ? "bg-navy text-white" : "bg-slate-100 text-slate-700 hover:bg-slate-200"
             }`}
           >
             {t.label}
