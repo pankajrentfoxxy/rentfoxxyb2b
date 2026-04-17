@@ -16,6 +16,7 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
     images?: string[];
     hsnCode?: string;
     isFeatured?: boolean;
+    inspectorVerified?: boolean;
     isActive?: boolean;
     slug?: string;
     brand?: string;
@@ -39,6 +40,7 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
   if (Array.isArray(body.images)) data.images = normalizeProductImages(body.images as string[]);
   if (typeof body.hsnCode === "string") data.hsnCode = body.hsnCode.trim() || product.hsnCode;
   if (typeof body.isFeatured === "boolean") data.isFeatured = body.isFeatured;
+  if (typeof body.inspectorVerified === "boolean") data.inspectorVerified = body.inspectorVerified;
   if (typeof body.isActive === "boolean") data.isActive = body.isActive;
   if (typeof body.brand === "string" && body.brand.trim()) data.brand = body.brand.trim();
   if (body.slug?.trim()) {

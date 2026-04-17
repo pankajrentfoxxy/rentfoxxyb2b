@@ -3,8 +3,10 @@
 import { PAYMENT_OPTIONS, type PaymentOptionId } from "@/constants/payment-options";
 import type { VendorPaymentFields } from "@/lib/vendor-payment-rules";
 import { validateVendorBidPayment } from "@/lib/vendor-payment-rules";
+import { BTN } from "@/constants/design";
 import { cn } from "@/lib/utils";
 import { Loader2, X } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useEffect, useMemo, useState } from "react";
@@ -32,7 +34,7 @@ export function BidModal({
 }) {
   const { status } = useSession();
   const router = useRouter();
-  const [step, setStep] = useState<1 | 2>(1);
+  const [step, setStep] = useState<1 | 2 | 3>(1);
   const [qty, setQty] = useState(listing?.minOrderQty ?? 1);
   const [price, setPrice] = useState("");
   const [note, setNote] = useState("");
@@ -156,8 +158,7 @@ export function BidModal({
         setError(data.error ?? "Could not submit bid");
         return;
       }
-      closeAll();
-      router.push("/customer/bids");
+      setStep(3);
       router.refresh();
     } finally {
       setLoading(false);
@@ -165,24 +166,45 @@ export function BidModal({
   }
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-end justify-center sm:items-center">
-      <button type="button" className="absolute inset-0 bg-slate-900/50" aria-label="Close" onClick={closeAll} />
-      <div className="relative z-10 max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-t-2xl border border-slate-200 bg-white p-6 shadow-2xl sm:rounded-2xl">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4">
+      <button type="button" className="absolute inset-0" aria-label="Close" onClick={closeAll} />
+      <div className="relative z-10 max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl border border-border bg-card p-6 shadow-xl">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h2 className="text-lg font-bold text-slate-900">
-              {step === 1 ? "Request a custom price" : "Payment preference"}
+            <h2 className="text-[16px] font-medium text-ink-primary">
+              {step === 3 ? "Bid submitted!" : step === 1 ? "Request Custom Price" : "Payment preference"}
             </h2>
-            <p className="text-sm text-muted">{productName}</p>
-            <p className="mt-1 text-xs text-muted">
-              Option {listing.label.replace("Option ", "")} · list ₹
-              {listing.unitPrice.toLocaleString("en-IN")}
-            </p>
+            {step !== 3 ? (
+              <>
+                <p className="text-sm text-ink-muted">{productName}</p>
+                <p className="mt-1 text-xs text-ink-muted">
+                  {listing.label} · list ₹{listing.unitPrice.toLocaleString("en-IN")}
+                </p>
+              </>
+            ) : null}
           </div>
           <button type="button" onClick={closeAll} className="rounded-lg p-1 hover:bg-surface">
-            <X className="h-5 w-5" />
+            <X className="h-5 w-5 text-ink-muted" />
           </button>
         </div>
+
+        {step === 3 ? (
+          <div className="mt-8 text-center">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-verified-bg text-2xl text-verified-text">
+              ✓
+            </div>
+            <p className="mt-4 text-sm text-ink-secondary">
+              Check status in{" "}
+              <Link href="/customer/bids" className="font-medium text-lot hover:underline">
+                My Account → Bids
+              </Link>
+              .
+            </p>
+            <button type="button" className={`${BTN.ghost} mt-6 w-full`} onClick={closeAll}>
+              Close
+            </button>
+          </div>
+        ) : null}
 
         {step === 1 ? (
           <div className="mt-6 space-y-4">
@@ -255,15 +277,14 @@ export function BidModal({
                 }
                 setStep(2);
               }}
-              className={cn(
-                "flex h-11 w-full items-center justify-center rounded-lg bg-primary font-semibold text-white",
-                "hover:bg-primary-light disabled:opacity-50",
-              )}
+              className={cn(BTN.primary, "flex h-11 w-full items-center justify-center disabled:opacity-50")}
             >
-              Continue — payment option
+              Next →
             </button>
           </div>
-        ) : (
+        ) : null}
+
+        {step === 2 ? (
           <div className="mt-6 space-y-3">
             <p className="text-sm text-muted">
               If your bid is approved, how would you like to pay? (Estimates include 18% GST on your bid
@@ -353,15 +374,15 @@ export function BidModal({
                 disabled={loading || rulesLoading || !anyPayValid}
                 onClick={submit}
                 className={cn(
-                  "flex flex-1 items-center justify-center rounded-lg bg-primary py-3 font-semibold text-white",
-                  "hover:bg-primary-light disabled:opacity-50",
+                  BTN.primary,
+                  "flex flex-1 items-center justify-center py-3 disabled:opacity-50",
                 )}
               >
-                {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : "Submit bid request"}
+                {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : "Submit Bid"}
               </button>
             </div>
           </div>
-        )}
+        ) : null}
       </div>
     </div>
   );

@@ -1,4 +1,5 @@
 import { LotCard } from "@/components/storefront/LotCard";
+import { SectionLabel } from "@/components/ui/SectionLabel";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 
@@ -25,18 +26,19 @@ export async function HomeLotSales() {
   if (lots.length === 0) return null;
 
   return (
-    <section className="border-b border-slate-100 bg-gradient-to-b from-orange-50/40 to-white py-12">
-      <div className="mx-auto max-w-6xl px-4">
-        <div className="flex flex-wrap items-end justify-between gap-4">
+    <section className="bg-white py-6 px-4">
+      <div className="mx-auto max-w-7xl">
+        <div className="mb-4 flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h2 className="text-2xl font-bold text-slate-900">Hot Lot Sales</h2>
-            <p className="mt-1 text-sm text-muted">Verified bulk laptops — mixed brands and grades</p>
+            <SectionLabel color="amber">🔥 Hot Lot Sales</SectionLabel>
+            <h2 className="mt-1.5 text-[17px] font-medium text-ink-primary">Bulk verified inventory</h2>
+            <p className="text-[13px] text-ink-muted">Mixed brands and grades — priced per lot</p>
           </div>
-          <Link href="/sales/lots" className="text-sm font-semibold text-accent hover:underline">
-            See all →
+          <Link href="/sales/lots" className="text-sm text-lot hover:underline">
+            See all lot sales →
           </Link>
         </div>
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {lots.map((l) => {
             const brands = Array.from(new Set(l.items.map((i) => i.brand))).slice(0, 3);
             const conditions = Array.from(new Set(l.items.map((i) => i.condition)));

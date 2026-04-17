@@ -4,7 +4,7 @@ import { NotificationBell } from "@/components/shared/NotificationBell";
 import type { Notice } from "@/components/shared/NotificationBell";
 import { useCallback, useEffect, useState } from "react";
 
-export function CustomerLiveNotificationBell() {
+export function CustomerLiveNotificationBell({ className }: { className?: string }) {
   const [items, setItems] = useState<Notice[] | undefined>(undefined);
 
   const load = useCallback(async () => {
@@ -38,9 +38,17 @@ export function CustomerLiveNotificationBell() {
 
   if (!items) {
     return (
-      <div className="h-10 w-10 animate-pulse rounded-lg border border-slate-200 bg-slate-100" />
+      <div
+        className={`h-9 w-9 animate-pulse rounded-full border border-white/10 bg-white/10 ${className ?? ""}`}
+      />
     );
   }
 
-  return <NotificationBell notifications={items} onMarkAllRead={() => load()} />;
+  return (
+    <NotificationBell
+      notifications={items}
+      onMarkAllRead={() => load()}
+      className={className}
+    />
+  );
 }

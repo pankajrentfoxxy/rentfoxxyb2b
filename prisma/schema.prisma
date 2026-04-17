@@ -279,6 +279,8 @@ model LotListing {
   /// Exact CSV text the vendor uploaded at listing creation (for download-original).
   uploadedCsvSnapshot String?        @db.Text
   verificationId String?
+  /// Set when inspector has verified the lot listing (default true for trusted catalogue).
+  inspectorVerified Boolean         @default(true)
   liveAt         DateTime?
   dispatchedAt   DateTime?
   items          LotInventoryItem[]
@@ -391,6 +393,8 @@ model AsAsListing {
   csvCleanUrl     String?
   uploadedCsvSnapshot String?        @db.Text
   verificationId  String?
+  /// Set when inspector has verified the AsAs listing (default true for trusted catalogue).
+  inspectorVerified Boolean           @default(true)
   items           AsAsInventoryItem[]
   purchases       AsAsPurchase[]
   asAsBids        AsAsBid[]
@@ -559,6 +563,8 @@ model Product {
   specs       Json
   images      String[]
   isFeatured  Boolean          @default(false)
+  /// Set by admin after on-site / inspector verification of inventory.
+  inspectorVerified Boolean    @default(false)
   isActive    Boolean          @default(true)
   hsnCode     String           @default("8471")
   createdAt   DateTime         @default(now())

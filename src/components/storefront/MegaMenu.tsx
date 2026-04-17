@@ -71,21 +71,21 @@ const PROMO_CARDS = [
     title: "Business Laptops",
     subtitle: "Bulk orders welcome",
     href: "/products?category=business",
-    bg: "from-primary/10 to-accent/10",
+    bg: "from-navy/8 to-lot/8",
     icon: "💼" as const,
   },
   {
     title: "Lot Sales",
     subtitle: "Bulk lots at deep discounts",
     href: "/sales/lots",
-    bg: "from-orange-50 to-red-50",
+    bg: "from-amber/8 to-amber/15",
     icon: "📦" as const,
   },
   {
     title: "AsAs Deals",
     subtitle: "Mixed fleet clearance",
     href: "/asas/listings",
-    bg: "from-purple-50 to-indigo-50",
+    bg: "from-asas/8 to-asas/15",
     icon: "🔄" as const,
   },
 ];
@@ -93,29 +93,29 @@ const PROMO_CARDS = [
 export function MegaMenuDrawerSection({ onNavigate }: { onNavigate: () => void }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="border-b border-slate-200">
+    <div className="border-b border-white/10">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex w-full items-center justify-between px-3 py-2 text-base font-medium text-slate-800"
+        className="flex w-full items-center justify-between px-3 py-3 text-base font-medium text-white"
       >
         <span className="inline-flex items-center gap-2">
-          <Tag className="h-4 w-4 text-accent" />
+          <Tag className="h-4 w-4 text-amber" />
           Products
         </span>
-        <ChevronDown className={`h-4 w-4 transition ${open ? "rotate-180" : ""}`} />
+        <ChevronDown className={`h-4 w-4 text-white/60 transition ${open ? "rotate-180" : ""}`} />
       </button>
       {open ? (
         <div className="space-y-4 px-3 pb-4">
           {Object.values(MENU_DATA).map((col) => (
             <div key={col.heading}>
-              <p className="mb-2 text-xs font-bold uppercase text-muted">{col.heading}</p>
+              <p className="mb-2 text-[10px] font-bold uppercase tracking-widest text-white/40">{col.heading}</p>
               <ul className="space-y-1">
                 {col.links.map((link) => (
                   <li key={link.href}>
                     <Link
                       href={link.href}
-                      className="block rounded-lg py-2 text-sm text-primary hover:bg-surface"
+                      className="block rounded-lg px-2 py-1.5 text-sm text-white/80 hover:bg-white/10 hover:text-white"
                       onClick={onNavigate}
                     >
                       {link.label}
@@ -126,7 +126,7 @@ export function MegaMenuDrawerSection({ onNavigate }: { onNavigate: () => void }
                   <li key={link.href}>
                     <Link
                       href={link.href}
-                      className="block rounded-lg py-2 text-sm text-slate-700 hover:bg-surface"
+                      className="block rounded-lg px-2 py-1.5 text-sm text-white/80 hover:bg-white/10 hover:text-white"
                       onClick={onNavigate}
                     >
                       {link.label}
@@ -141,18 +141,18 @@ export function MegaMenuDrawerSection({ onNavigate }: { onNavigate: () => void }
               key={card.href}
               href={card.href}
               onClick={onNavigate}
-              className={`block rounded-xl border border-slate-200 bg-gradient-to-br ${card.bg} p-3`}
+              className={`block rounded-xl border border-white/10 bg-gradient-to-br ${card.bg} p-3`}
             >
-              <p className="text-sm font-bold text-primary">
+              <p className="text-sm font-bold text-ink-primary">
                 {card.icon} {card.title}
               </p>
-              <p className="text-xs text-muted">{card.subtitle}</p>
+              <p className="text-xs text-ink-muted">{card.subtitle}</p>
             </Link>
           ))}
           <Link
             href="/products"
             onClick={onNavigate}
-            className="block text-center text-sm font-bold text-accent"
+            className="block text-center text-sm font-bold text-amber hover:underline"
           >
             View all products →
           </Link>
@@ -188,33 +188,33 @@ export function MegaMenu() {
       <button
         type="button"
         className={`flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-          isOpen ? "bg-accent/10 text-accent" : "text-slate-700 hover:bg-accent/5 hover:text-accent"
+          isOpen ? "text-amber" : "text-white/55 hover:text-white"
         }`}
         onClick={() => setIsOpen((v) => !v)}
         aria-expanded={isOpen}
         aria-haspopup="true"
       >
         Products
-        <ChevronDown className={`h-4 w-4 transition duration-200 ${isOpen ? "rotate-180 text-accent" : ""}`} />
+        <ChevronDown className={`h-4 w-4 transition duration-200 ${isOpen ? "rotate-180 text-amber" : ""}`} />
       </button>
       {isOpen ? (
         <>
           <button
             type="button"
-            className="fixed inset-0 top-16 z-40 bg-black/20 lg:block"
+            className="fixed inset-0 top-[50px] z-40 bg-navy/20 lg:block"
             aria-label="Close menu"
             onClick={() => setIsOpen(false)}
           />
           <div
-            className="mega-menu-panel absolute left-0 top-full z-50 mt-1 max-h-[calc(100vh-5rem)] w-[min(900px,calc(100vw-2rem))] overflow-auto rounded-2xl border border-slate-200 bg-white shadow-2xl"
+            className="mega-menu-panel absolute left-0 top-full z-50 mt-1 max-h-[calc(100vh-3.5rem)] w-[min(900px,calc(100vw-2rem))] overflow-auto rounded-xl border border-border bg-white shadow-xl"
             onMouseEnter={openMenu}
             onMouseLeave={scheduleClose}
           >
-            <div className="grid grid-cols-[1fr_1fr_1fr_1.4fr] divide-x divide-slate-100">
+            <div className="grid grid-cols-[1fr_1fr_1fr_1.4fr] divide-x divide-border-light">
               {Object.values(MENU_DATA).map((col) => (
                 <div key={col.heading} className="p-5">
-                  <p className="mb-3 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-primary">
-                    <col.Icon className="h-3.5 w-3.5" />
+                  <p className="mb-3 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-ink-muted">
+                    <col.Icon className="h-3.5 w-3.5 text-ink-muted" />
                     {col.heading}
                   </p>
                   <ul className="mb-4 space-y-1">
@@ -223,14 +223,14 @@ export function MegaMenu() {
                         <Link
                           href={link.href}
                           onClick={() => setIsOpen(false)}
-                          className="block rounded-lg px-2 py-1.5 text-sm text-slate-700 transition-colors hover:bg-accent/5 hover:text-accent"
+                          className="block rounded-lg px-2 py-1.5 text-sm text-ink-secondary transition-colors hover:bg-surface hover:text-navy"
                         >
                           {link.label}
                         </Link>
                       </li>
                     ))}
                   </ul>
-                  <p className="mb-2 border-t border-slate-100 pt-3 text-xs font-bold uppercase tracking-wider text-muted">
+                  <p className="mb-2 border-t border-border-light pt-3 text-[10px] font-bold uppercase tracking-widest text-ink-muted">
                     {col.subSection.heading}
                   </p>
                   <ul className="space-y-1">
@@ -239,7 +239,7 @@ export function MegaMenu() {
                         <Link
                           href={link.href}
                           onClick={() => setIsOpen(false)}
-                          className="block rounded-lg px-2 py-1.5 text-sm font-medium text-slate-700 transition-colors hover:bg-accent/5 hover:text-accent"
+                          className="block rounded-lg px-2 py-1.5 text-sm text-ink-secondary transition-colors hover:bg-surface hover:text-navy"
                         >
                           {link.label}
                         </Link>
@@ -248,31 +248,31 @@ export function MegaMenu() {
                   </ul>
                 </div>
               ))}
-              <div className="bg-slate-50 p-5">
-                <p className="mb-3 text-xs font-bold uppercase tracking-wider text-primary">Featured</p>
+              <div className="bg-surface p-5">
+                <p className="mb-3 text-[10px] font-bold uppercase tracking-widest text-ink-muted">Featured</p>
                 <div className="space-y-3">
                   {PROMO_CARDS.map((card) => (
                     <Link
                       key={card.href}
                       href={card.href}
                       onClick={() => setIsOpen(false)}
-                      className={`block rounded-xl border border-slate-200 bg-gradient-to-br ${card.bg} p-3 transition-all hover:border-slate-300 hover:shadow-md`}
+                      className={`block rounded-xl border border-border bg-gradient-to-br ${card.bg} p-3 transition-all hover:border-border-dark hover:shadow-md`}
                     >
                       <div className="flex items-center gap-2">
                         <span className="text-xl">{card.icon}</span>
                         <div>
-                          <p className="text-sm font-bold text-primary">{card.title}</p>
-                          <p className="text-xs text-muted">{card.subtitle}</p>
+                          <p className="text-sm font-bold text-ink-primary">{card.title}</p>
+                          <p className="text-xs text-ink-muted">{card.subtitle}</p>
                         </div>
                       </div>
-                      <p className="mt-2 text-xs font-semibold text-accent">See more →</p>
+                      <p className="mt-2 text-xs font-semibold text-lot">See more →</p>
                     </Link>
                   ))}
                 </div>
                 <Link
                   href="/products"
                   onClick={() => setIsOpen(false)}
-                  className="mt-4 block py-2 text-center text-xs font-bold text-accent hover:underline"
+                  className="mt-4 block py-2 text-center text-xs font-bold text-lot hover:underline"
                 >
                   View all products →
                 </Link>

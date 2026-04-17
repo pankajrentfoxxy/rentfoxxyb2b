@@ -46,6 +46,7 @@ export default async function AdminProductEditPage({ params }: { params: Promise
           brand: p.brand,
           hsnCode: p.hsnCode,
           isFeatured: p.isFeatured,
+          inspectorVerified: p.inspectorVerified,
           isActive: p.isActive,
           images: p.images,
           specs: p.specs,

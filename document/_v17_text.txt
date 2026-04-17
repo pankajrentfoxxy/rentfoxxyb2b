@@ -1,0 +1,943 @@
+﻿≡ƒªè RENTFOXXY
+Frontend Redesign ΓÇö Complete Cursor Prompt
+Navy ├ù Amber ├ù Verified Green Design System
+ADDENDUM v1.7
+Which AI Model to Use ΓÇö and Why
+This is a complex frontend redesign that touches 40+ components across 4 portals. Model choice matters significantly. Here is the honest breakdown:
+≡ƒôî NOTE: Use Claude Sonnet 4.5 in Cursor's Composer mode (Cmd+I / Ctrl+I) for all prompts. In Cursor settings, select "claude-sonnet-4-6" as your model. Enable "Long Context" mode if available. Run ONE prompt at a time ΓÇö do not combine prompts.
+How to Use These Prompts in Cursor
+Open Cursor ΓåÆ Press Cmd+I (Mac) or Ctrl+I (Windows) ΓåÆ Opens Composer
+In the model selector at the top of Composer, choose: claude-sonnet-4-6
+Copy the ENTIRE prompt block (from === to ===) and paste into Composer
+Press Enter and let Cursor apply all file changes
+Review changes, fix any TypeScript errors, then move to next prompt
+NEVER skip a prompt ΓÇö each builds on the previous one
+ΓÜá∩╕Å  RULE: After running P1 (design system), run: npx tailwindcss build to verify config is valid before proceeding. Any Tailwind config error will break all subsequent prompts.
+Design System Reference ΓÇö Study Before Prompting
+This is the complete token system that every prompt references. Keep this page open while running prompts so you can verify the AI is applying it correctly.
+Color Tokens
+Button System
+PROMPT P1: DESIGN SYSTEM SETUP
+tailwind.config.ts ┬╖ globals.css ┬╖ design tokens ┬╖ shared constants
+=== CURSOR PROMPT P1 ΓÇö DESIGN SYSTEM SETUP ===
+=== MODEL: Claude Sonnet 4.5 (claude-sonnet-4-6) ===
+We are doing a complete professional frontend redesign of the Rentfoxxy B2B
+laptop marketplace. DO NOT touch any API routes, Prisma schema, or business logic.
+CSS, Tailwind config, and React components ONLY.
+ΓöÇΓöÇΓöÇ P1A: TAILWIND CONFIG ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+Replace tailwind.config.ts colors section entirely with:
+colors: {
+navy:    { DEFAULT:"#0A1628", light:"#0D1F3C", mid:"#0D2040", dark:"#060F1A" },
+amber:   { DEFAULT:"#F59E0B", dark:"#D97706", bg:"#FFFBEB", border:"#FDE68A" },
+verified:{ DEFAULT:"#10B981", bg:"#F0FDF4", border:"#BBF7D0", text:"#166534" },
+lot:     { DEFAULT:"#1D4ED8", bg:"#EFF6FF", border:"#BFDBFE", text:"#1D4ED8" },
+asas:    { DEFAULT:"#7C3AED", dark:"#6D28D9", bg:"#F5F3FF", border:"#DDD6FE", text:"#5B21B6" },
+surface: "#F8FAFC",
+card:    "#FFFFFF",
+border:  { DEFAULT:"#E2E8F0", light:"#F1F5F9", dark:"#CBD5E1" },
+// Text
+ink:     { primary:"#0A1628", secondary:"#475569", muted:"#94A3B8", hint:"#CBD5E1" },
+// Condition badge system
+grade: {
+new:   { bg:"#F0FDF4", text:"#166534" },
+aplus: { bg:"#EFF6FF", text:"#1D4ED8" },
+a:     { bg:"#F5F3FF", text:"#5B21B6" },
+b:     { bg:"#FEF9C3", text:"#92400E" },
+c:     { bg:"#FEF3C7", text:"#B45309" },
+},
+},
+Also ensure fontFamily includes:
+sans: ['Inter', 'ui-sans-serif', 'system-ui'],
+Add this to plugins array:
+require('@tailwindcss/typography'),
+ΓöÇΓöÇΓöÇ P1B: GLOBALS.CSS ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+Replace src/app/globals.css @layer base section:
+@layer base {
+:root {
+--navy:         #0A1628;
+--navy-light:   #0D1F3C;
+--navy-mid:     #0D2040;
+--amber:        #F59E0B;
+--amber-dark:   #D97706;
+--amber-bg:     #FFFBEB;
+--verified:     #10B981;
+--verified-bg:  #F0FDF4;
+--lot:          #1D4ED8;
+--asas:         #7C3AED;
+--asas-dark:    #6D28D9;
+--asas-bg:      #F5F3FF;
+--surface:      #F8FAFC;
+--card:         #FFFFFF;
+--border:       #E2E8F0;
+--border-light: #F1F5F9;
+--text-primary: #0A1628;
+--text-secondary: #475569;
+--text-muted:   #94A3B8;
+}
+body {
+background: var(--surface);
+color: var(--text-primary);
+font-family: Inter, ui-sans-serif, system-ui;
+-webkit-font-smoothing: antialiased;
+}
+* { box-sizing: border-box; }
+}
+ΓöÇΓöÇΓöÇ P1C: CONSTANTS FILE ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+Create src/constants/design.ts:
+export const CONDITION_BADGE = {
+'Brand New':  { bg:'bg-grade-new-bg',   text:'text-grade-new-text',   dot:'bg-green-500',  label:'Brand New' },
+'Refurb A+':  { bg:'bg-grade-aplus-bg', text:'text-grade-aplus-text', dot:'bg-blue-600',   label:'Refurb A+' },
+'Refurb A':   { bg:'bg-grade-a-bg',     text:'text-grade-a-text',     dot:'bg-purple-600', label:'Refurb A' },
+'Refurb B':   { bg:'bg-grade-b-bg',     text:'text-grade-b-text',     dot:'bg-amber-500',  label:'Refurb B' },
+'Refurb C':   { bg:'bg-grade-c-bg',     text:'text-grade-c-text',     dot:'bg-orange-600', label:'Refurb C' },
+} as const
+export const BTN = {
+primary: 'bg-amber text-navy font-medium px-5 py-2.5 rounded-lg hover:bg-amber-dark transition-colors',
+navy:    'bg-navy text-white font-medium px-5 py-2.5 rounded-lg hover:bg-navy-dark transition-colors',
+outline: 'border border-navy text-navy font-medium px-5 py-2.5 rounded-lg hover:bg-surface transition-colors',
+bid:     'bg-amber-bg border border-amber-border text-amber-dark font-medium px-4 py-2 rounded-lg hover:bg-amber-bg/80 transition-colors',
+asas:    'bg-asas text-white font-medium px-5 py-2.5 rounded-lg hover:bg-asas-dark transition-colors',
+asas_outline: 'border border-asas text-asas font-medium px-5 py-2.5 rounded-lg hover:bg-asas-bg transition-colors',
+ghost:   'border border-border text-ink-secondary font-medium px-4 py-2 rounded-lg hover:bg-surface transition-colors',
+} as const
+export const CARD = 'bg-card border border-border rounded-xl overflow-hidden'
+export const CARD_HEADER_DARK = 'bg-navy-light p-4'
+export const SURFACE_SECTION = 'bg-surface py-6 px-4'
+ΓöÇΓöÇΓöÇ P1D: SHARED COMPONENTS ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+Create src/components/ui/ConditionBadge.tsx:
+import { CONDITION_BADGE } from '@/constants/design'
+interface Props {
+condition: string
+size?: 'sm' | 'md'
+}
+export function ConditionBadge({ condition, size = "md" }: Props) {
+const cfg = CONDITION_BADGE[condition as keyof typeof CONDITION_BADGE]
+?? { bg:"bg-gray-100", text:"text-gray-700", dot:"bg-gray-400", label: condition }
+const sizeClass = size === "sm" ? "text-[10px] px-1.5 py-0.5" : "text-xs px-2 py-1"
+return (
+<span className={`inline-flex items-center gap-1.5 font-medium rounded
+${sizeClass} ${cfg.bg} ${cfg.text}`}>
+<span className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`} />
+{cfg.label}
+</span>
+)
+}
+Create src/components/ui/VerifiedBadge.tsx:
+export function VerifiedBadge({ size = "md" }: { size?: "sm"|"md" }) {
+const cls = size === "sm" ? "text-[9px] px-1.5 py-0.5" : "text-[10px] px-2 py-1"
+return (
+<span className={`inline-flex items-center gap-1 bg-verified text-white
+font-medium rounded ${cls}`}>
+<span className="text-[9px]">Γ£ô</span> Verified
+</span>
+)
+}
+Create src/components/ui/SectionLabel.tsx:
+interface Props { color?: "amber"|"lot"|"asas"|"verified"; children: React.ReactNode }
+export function SectionLabel({ color = "amber", children }: Props) {
+const colors = {
+amber: 'text-amber-dark bg-amber-bg border-amber-border',
+lot:   'text-lot-text bg-lot-bg border-lot-border',
+asas:  'text-asas-text bg-asas-bg border-asas-border',
+verified: 'text-verified-text bg-verified-bg border-verified-border',
+}
+return <span className={`inline-block text-[10px] font-semibold tracking-widest
+uppercase px-2.5 py-1 rounded border ${colors[color]}`}>{children}</span>
+}
+Create src/components/ui/StatBadge.tsx (for progress bars on lot/asas cards):
+interface Props { sold: number; total: number; urgency?: boolean }
+export function LotProgress({ sold, total, urgency }: Props) {
+const pct = Math.round((sold / total) * 100)
+const barColor = pct >= 90 ? "bg-red-500" : pct >= 70 ? "bg-amber" : "bg-lot"
+return (
+<div>
+<div className="flex justify-between text-[10px] text-ink-muted mb-1">
+<span>{sold} / {total} lots sold</span>
+<span className={pct >= 70 ? "text-red-600 font-medium" : "text-verified-text font-medium"}>
+{total - sold} left
+</span>
+</div>
+<div className="bg-border-light rounded-full h-1.5">
+<div className={`h-1.5 rounded-full transition-all ${barColor}`}
+style={{ width: `${pct}%` }} />
+</div>
+</div>
+)
+}
+PROMPT P2: NAVBAR + LOGO REDESIGN
+Sticky nav ┬╖ Dark navy ┬╖ Amber CTA ┬╖ Mega menu ┬╖ Mobile drawer
+=== CURSOR PROMPT P2 ΓÇö NAVBAR + LOGO ===
+Rebuild src/components/storefront/Navbar.tsx completely.
+ΓöÇΓöÇΓöÇ NAVBAR SPECS ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+Container: bg-navy, height h-[50px], sticky top-0, z-50
+Border bottom: border-b border-white/5
+LEFT: Logo + divider + nav links
+RIGHT: Search pill + Login text + Register amber button
+LOGO (rebuild src/components/ui/Logo.tsx):
+SVG hexagon outline in amber, filled amber center circle, navy background
+Text: "rentfoxxy" in white, 14px, font-medium, tracking-tight
+Sub-label: "B2B LAPTOP PROCUREMENT" in rgba(255,255,255,0.3), 8px, tracking-widest
+NAV LINKS (in order):
+1. Products ΓÇö with MegaMenu (from Addendum v1.5 Prompt 3)
+Color when menu closed: text-white/55 hover:text-white
+Color when menu open: text-amber
+2. "≡ƒöÑ Lot Sales" ΓÇö text-amber font-medium (always amber ΓÇö stands out)
+Link to: /sales/lots
+3. "AsAs Deals" ΓÇö text-asas-DEFAULT/80 hover:text-asas-DEFAULT
+Link to: /asas/listings
+4. About ΓÇö text-white/55 hover:text-white
+SEARCH PILL (desktop only):
+bg-white/7 border border-white/12 rounded px-3 py-1.5
+Text: "Search laptops..." text-white/40 text-xs
+Keyboard shortcut badge: "ΓîÿK" bg-white/8 text-white/25 text-[10px] px-1.5 rounded
+onClick: opens command palette (use existing search functionality)
+AUTH BUTTONS:
+Login: text-white/50 text-xs px-3 hover:text-white (no border)
+Register: bg-amber text-navy text-xs px-4 py-1.5 rounded font-medium
+hover:bg-amber-dark transition-colors
+If user is logged in, show:
+NotificationBell component (existing, but restyle: text-white/60)
+Avatar dropdown: initials circle bg-white/10 text-white
+MOBILE NAVBAR:
+Same dark bg-navy
+Hamburger icon: text-white/60
+Full-height slide-in drawer from left:
+Drawer bg: bg-navy border-r border-white/8
+Logo at top
+Nav links as full-width rows with chevrons
+Products link: expands accordion showing mega menu columns stacked
+Bottom: Login + Register buttons full-width
+ΓöÇΓöÇΓöÇ ACTIVE STATE ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+Use usePathname() to detect current route.
+Active link: text-white font-medium
+Active lot sales link: text-amber font-semibold
+ΓöÇΓöÇΓöÇ MEGA MENU (Products dropdown) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+Keep the MegaMenu from Addendum v1.5 Prompt 3.
+Update colors to match new system:
+Menu panel: bg-white shadow-xl border border-border rounded-xl
+Section headings: text-ink-muted text-[10px] tracking-widest uppercase
+Links: text-ink-secondary text-sm hover:text-navy hover:bg-surface rounded px-2 py-1.5
+Promo cards: keep existing structure but update gradient colors:
+Business Laptops: bg-gradient-to-br from-navy/8 to-lot/8
+Lot Sales: bg-gradient-to-br from-amber/8 to-amber/15
+AsAs Deals: bg-gradient-to-br from-asas/8 to-asas/15
+Backdrop: bg-navy/20 (subtle not heavy)
+PROMPT P3: HOMEPAGE FULL REBUILD
+Hero ┬╖ Lot cards ┬╖ AsAs section ┬╖ Product grid ┬╖ Trust signals
+=== CURSOR PROMPT P3 ΓÇö HOMEPAGE COMPLETE REBUILD ===
+Rebuild src/app/(public)/page.tsx completely.
+Remove: static category grid section (mega menu replaces it).
+Remove: the custom quote widget.
+ΓöÇΓöÇΓöÇ SECTION ORDER ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+1. Hero (dark navy)
+2. Trust bar (slim navy stripe)
+3. Hot Lot Sales (white surface with amber label)
+4. AsAs Deals (light purple-tinted surface)
+5. Featured Products (white surface with blue label)
+6. How It Works (dark navy ΓÇö alternating dark/light contrast)
+7. CTA Banner (navy with amber button)
+ΓöÇΓöÇΓöÇ SECTION 1: HERO ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+bg: bg-gradient-to-br from-navy via-navy to-[#0F2040]
+padding: py-12 px-4
+layout: grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-8 items-start
+LEFT SIDE:
+Tag: <SectionLabel color="verified">Inspection-Certified Inventory</SectionLabel>
+H1: "India's verified B2B laptop marketplace."
+text-white text-[32px] lg:text-[36px] font-medium leading-[1.2] mb-3
+Subtext: "Compare. Negotiate. Buy." text-amber text-xl font-medium
+Description: text-white/50 text-[13px] leading-[1.75] max-w-[440px] mb-5
+Buttons: flex gap-2
+<button className={BTN.primary}>Browse Products</button>
+<button className="bg-white/6 border border-white/12 text-white/80
+text-sm px-5 py-2.5 rounded-lg hover:bg-white/10 transition-colors">
+View Lot Sales
+</button>
+Stats bar (below buttons, mt-6):
+Bordered box: border border-white/10 rounded-lg overflow-hidden
+4 cells divided by border-r border-white/10:
+each: px-4 py-3 text-center
+number: text-amber text-lg font-medium
+label: text-white/35 text-[10px] mt-0.5
+Values: 500+ Enterprises | 50+ Vendors | 100% GST | Γé╣0 Hidden fees
+RIGHT SIDE (hero deal cards):
+Stack of 3 cards, gap-2:
+Card 1 ΓÇö Featured Lot:
+bg-navy-light border-l-[3px] border-amber border border-white/9 rounded-xl p-3
+Top row: "≡ƒöÑ HOT LOT" text-white/35 text-[9px] tracking-widest | urgency badge
+Title: text-white text-[13px] font-medium leading-snug mb-2
+Condition badges: using ConditionBadge component size="sm"
+Progress: <LotProgress sold={8} total={20} />
+Bottom: price text-amber font-medium | Buy button bg-amber text-navy
+Card 2 ΓÇö AsAs Deal:
+bg-navy-light border-l-[3px] border-asas border border-white/9 rounded-xl p-3
+Top row: "≡ƒöä AsAs DEAL" | "Bid open" badge bg-asas/15 text-asas-border
+Title: text-white text-[13px] font-medium mb-1
+Brands: text-white/35 text-[11px] mb-2
+Bottom: price text-asas-border font-medium | Bid + Buy buttons
+Card 3 ΓÇö Verification trust card:
+bg-white/4 border border-white/8 rounded-xl p-3 flex items-center gap-3
+Icon: w-7 h-7 bg-verified/12 rounded flex items-center justify-center
+text-verified text-sm "Γ£ô"
+Text: "Physical verification on every refurb lot" text-white/70 text-[11px] font-medium
+"Our team visits vendor warehouse before listing goes live" text-white/30 text-[10px]
+ΓöÇΓöÇΓöÇ SECTION 2: TRUST BAR ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+bg-navy border-t border-white/5 border-b border-white/5 py-2 px-4
+flex items-center gap-6 overflow-x-auto
+"PROCUREMENT PARTNERS" text-white/20 text-[9px] tracking-widest mr-2 whitespace-nowrap
+Company names: text-white/18 text-[11px] each
+ΓöÇΓöÇΓöÇ SECTION 3: HOT LOT SALES ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+bg-white py-6 px-4
+Header row: flex items-center justify-between mb-4
+Left: <SectionLabel color="amber">≡ƒöÑ Hot Lot Sales</SectionLabel>
+h2 text-[17px] font-medium text-ink-primary mt-1.5
+"Bulk verified inventory" text-ink-muted text-[13px]
+Right: "See all lot sales ΓåÆ" text-lot text-sm
+Grid: grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3
+LOT CARD component (src/components/storefront/LotCard.tsx):
+Container: bg-card border border-border rounded-xl overflow-hidden
+hover:border-lot/40 hover:shadow-md transition-all
+border-l-[3px] border-l-amber (left accent stripe)
+CARD HEADER (dark):
+bg-navy-light px-4 py-3
+Row 1: brand badges (bg-white/15 text-white text-[9px] px-2 py-0.5 rounded)
++ urgency badge if >70% sold (bg-red-500/15 text-red-300)
+Row 2: title text-white text-[13px] font-medium leading-snug
+Row 3: description text-white/40 text-[11px] line-clamp-1 (if exists)
+CARD BODY:
+px-4 py-3 space-y-3
+Condition chips: flex flex-wrap gap-1 ΓåÆ <ConditionBadge size="sm" />
+Progress: <LotProgress sold={lotsSold} total={totalLots} />
+"X units per lot" text-[9px] text-ink-muted mt-0.5
+Bottom row: border-t border-border-light pt-3 flex justify-between items-end
+Price: text-[17px] font-medium text-ink-primary
+text-[9px] text-ink-muted "per lot"
+text-[9px] text-ink-muted "Γëê Γé╣X/unit"
+Button: bg-navy text-white text-[10px] px-3 py-1.5 rounded
+hover:bg-navy-light "View Lot ΓåÆ"
+ΓöÇΓöÇΓöÇ SECTION 4: AsAs DEALS ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+bg-asas-bg/30 py-6 px-4 (very light purple tint to distinguish section)
+Header: <SectionLabel color="asas">≡ƒöä AsAs Deals</SectionLabel>
+h2 "Fleet Clearance" | description | "See all ΓåÆ" text-asas
+AsAs CARD (src/components/storefront/AsAsCard.tsx):
+Container: bg-card border border-border rounded-xl overflow-hidden
+hover:border-asas/30 hover:shadow-md transition-all
+border-l-[3px] border-l-asas
+CARD HEADER:
+bg-[#3B0764] px-4 py-3 (very dark purple)
+Row 1: "≡ƒöä AsAs" badge (bg-white/12 text-white text-[9px])
++ "Bid open" badge if allowBidding (bg-asas/30 text-purple-200)
+Title: text-white text-[13px] font-medium line-clamp-2
+Description: text-white/35 text-[11px] line-clamp-1
+CARD BODY:
+Condition chips + units count
+If isLotMode: <LotProgress sold={lotsSold} total={totalLots} />
+Else: "{unitsAvailable} units available" text-sm text-ink-secondary
+Bottom row: price text-asas font-medium | "View Deal ΓåÆ" bg-asas text-white
+ΓöÇΓöÇΓöÇ SECTION 5: FEATURED PRODUCTS ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+bg-surface py-6 px-4
+Header: <SectionLabel color="lot">Individual Products</SectionLabel>
+Filter pills: All | Business | Brand New | Refurb A+
+Grid: grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3
+PRODUCT CARD (src/components/storefront/ProductCard.tsx):
+Container: bg-card border border-border rounded-xl overflow-hidden
+hover:border-navy/30 hover:shadow-md transition-all
+IMAGE AREA: bg-navy-light p-4 flex items-center justify-center min-h-[90px]
+relative (for badge positioning)
+Laptop emoji or next/image with object-contain
+TOP-LEFT: <ConditionBadge condition={condition} size="sm" />
+TOP-RIGHT: <VerifiedBadge size="sm" /> (only if inspection verified)
+BOTTOM-RIGHT (if low stock < 10):
+bg-red-500/15 text-red-300 text-[9px] px-1.5 py-0.5 rounded
+"Low stock: {count}"
+CARD BODY: px-3 py-3
+Brand+Series: text-ink-muted text-[10px] uppercase tracking-wide mb-0.5
+Model name: text-ink-primary text-[13px] font-medium mb-2
+Spec chips: flex flex-wrap gap-1
+each: bg-surface text-ink-secondary text-[10px] px-1.5 py-0.5 rounded
+Options count: text-ink-muted text-[10px] mt-1 mb-2
+"{N} options ┬╖ From Γé╣{minPrice}"
+Divider: border-t border-border-light pt-2 mt-1
+Bottom: flex justify-between items-center
+Price: text-[16px] font-medium text-ink-primary
+text-[9px] text-ink-muted "per unit"
+Buttons: flex gap-1
+<button className={BTN.bid}>Bid</button>
+<button className="bg-navy text-white text-[10px] px-3 py-1.5 rounded
+hover:bg-navy-light">View ΓåÆ</button>
+ΓöÇΓöÇΓöÇ SECTION 6: HOW IT WORKS ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+bg-navy py-10 px-4
+Heading: text-white text-xl font-medium text-center mb-6
+2 columns: "For Buyers" | "For Vendors" (each with 3 steps)
+Step item: flex gap-3
+Number circle: w-9 h-9 bg-amber text-navy text-sm font-semibold
+flex items-center justify-center rounded-lg flex-shrink-0
+Title: text-white text-[13px] font-medium
+Desc: text-white/45 text-[12px] leading-relaxed
+ΓöÇΓöÇΓöÇ SECTION 7: CTA BANNER ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+bg-navy-light border-t border-white/6 py-8 px-4 text-center
+H2: text-white text-xl font-medium mb-2
+p: text-white/45 text-sm mb-5
+Buttons: flex gap-3 justify-center
+<button className={BTN.primary}>Browse Products</button>
+Link to /auth/register ΓåÆ "Register as Vendor" BTN.outline (text-white border-white/30)
+PROMPT P4: PRODUCT LISTING + PRODUCT DETAIL PAGES
+Filter sidebar ┬╖ Product grid ┬╖ Detail 2-col layout ┬╖ Bid modal
+=== CURSOR PROMPT P4 ΓÇö PRODUCT LISTING + DETAIL PAGES ===
+ΓöÇΓöÇΓöÇ P4A: PRODUCT LISTING PAGE (/products) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+Layout: grid grid-cols-[220px_1fr] gap-3 py-4 px-4 bg-surface
+LEFT SIDEBAR:
+bg-card border border-border rounded-xl p-4 h-fit sticky top-[58px]
+Heading: "Filters" text-ink-primary text-[13px] font-medium mb-3
+Filter group pattern:
+Section title: text-ink-muted text-[10px] uppercase tracking-widest mb-2
+Checkbox item: flex items-center gap-2 text-[12px] text-ink-secondary py-1
+Checked box: w-3.5 h-3.5 bg-navy rounded flex items-center justify-center
+text-white text-[9px] "Γ£ô"
+Unchecked: w-3.5 h-3.5 border border-border rounded
+Count: ml-auto text-ink-muted text-[10px]
+Divider between groups: border-t border-border-light my-3
+GROUPS (in order):
+1. Condition: Brand New / Refurb A+ / Refurb A / Refurb B / Refurb C
+2. Brand: Dell / Lenovo / HP / Apple / ASUS / Acer
+3. Price Range: dual-handle range slider
+4. Processor: Intel i3 / i5 / i7 / i9 / AMD Ryzen / Apple M
+5. RAM: toggle pills ΓÇö 4GB / 8GB / 16GB / 32GB / 64GB
+Active filters callout (show when any filter active):
+bg-amber-bg border border-amber-border rounded-lg p-3 mt-3
+Text: text-[11px] text-amber-dark listing active filters
+"Clear all" link: text-navy text-[11px] font-medium mt-2
+RIGHT MAIN:
+Top bar: flex justify-between items-center mb-3
+Left: "Showing X of Y products" text-[12px] text-ink-muted
+Right: Sort select + Grid/List toggle
+Sort: border border-border rounded text-[11px] px-2 py-1.5
+Grid toggle: border border-border rounded overflow-hidden flex
+Active: bg-navy text-white, inactive: bg-white text-ink-muted
+Grid: grid grid-cols-2 md:grid-cols-3 gap-3
+Use ProductCard component from P3 (same component, more columns here)
+Load more button (bottom, centered):
+ghost button: "Load 20 more products"
+ΓöÇΓöÇΓöÇ P4B: PRODUCT DETAIL PAGE (/products/[slug]) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+Breadcrumb: bg-white border-b border-border py-2 px-4 text-[11px]
+Layout: grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6 py-5 px-4
+LEFT COLUMN:
+IMAGE GALLERY:
+bg-navy-light rounded-xl p-6 flex items-center justify-center
+Main image: min-h-[220px]
+Thumbnail strip below: flex gap-2 mt-3
+each: w-12 h-12 bg-navy rounded border border-white/10
+selected: border-amber
+PRODUCT INFO (below image):
+Brand + Series: text-ink-muted text-[11px] uppercase tracking-wide mb-1
+H1: text-ink-primary text-xl font-medium mb-3
+Key specs grid (2├ù2 or 2├ù3):
+each spec: bg-surface border border-border rounded-lg p-3
+icon: text-ink-muted w-4 h-4
+label: text-ink-muted text-[10px] uppercase
+value: text-ink-primary text-[13px] font-medium
+PRICE OPTIONS TABLE:
+Heading: "Available Options" text-[14px] font-medium text-ink-primary mb-3
+Table: border border-border rounded-xl overflow-hidden
+Thead: bg-navy text-white text-[10px] tracking-wide
+Cols: Option | Condition | Stock | MOQ | Price | Action
+Each row:
+Option: "Option A/B/C" (NEVER vendor name)
+Condition: <ConditionBadge />
+Best value badge on lowest price row: bg-verified-bg text-verified-text text-[9px]
+Price: text-[14px] font-medium text-ink-primary
+Action: Qty input (small, border border-border rounded px-2 py-1)
++ "Add to Cart" bg-navy text-white text-[10px]
++ "Bid" BTN.bid
+BID SECTION (below options):
+bg-amber-bg border border-amber-border rounded-xl p-4
+Heading: "Want a better price?" text-[13px] font-medium text-amber-dark
+Text: describe bid flow briefly text-[12px] text-amber-dark/70
+Button: "Request Custom Price" BTN.primary full-width
+SPEC ACCORDION:
+bg-card border border-border rounded-xl overflow-hidden
+Each section: border-b border-border-light last:border-0
+Header: px-4 py-3 flex justify-between cursor-pointer
+text-[13px] font-medium text-ink-primary
+Body: px-4 pb-4 grid grid-cols-2 gap-y-2
+each: label text-ink-muted text-[11px] | value text-ink-secondary text-[12px]
+RIGHT COLUMN (STICKY):
+bg-card border border-border rounded-xl p-4 sticky top-[58px] h-fit
+Selected option summary:
+"Selected: Option A" text-[11px] text-ink-muted
+Condition badge + price large
+Qty stepper: minus button | number | plus button
+border border-border rounded-lg overflow-hidden
+Payment options:
+ONLY 2 options ΓÇö Full Payment + Token 5%
+(use exact same card UI as defined in Addendum v1.6 Prompt #1)
+Price summary box: bg-surface rounded-lg p-3
+subtotal, GST 18%, grand total
+Buttons: flex flex-col gap-2
+"Add to Cart" BTN.navy full-width
+"Bid for Custom Price" BTN.bid full-width
+Trust: flex flex-wrap gap-1.5 mt-3 pt-3 border-t border-border-light
+small chips: "≡ƒ¢í Verified" | "≡ƒôä GST Invoice" | "≡ƒöÆ Secure Payment"
+ΓöÇΓöÇΓöÇ P4C: BID MODAL ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+Modal wrapper: fixed inset-0 bg-black/40 z-50 flex items-center justify-center
+Inner: bg-card rounded-2xl p-6 w-full max-w-md shadow-xl
+Header: "Request Custom Price" text-[16px] font-medium text-ink-primary
+Close X button top-right
+STEP 1 ΓÇö Bid Details:
+Product name (read-only display)
+Qty display: "For X units"
+"Your price per unit" input:
+Γé╣ prefix, number input, border border-border rounded-lg px-3 py-2.5
+Below: "Current listing: Γé╣X | Savings: Γé╣Y total" text-[11px] text-ink-muted
+Note textarea: optional, 3 rows
+"Next ΓåÆ" BTN.primary
+STEP 2 ΓÇö Payment Preference:
+ONLY 2 options (Full + Token 5%) ΓÇö exact same UI as purchase panel
+"Submit Bid" BTN.primary | "Back" BTN.ghost
+STEP 3 ΓÇö Success:
+Green checkmark circle animation
+"Bid submitted!" heading
+"Check status in My Account ΓåÆ Bids" text
+"Close" BTN.ghost
+PROMPT P5: LOT SALES LIST + DETAIL PAGES
+Lot listing grid ┬╖ Lot detail 2-col ┬╖ Inventory table ┬╖ Simulator ┬╖ Sticky buy panel
+=== CURSOR PROMPT P5 ΓÇö LOT SALES LIST + DETAIL PAGES ===
+ΓöÇΓöÇΓöÇ P5A: /sales/lots PAGE ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+Page header: bg-navy py-6 px-4
+Breadcrumb: text-white/40 text-[11px]
+H1: text-white text-2xl font-medium "Bulk Lot Sales"
+p: text-white/45 text-[13px]
+Filter chips row: flex gap-2 mt-4 flex-wrap
+Each chip: border border-white/20 text-white/60 text-[11px] px-3 py-1.5 rounded-full
+hover:border-amber hover:text-amber
+Active: border-amber text-amber
+Chips: All | Brand New | Refurb A+ | Refurb A | Refurb B | Dell | Lenovo | HP
+Body: bg-surface py-5 px-4
+Sort bar: flex justify-between mb-4
+"X lot sales" text-ink-muted text-[12px]
+Sort select
+Grid: grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4
+Use LotCard component (from P3) ΓÇö same card in full-size grid
+ΓöÇΓöÇΓöÇ P5B: /sales/lots/[id] DETAIL PAGE ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+TOP HERO BAND:
+bg-gradient-to-br from-navy via-navy to-[#0F2040]
+py-5 px-4 border-b border-white/6
+Line 1 badges:
+"≡ƒöÑ LOT SALE" bg-amber/15 border border-amber/30 text-amber text-[10px] px-2 py-1 rounded
+<VerifiedBadge />
+If >70% sold: "X lots left!" bg-red-500/15 text-red-300 border border-red-500/20
+H1: text-white text-[18px] font-medium leading-snug mb-2
+Description: text-white/45 text-[12px] leading-relaxed max-w-[500px]
+Stats row: flex gap-0 border border-white/10 rounded-lg overflow-hidden mt-4 w-fit
+4 cells: border-r border-white/10 last:border-0 px-5 py-3 text-center
+number: text-amber text-[18px] font-medium
+label: text-white/30 text-[9px] mt-1
+Values: Total Lots | Sold | Remaining | Units/Lot
+Progress bar: mt-4
+Row: text-white/35 text-[10px] mb-1.5 flex justify-between
+Bar: bg-white/8 rounded-full h-1.5
+Fill: bg-gradient-to-r from-lot to-amber (or red if >70%)
+BODY: grid grid-cols-1 lg:grid-cols-[1fr_300px] border-t border-border
+LEFT PANEL:
+Tab bar: bg-white border-b border-border flex px-4 overflow-x-auto
+Tab: py-3 px-4 text-[12px] cursor-pointer border-b-2 whitespace-nowrap
+Active: border-b-navy text-navy font-medium
+Inactive: border-transparent text-ink-muted hover:text-ink-secondary
+Tabs: "≡ƒôª Full Inventory" | "≡ƒº« Lot Simulator" | "Γ¡É Condition Guide"
+Right side of tab bar: Download CSV link
+text-lot border border-lot/30 bg-lot-bg text-[10px] px-3 py-1 rounded my-2
+TAB CONTENT AREA: bg-white p-4
+FULL INVENTORY TAB:
+Brand breakdown pills: flex flex-wrap gap-2 mb-4
+each: bg-lot-bg border border-lot-border rounded-lg px-3 py-1.5 flex items-center gap-2
+Brand name: text-ink-primary text-[11px] font-medium
+Count badge: bg-lot text-white text-[10px] px-2 py-0.5 rounded-full
+Inventory table:
+border border-border rounded-xl overflow-hidden
+Thead: bg-navy text-white text-[10px] tracking-wide
+Cols: Brand & Model | Processor | RAM | Storage | Condition | Count | Γé╣/unit
+Grid: grid-cols-[2fr_2fr_1fr_1fr_1.2fr_0.8fr_0.8fr]
+Rows: alternating bg-white / bg-surface
+each: py-2.5 px-3 text-[11px]
+Brand+Model: font-medium text-ink-primary + generation text-ink-muted text-[9px]
+Condition: <ConditionBadge size="sm" />
+Count: font-medium text-ink-primary text-center
+Price: text-verified-text font-medium
+If non-functional excluded: amber callout row spanning all cols
+Inspection callout (below table):
+bg-verified-bg border border-verified-border rounded-xl p-3 flex gap-3
+"Γ£ô" text-verified w-5 h-5 flex-shrink-0 mt-0.5
+Heading: text-verified-text text-[11px] font-medium
+Body: text-[10px] text-verified-text/70
+LOT SIMULATOR TAB:
+Heading + description
+Slider: input[type=range] accent-navy w-full my-3
+Result cards: grid grid-cols-3 gap-3 mb-4
+each: bg-surface border border-border rounded-xl p-3 text-center
+number: text-[20px] font-medium text-lot / text-amber / text-verified-text
+Simulated breakdown table: same style as inventory table
+Amber footnote: bg-amber-bg border border-amber-border rounded-lg p-3
+CONDITION GUIDE TAB:
+Stack of 5 grade cards:
+each: flex gap-4 p-4 rounded-xl border-l-4 (color matches grade)
+dot circle: w-8 h-8 rounded-full in grade color flex-shrink-0
+content: grade label bold + description text
+RIGHT PANEL (sticky):
+bg-white p-4 border-l border-border sticky top-[50px]
+Price display:
+"Price per lot" text-ink-muted text-[11px]
+Price: text-[26px] font-medium text-ink-primary
+Sub: "X units per lot ┬╖ Γëê Γé╣Y/unit avg" text-[11px] text-ink-muted
+Qty stepper: "Number of lots" label
+Row: border border-border rounded-xl flex items-center
+minus: px-3 py-2 text-ink-secondary border-r border-border
+display: flex-1 text-center text-[20px] font-medium
+plus: px-3 py-2 text-ink-secondary border-l border-border
+"X lots remaining" text-[10px] text-ink-muted text-center mt-1
+Payment options: 2 cards (Full + Token 5%) ΓÇö exact same UI from Addendum v1.6
+Price summary: bg-surface rounded-xl p-3
+rows: subtotal | GST 18% | grand total (bold)
+if token: amber box with Pay Now / Pay Later split
+CTA buttons: flex flex-col gap-2
+"Buy X Lots ΓÇö Γé╣Y" BTN.primary full-width py-3
+"Negotiate Price (Bid)" BTN.outline full-width py-2.5
+Trust chips: flex flex-wrap gap-1.5 mt-3 pt-3 border-t border-border-light
+"≡ƒ¢í Verified lot" | "≡ƒôä GST Invoice" | "≡ƒöä Fair dispatch"
+each: bg-surface text-ink-muted text-[10px] px-2 py-1 rounded
+PROMPT P6: ASAS LIST + DETAIL PAGES
+Purple accent ┬╖ Whole-listing purchase ┬╖ Pivot table ┬╖ Bid flow
+=== CURSOR PROMPT P6 ΓÇö AsAs LIST + DETAIL PAGES ===
+ΓöÇΓöÇΓöÇ P6A: /asas/listings PAGE ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+Page header: bg-gradient-to-r from-[#3B0764] to-[#4C1D95]
+py-6 px-4
+Breadcrumb + H1 "AsAs Fleet Deals" text-white
+Filter chips same pattern as lot sales but purple accents
+Body: bg-surface py-5 px-4
+Grid: grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4
+Use AsAsCard component (from P3)
+ΓöÇΓöÇΓöÇ P6B: /asas/listings/[id] DETAIL PAGE ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+TOP HERO: bg-gradient-to-br from-[#3B0764] via-[#4C1D95] to-[#5B21B6]
+py-5 px-4 border-b border-white/8
+layout: flex items-start justify-between gap-4
+LEFT:
+Badges row: "≡ƒöä AsAs DEAL" | <VerifiedBadge /> | "≡ƒÆ¼ Bidding open"
+AsAs badge: bg-white/12 border border-white/20 text-white/80
+Bidding badge: bg-amber/15 border border-amber/25 text-amber text-[10px]
+H1: text-white text-[18px] font-medium leading-snug mb-2
+Highlights: flex flex-wrap gap-3 mt-2
+each: flex items-center gap-1.5 text-purple-200 text-[11px]
+"Γ£ô" text-verified
+RIGHT: 3-cell stat panel
+bg-white/8 rounded-xl border border-white/10 grid grid-cols-3
+each: px-4 py-3 text-center border-r border-white/10 last:border-0
+number: text-amber text-[18px] font-medium | text-asas-border
+label: text-white/30 text-[9px]
+Values: Total Units | Brands count | "1 Buyer Only"
+BODY: grid grid-cols-1 lg:grid-cols-[1fr_300px]
+LEFT PANEL:
+Tab bar (same structure as lot detail):
+Active tab: border-b-asas text-asas (purple underline)
+Tabs: "≡ƒôï Full Details" | "≡ƒôè Inventory Pivot" | "Γ¡É Condition Guide"
+Download CSV: border border-asas/30 bg-asas-bg text-asas-text
+FULL DETAILS TAB:
+Brand pills same as lot but using asas color
+Inventory table same structure ΓÇö no price column for AsAs
+Non-functional excluded note if applicable
+INVENTORY PIVOT TAB:
+Heading: "Brand ├ù Condition Distribution" text-ink-primary font-medium
+Table: border border-asas-border rounded-xl overflow-hidden
+Thead: bg-navy text-white (columns: Brand | Refurb A+ | A | B | C | Total)
+Each brand row: first cell bg-surface font-medium text-ink-primary text--left
+Data cells: text-center
+Has units: font-medium text-asas
+Zero: text-ink-hint "ΓÇö"
+Totals row: bg-navy text-white font-medium
+Brand cell: "Total"
+Unit cells: text-asas-border (purple on navy)
+Grand total: text-verified font-bold
+Callout below: bg-amber-bg border border-amber-border rounded-xl p-3
+text-[10px] text-amber-dark
+"Exact units assigned by AI at dispatch to ensure fair brand/condition distribution"
+RIGHT PANEL (sticky):
+bg-white p-4 border-l border-border
+Listing value panel: bg-[#4C1D95] rounded-xl px-4 py-3 mb-3
+"WHOLE LISTING PRICE" text-purple-200 text-[10px] tracking-widest mb-1
+Price: text-white text-[24px] font-medium
+Sub: text-purple-300/60 text-[11px]
+"You receive" summary: bg-surface border border-border rounded-xl p-3 mb-3
+Heading: "All {N} units:" text-[11px] font-medium text-ink-primary mb-2
+Each brand row: flex justify-between text-[11px]
+brand: text-ink-secondary | condition: text-asas font-medium
+Payment options: same 2-card system
+Price summary box
+CTA buttons:
+"Buy Entire Listing" bg-asas text-white full-width py-3 rounded-xl font-medium
+hover:bg-asas-dark
+"Negotiate Price (Bid)" border border-asas text-asas full-width py-2.5
+rounded-xl font-medium hover:bg-asas-bg
+"Why AsAs?" collapsible: bg-surface rounded-xl p-3 mt-3
+text-[10px] text-ink-muted leading-relaxed
+PROMPT P7: CUSTOMER ┬╖ VENDOR ┬╖ ADMIN ┬╖ INSPECTOR PORTALS
+Sidebar layouts ┬╖ Dashboard cards ┬╖ Tables ┬╖ Status badges
+=== CURSOR PROMPT P7 ΓÇö ALL PORTAL LAYOUTS ===
+ΓöÇΓöÇΓöÇ SHARED PORTAL LAYOUT PATTERN ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+All portals share the same structural layout:
+Left sidebar (fixed, w-56) + main content area (flex-1)
+Portals have their own sidebar color but SAME structural CSS
+ΓöÇΓöÇΓöÇ CUSTOMER PORTAL ΓÇö /customer/* ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+Sidebar: bg-navy border-r border-white/8 h-screen fixed left-0 top-0 w-56
+Logo area: px-4 pt-5 pb-4 border-b border-white/8
+Logo + "My Account" text-white/40 text-[10px] uppercase tracking-widest
+Nav items: px-3 py-2
+Each: flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer
+text-white/55 text-[12px] hover:bg-white/6 hover:text-white
+Active: bg-white/10 text-white font-medium
+Icon: w-4 h-4 (lucide-react)
+Items:
+Dashboard (LayoutDashboard)
+My Orders (Package)
+My Bids (MessageSquare)
+Invoices (FileText)
+Tracking (Truck)
+Profile (User)
+Bottom of sidebar:
+Notification bell + user name + logout
+bg-white/5 border-t border-white/8 px-4 py-3
+Main content: ml-56 bg-surface min-h-screen
+Top bar of main: bg-white border-b border-border px-6 py-3 flex items-center
+justify-between sticky top-0 z-10
+Page title: text-ink-primary text-[15px] font-medium
+Right: NotificationBell + avatar
+KPI CARDS (dashboard):
+grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6
+Each: bg-white border border-border rounded-xl p-4
+Icon circle: w-9 h-9 rounded-lg (color varies by metric)
+Number: text-[22px] font-medium text-ink-primary mt-2
+Label: text-ink-muted text-[12px]
+Delta: text-[11px] (green if positive, red if negative)
+TABLE PATTERN:
+Container: bg-white border border-border rounded-xl overflow-hidden
+Header row: bg-surface border-b border-border px-4 py-3
+flex justify-between: table title | search/filter
+Table head: bg-surface text-ink-muted text-[10px] uppercase tracking-wide
+th: px-4 py-2.5
+Table body: rows border-b border-border-light last:border-0
+td: px-4 py-3 text-[12px] text-ink-secondary
+hover: bg-surface/50
+STATUS BADGES:
+Use this function in src/lib/status-badge.ts:
+export function getStatusBadge(status: string) {
+const map: Record<string, string> = {
+ORDER_PLACED:    "bg-blue-50 text-blue-700 border border-blue-200",
+ORDER_CONFIRMED: "bg-blue-100 text-blue-800 border border-blue-300",
+PACKED:          "bg-indigo-50 text-indigo-700 border border-indigo-200",
+DISPATCHED:      "bg-purple-50 text-purple-700 border border-purple-200",
+DELIVERED:       "bg-verified-bg text-verified-text border border-verified-border",
+PAYOUT_RELEASED: "bg-verified-bg text-verified-text border border-verified-border",
+TOKEN_PAID:      "bg-amber-bg text-amber-dark border border-amber-border",
+STOCK_RESERVED:  "bg-amber-bg text-amber-dark border border-amber-border",
+TOKEN_FORFEITED: "bg-red-50 text-red-700 border border-red-200",
+CANCELLED:       "bg-red-50 text-red-700 border border-red-200",
+BID_PENDING:     "bg-amber-bg text-amber-dark border border-amber-border",
+BID_APPROVED:    "bg-verified-bg text-verified-text border border-verified-border",
+BID_REJECTED:    "bg-red-50 text-red-700 border border-red-200",
+}
+return map[status] ?? "bg-surface text-ink-muted border border-border"
+}
+Usage: <span className={`text-[10px] px-2 py-0.5 rounded font-medium ${getStatusBadge(status)}`}>{status}</span>
+ΓöÇΓöÇΓöÇ VENDOR PORTAL ΓÇö /vendor/* ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+Sidebar: bg-[#0A2618] (dark forest green ΓÇö distinct from customer navy)
+Accent: text-verified and border-verified/30 for active items
+Logo area: "Vendor Portal" label
+Nav items: same structure as customer sidebar
+Items: Dashboard | Products | Lot Orders | AsAs Orders | Bids | Payouts | Profile
+Active item: bg-verified/10 text-verified border-l-2 border-verified
+ΓöÇΓöÇΓöÇ ADMIN PORTAL ΓÇö /admin/* ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+Sidebar: bg-[#0A1628] (same as navbar ΓÇö distinctly "control" feel)
+Top band: bg-amber px-4 py-2 text-navy text-[10px] font-bold tracking-widest
+"RENTFOXXY ADMIN"
+Nav: same structure, but more items
+Active: bg-amber/10 text-amber border-l-2 border-amber
+ΓöÇΓöÇΓöÇ INSPECTOR PORTAL ΓÇö /inspector/* ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+Sidebar: bg-[#042f2e] (very dark teal ΓÇö "field team" feel)
+Accent: text-teal-400 for active items
+Active: bg-teal-500/10 text-teal-300 border-l-2 border-teal-400
+ΓöÇΓöÇΓöÇ BALANCE PAYMENT BANNER ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+In customer/orders/[id] when order.status === TOKEN_PAID:
+bg-gradient-to-r from-amber to-amber-dark rounded-xl p-5 mb-5
+ΓÅ░ heading: text-navy font-semibold text-[15px]
+Balance amount: text-navy text-[13px]
+Deadline: text-navy/70 text-[12px]
+CountdownTimer: text-navy font-bold text-[18px] (days/hours/mins/secs)
+"Pay Balance Now" button: bg-white text-amber-dark font-bold py-3 rounded-xl
+hover:bg-amber-bg
+Forfeit warning: text-navy/50 text-[10px]
+ΓöÇΓöÇΓöÇ ORDER TIMELINE ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+Vertical timeline component:
+Container: relative flex flex-col gap-0
+Connector line: absolute left-[19px] top-10 bottom-0 w-px bg-border
+Each step: flex items-start gap-4 pb-6 relative
+Circle: w-10 h-10 rounded-full flex items-center justify-center z-10
+Completed: bg-verified text-white "Γ£ô"
+Active: bg-navy text-white ring-4 ring-navy/20
+Future: bg-surface border-2 border-border text-ink-hint
+Content: flex-1
+Label: text-[13px] font-medium text-ink-primary (active) or text-ink-muted
+Timestamp: text-[11px] text-ink-muted
+Description: text-[12px] text-ink-secondary
+PROMPT P8: FINAL POLISH + RESPONSIVE + GLOBAL CLEANUP
+Mobile responsiveness ┬╖ Loading states ┬╖ Empty states ┬╖ Toasts ┬╖ Animations
+=== CURSOR PROMPT P8 ΓÇö FINAL POLISH & GLOBAL CLEANUP ===
+ΓöÇΓöÇΓöÇ P8A: GLOBAL SEARCH & REPLACE ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+After running P1-P7, do a global search for these old color classes
+and replace with the new system:
+Search ΓåÆ Replace:
+"bg-primary" ΓåÆ "bg-navy"
+"text-primary" ΓåÆ "text-navy" (unless it means text-ink-primary ΓÇö check context)
+"bg-accent" ΓåÆ "bg-lot" (for lot/product contexts) or "bg-amber" (for CTAs)
+"text-accent" ΓåÆ "text-lot" or "text-amber" (check context)
+"bg-accent/5" ΓåÆ "bg-lot-bg"
+"bg-purple-600" ΓåÆ "bg-asas" (AsAs contexts only)
+"text-green-600" ΓåÆ "text-verified-text" (verified badge only)
+"bg-green-100" ΓåÆ "bg-verified-bg"
+Old BTN classes ΓåÆ use BTN constants from design.ts
+ΓöÇΓöÇΓöÇ P8B: RESPONSIVE BREAKPOINTS ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+Verify these breakpoints on every key page:
+Mobile (< 640px):
+Navbar: hamburger only, hide all links
+Product grid: 1 column
+Lot/AsAs grid: 1 column
+Lot detail: stacked (right buy panel BELOW left content)
+AsAs detail: stacked (right buy panel BELOW)
+Portal sidebar: hidden, toggle with menu icon
+Stat bars: 2├ù2 grid instead of 4-column row
+Tablet (640px-1024px):
+Product grid: 2 columns
+Lot/AsAs grid: 2 columns
+Detail pages: still stacked (2-col layout only at lg+)
+Portal sidebar: visible but collapsed (icons only, expand on hover)
+ΓöÇΓöÇΓöÇ P8C: LOADING STATES ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+Create src/components/ui/Skeleton.tsx:
+export function SkeletonCard() {
+return (
+<div className="bg-card border border-border rounded-xl overflow-hidden
+animate-pulse">
+<div className="bg-navy-light h-24" />
+<div className="p-3 space-y-2">
+<div className="h-3 bg-border rounded w-3/4" />
+<div className="h-3 bg-border rounded w-1/2" />
+<div className="h-2 bg-border rounded w-full mt-3" />
+<div className="flex justify-between mt-3">
+<div className="h-5 bg-border rounded w-1/3" />
+<div className="h-6 bg-border rounded w-1/4" />
+</div>
+</div>
+</div>
+)
+}
+export function SkeletonTable({ rows = 5 }) {
+return (
+<div className="bg-card border border-border rounded-xl overflow-hidden animate-pulse">
+<div className="bg-surface h-10" />
+{Array.from({length: rows}).map((_,i) => (
+<div key={i} className="flex gap-4 px-4 py-3 border-b border-border-light">
+<div className="h-3 bg-border rounded flex-1" />
+<div className="h-3 bg-border rounded w-1/4" />
+<div className="h-3 bg-border rounded w-1/6" />
+</div>
+))}
+</div>
+)
+}
+Add loading.tsx in every route segment with SkeletonCard or SkeletonTable.
+ΓöÇΓöÇΓöÇ P8D: EMPTY STATES ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+Create src/components/ui/EmptyState.tsx:
+interface Props {
+icon: React.ReactNode
+heading: string
+description: string
+action?: { label: string; href: string }
+}
+export function EmptyState({ icon, heading, description, action }: Props) {
+return (
+<div className="flex flex-col items-center justify-center py-16 text-center">
+<div className="w-16 h-16 bg-surface border border-border rounded-2xl
+flex items-center justify-center mb-4 text-ink-hint">
+{icon}
+</div>
+<h3 className="text-ink-primary text-[15px] font-medium mb-2">{heading}</h3>
+<p className="text-ink-muted text-[13px] max-w-sm leading-relaxed mb-5">
+{description}
+</p>
+{action && (
+<Link href={action.href}
+className="bg-navy text-white text-[12px] px-5 py-2.5 rounded-lg
+hover:bg-navy-light transition-colors">
+{action.label}
+</Link>
+)}
+</div>
+)
+}
+ΓöÇΓöÇΓöÇ P8E: TOAST NOTIFICATIONS ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+Update toast styles (Radix UI or react-hot-toast):
+Success: bg-verified-bg border border-verified-border text-verified-text
+Error: bg-red-50 border border-red-200 text-red-700
+Warning/Info: bg-amber-bg border border-amber-border text-amber-dark
+Default: bg-navy text-white
+ΓöÇΓöÇΓöÇ P8F: MICRO-ANIMATIONS ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+Add to globals.css (keep minimal ΓÇö only what adds value):
+@keyframes fadeIn {
+from { opacity: 0; transform: translateY(4px); }
+to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in { animation: fadeIn 200ms ease-out forwards; }
+@keyframes slideIn {
+from { transform: translateX(-8px); opacity: 0; }
+to   { transform: translateX(0); opacity: 1; }
+}
+.animate-slide-in { animation: slideIn 150ms ease-out forwards; }
+Apply animate-fade-in to:
+- Page hero sections
+- Modal content
+- Tab content on switch
+ΓöÇΓöÇΓöÇ P8G: FINAL VERIFICATION CHECKLIST ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+Before calling the redesign complete, verify:
+[ ] Navbar is dark navy on ALL pages (public + portals)
+[ ] Amber is used ONLY for: primary CTAs, logo, lot urgency badges, bid buttons
+[ ] Emerald green appears ONLY on: "Verified" badges and verified callout boxes
+[ ] Purple appears ONLY on: AsAs-related elements
+[ ] No vendor name appears on any customer-facing page
+[ ] Product cards have: dark header + condition badge top-left + verified badge top-right
+[ ] Lot detail has: tab system (Inventory + Simulator + Condition Guide)
+[ ] AsAs detail has: tab system (Full Details + Pivot Table + Condition Guide)
+[ ] Both detail pages: only 2 payment options (Full + Token 5%)
+[ ] All portal sidebars have distinct colors (navy=customer, green=vendor,
+navy+amber-header=admin, dark-teal=inspector)
+[ ] Loading skeletons on all listing pages
+[ ] Empty states on bid list, order list, lot orders
+[ ] Mobile: single column everywhere at <640px
+[ ] TypeScript: zero errors after all changes (run: npx tsc --noEmit)
+[ ] Tailwind: no unused custom classes (run: npx tailwindcss build)
+ΓöÇΓöÇΓöÇ P8H: SEO META UPDATE ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+Update src/app/(public)/layout.tsx metadata:
+export const metadata = {
+title: {
+default: "Rentfoxxy ΓÇö B2B Laptop Procurement Platform",
+template: "%s | Rentfoxxy"
+},
+description: "India's verified B2B marketplace for bulk laptop procurement.
+Compare prices anonymously, bid for bulk deals, and receive GST invoices.",
+keywords: ["B2B laptops India", "bulk laptop purchase", "refurbished laptops B2B",
+"laptop lot sales", "GST invoice laptops"],
+openGraph: {
+title: "Rentfoxxy ΓÇö B2B Laptop Procurement",
+description: "Verified suppliers. Anonymous pricing. GST invoicing.",
+siteName: "Rentfoxxy",
+type: "website",
+}
+}
+Execution Summary
+≡ƒôî NOTE: Total estimated time: 2.5ΓÇô3 hours running all 8 prompts sequentially with review between each. Fix TypeScript errors after each prompt before moving to the next.
+ΓÜá∩╕Å  RULE: DO NOT run multiple prompts at once. Cursor's Composer processes one file diff session at a time. Running two prompts simultaneously causes conflicts.
+Γ£à DO: After P3 is done, take a screenshot and compare against the 3 homepage mockups shown earlier. If anything diverges significantly, fix it before proceeding to P4.
+RENTFOXXY  ┬╖  Frontend Redesign Cursor Prompts ΓÇö Addendum v1.7  ┬╖  Confidential

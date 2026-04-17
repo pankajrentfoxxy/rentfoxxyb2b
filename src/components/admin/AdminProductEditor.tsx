@@ -16,6 +16,7 @@ export function AdminProductEditor({
     brand: string;
     hsnCode: string;
     isFeatured: boolean;
+    inspectorVerified: boolean;
     isActive: boolean;
     images: string[];
     specs: unknown;
@@ -28,6 +29,7 @@ export function AdminProductEditor({
   const [brand, setBrand] = useState(initial.brand);
   const [hsnCode, setHsnCode] = useState(initial.hsnCode);
   const [isFeatured, setIsFeatured] = useState(initial.isFeatured);
+  const [inspectorVerified, setInspectorVerified] = useState(initial.inspectorVerified);
   const [isActive, setIsActive] = useState(initial.isActive);
   const [imagesText, setImagesText] = useState(normalizeProductImages(initial.images).join("\n"));
   const [specsText, setSpecsText] = useState(JSON.stringify(initial.specs, null, 2));
@@ -57,6 +59,7 @@ export function AdminProductEditor({
           brand,
           hsnCode,
           isFeatured,
+          inspectorVerified,
           isActive,
           images,
           specs,
@@ -112,6 +115,14 @@ export function AdminProductEditor({
       </label>
       <label className="flex items-center gap-2 text-sm">
         <input type="checkbox" checked={isFeatured} onChange={(e) => setIsFeatured(e.target.checked)} /> Featured
+      </label>
+      <label className="flex items-center gap-2 text-sm">
+        <input
+          type="checkbox"
+          checked={inspectorVerified}
+          onChange={(e) => setInspectorVerified(e.target.checked)}
+        />{" "}
+        Inspector verified (show Verified badge on storefront)
       </label>
       <label className="flex items-center gap-2 text-sm">
         <input type="checkbox" checked={isActive} onChange={(e) => setIsActive(e.target.checked)} /> Active on storefront

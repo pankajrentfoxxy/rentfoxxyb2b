@@ -1,4 +1,7 @@
-import { lotConditionToLabel } from "@/lib/lot-ai-cleaner";
+import { BTN } from "@/constants/design";
+import { cn } from "@/lib/utils";
+import { ConditionBadge } from "@/components/ui/ConditionBadge";
+import { LotProgress } from "@/components/ui/StatBadge";
 import type { LotItemCondition } from "@prisma/client";
 import Link from "next/link";
 
@@ -31,77 +34,57 @@ export function AsAsCard({
   isLotMode,
   totalLots,
   lotsSold,
-  lotsRemaining,
   lotSize,
-  percentSold,
 }: AsAsCardProps) {
-  const pct =
-    percentSold ??
-    (isLotMode && totalLots && lotsSold != null
-      ? Math.round((lotsSold / totalLots) * 100)
-      : undefined);
-
   return (
     <Link
       href={`/asas/listings/${id}`}
-      className="group block overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all duration-200 hover:border-purple-400 hover:shadow-xl"
+      className="group block overflow-hidden rounded-xl border border-border bg-card transition-all hover:border-asas/30 hover:shadow-md"
     >
-      <div className="border-b border-purple-100 bg-gradient-to-br from-purple-50 to-indigo-50 px-4 pb-3 pt-4">
-        <div className="mb-2 flex flex-wrap items-center gap-1.5">
-          {brands.map((b) => (
-            <span key={b} className="rounded-lg bg-purple-700 px-2.5 py-1 text-xs font-bold text-white">
-              {b}
-            </span>
-          ))}
-          {allowBidding ? (
-            <span className="rounded-lg bg-amber-500 px-2 py-1 text-xs font-semibold text-white">Bid</span>
+      <div className="border-l-[3px] border-l-asas">
+        <div className="bg-[#3B0764] px-4 py-3">
+          <div className="mb-2 flex flex-wrap items-center gap-1.5">
+            <span className="rounded bg-white/12 px-2 py-0.5 text-[9px] font-medium text-white">🔄 AsAs</span>
+            {allowBidding ? (
+              <span className="rounded bg-asas/30 px-2 py-0.5 text-[9px] font-medium text-purple-200">
+                Bid open
+              </span>
+            ) : null}
+          </div>
+          <h3 className="mb-1 line-clamp-2 text-[13px] font-medium leading-snug text-white">{title}</h3>
+          {brands.length ? (
+            <p className="mb-1 text-[11px] text-white/35">{brands.slice(0, 4).join(" · ")}</p>
+          ) : null}
+          {description ? (
+            <p className="line-clamp-1 text-[11px] text-white/35">{description}</p>
           ) : null}
         </div>
-        <h3 className="mb-1 line-clamp-2 text-sm font-bold leading-snug text-primary transition-colors group-hover:text-purple-700">
-          {title}
-        </h3>
-        {description ? <p className="line-clamp-1 text-xs text-muted">{description}</p> : null}
-      </div>
-      <div className="space-y-3 p-4">
-        <div className="flex flex-wrap gap-1">
-          {conditions.map((c, i) => (
-            <span key={`${c}-${i}`} className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
-              {lotConditionToLabel(c)}
-            </span>
-          ))}
-        </div>
-        {isLotMode && totalLots ? (
-          <div>
-            <div className="mb-1.5 flex justify-between">
-              <span className="text-xs font-semibold text-primary">
-                {lotsSold ?? 0} / {totalLots} lots sold
-              </span>
-              <span className="text-xs font-bold text-purple-600">{lotsRemaining ?? 0} remaining</span>
-            </div>
-            <div className="h-2.5 w-full rounded-full bg-slate-100">
-              <div
-                className="h-2.5 rounded-full bg-gradient-to-r from-purple-500 to-indigo-600"
-                style={{ width: `${Math.min(100, pct ?? 0)}%` }}
-              />
-            </div>
-            {lotSize ? <p className="mt-1 text-xs text-muted">Each lot ≈ {lotSize} units</p> : null}
+
+        <div className="space-y-3 px-4 py-3">
+          <div className="flex flex-wrap gap-1">
+            {conditions.map((c, i) => (
+              <ConditionBadge key={`${String(c)}-${i}`} condition={String(c)} size="sm" />
+            ))}
           </div>
-        ) : (
-          <div className="text-sm">
-            <span className="font-bold text-primary">{unitsAvailable}</span>
-            <span className="text-muted"> units available</span>
-          </div>
-        )}
-        <div className="flex items-end justify-between border-t border-slate-100 pt-1">
-          <div>
-            <p className="text-xs text-muted">Avg. price / unit</p>
-            <p className="text-xl font-bold text-primary">
-              ₹{avgUnitPrice.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
+          {isLotMode && totalLots ? (
+            <>
+              <LotProgress sold={lotsSold ?? 0} total={totalLots} />
+              {lotSize ? <p className="text-[9px] text-ink-muted">~{lotSize} units per lot</p> : null}
+            </>
+          ) : (
+            <p className="text-sm text-ink-secondary">
+              <span className="font-semibold text-ink-primary">{unitsAvailable}</span> units available
             </p>
+          )}
+          <div className="flex items-end justify-between border-t border-border-light pt-3">
+            <div>
+              <p className="text-[17px] font-medium text-asas">
+                ₹{avgUnitPrice.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
+              </p>
+              <p className="text-[9px] text-ink-muted">avg / unit</p>
+            </div>
+            <span className={cn(BTN.asas, "px-3 py-1.5 text-[10px]")}>View Deal →</span>
           </div>
-          <span className="rounded-xl bg-purple-600 px-4 py-2 text-xs font-bold text-white transition-colors group-hover:bg-purple-700">
-            View deal →
-          </span>
         </div>
       </div>
     </Link>

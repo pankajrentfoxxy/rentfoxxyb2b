@@ -1,19 +1,25 @@
+import { BTN } from "@/constants/design";
 import Link from "next/link";
 
 export function HomeCTA() {
   return (
-    <section className="bg-primary py-16 text-white">
-      <div className="mx-auto max-w-7xl px-4 text-center sm:px-6">
-        <h2 className="text-2xl font-bold sm:text-3xl">Ready to streamline your IT procurement?</h2>
-        <p className="mt-3 text-slate-300">
-          Create a buyer account in minutes and unlock catalog access, bids, and GST invoices.
+    <section className="border-t border-white/6 bg-navy-light px-4 py-8 text-center">
+      <div className="mx-auto max-w-2xl">
+        <h2 className="mb-2 text-xl font-medium text-white">Ready to modernise laptop procurement?</h2>
+        <p className="mb-5 text-sm text-white/45">
+          Create a buyer account for catalog access, or register as a vendor to reach verified enterprise buyers.
         </p>
-        <Link
-          href="/auth/register?intent=buyer"
-          className="mt-8 inline-flex h-12 items-center rounded-lg bg-fox px-8 text-sm font-bold text-slate-900 shadow-lg transition hover:bg-fox-light"
-        >
-          Register now
-        </Link>
+        <div className="flex flex-wrap justify-center gap-3">
+          <Link href="/products" className={`inline-flex ${BTN.primary}`}>
+            Browse Products
+          </Link>
+          <Link
+            href="/auth/register?intent=vendor"
+            className="inline-flex rounded-lg border border-white/30 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-white/10"
+          >
+            Register as Vendor
+          </Link>
+        </div>
       </div>
     </section>
   );

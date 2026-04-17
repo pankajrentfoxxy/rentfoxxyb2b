@@ -44,6 +44,8 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
 
   return NextResponse.json({
     id: listing.id,
+    inspectorVerified: listing.inspectorVerified,
+    listingTotalUnits: listing.totalUnits,
     hasUploadedCsv: Boolean(listing.uploadedCsvSnapshot?.trim()),
     title: listing.title,
     description: listing.description,

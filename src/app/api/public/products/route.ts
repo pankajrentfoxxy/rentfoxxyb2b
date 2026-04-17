@@ -114,7 +114,7 @@ export async function GET(req: NextRequest) {
     products: slice,
     pagination: { page, limit, total, totalPages: Math.ceil(total / limit) || 1 },
     filterMeta: {
-      ramOptions: ["4GB", "8GB", "16GB", "32GB"],
+      ramOptions: ["4GB", "8GB", "16GB", "32GB", "64GB"],
       cpuOptions: CPU_OPTS,
       brands: distinctBrands.map((b) => b.brand),
     },

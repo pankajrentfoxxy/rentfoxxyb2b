@@ -1,28 +1,57 @@
-import { CreditCard, PackageSearch, Search, Truck } from "lucide-react";
+const BUYER_STEPS = [
+  { n: 1, title: "Browse verified lots", desc: "Filter by grade, brand, and MOQ without exposing vendor identities upfront." },
+  { n: 2, title: "Bid or buy instantly", desc: "Structured bids with clear timelines, or checkout at listed B2B prices." },
+  { n: 3, title: "Invoice & fulfilment", desc: "GST-ready paperwork and tracking through to delivery confirmation." },
+];
 
-const steps = [
-  { n: 1, title: "Browse & compare", desc: "Filter by specs and see anonymised price options.", icon: Search },
-  { n: 2, title: "Request a quote", desc: "Submit bids or checkout instantly at listed prices.", icon: PackageSearch },
-  { n: 3, title: "Pay securely", desc: "Razorpay-powered payments with GST-ready invoices.", icon: CreditCard },
-  { n: 4, title: "Track delivery", desc: "Live status updates until delivery confirmation.", icon: Truck },
+const VENDOR_STEPS = [
+  { n: 1, title: "List inventory", desc: "Upload lots and line-items with grading aligned to Rentfoxxy standards." },
+  { n: 2, title: "Respond to demand", desc: "Receive bids and orders with anonymised buyer context until award." },
+  { n: 3, title: "Get paid", desc: "Payments and settlements per agreed commercial terms on-platform." },
 ];
 
 export function HowItWorks() {
   return (
-    <section className="bg-white py-14">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6">
-        <h2 className="text-center text-2xl font-bold text-slate-900">How it works</h2>
-        <div className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-          {steps.map((s) => (
-            <div key={s.n} className="relative rounded-xl border border-slate-100 bg-surface p-6 text-center">
-              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary text-lg font-bold text-white">
-                {s.n}
-              </div>
-              <s.icon className="mx-auto mt-4 h-8 w-8 text-accent" aria-hidden />
-              <h3 className="mt-3 font-semibold text-slate-900">{s.title}</h3>
-              <p className="mt-2 text-sm text-muted">{s.desc}</p>
-            </div>
-          ))}
+    <section className="bg-navy px-4 py-10">
+      <div className="mx-auto max-w-5xl">
+        <h2 className="mb-6 text-center text-xl font-medium text-white">How it works</h2>
+        <div className="grid gap-10 md:grid-cols-2">
+          <div>
+            <p className="mb-4 text-center text-[11px] font-semibold uppercase tracking-widest text-white/40 md:text-left">
+              For Buyers
+            </p>
+            <ul className="space-y-5">
+              {BUYER_STEPS.map((s) => (
+                <li key={s.n} className="flex gap-3">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-amber text-sm font-semibold text-navy">
+                    {s.n}
+                  </span>
+                  <div>
+                    <p className="text-[13px] font-medium text-white">{s.title}</p>
+                    <p className="mt-1 text-[12px] leading-relaxed text-white/45">{s.desc}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <p className="mb-4 text-center text-[11px] font-semibold uppercase tracking-widest text-white/40 md:text-left">
+              For Vendors
+            </p>
+            <ul className="space-y-5">
+              {VENDOR_STEPS.map((s) => (
+                <li key={s.n} className="flex gap-3">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-amber text-sm font-semibold text-navy">
+                    {s.n}
+                  </span>
+                  <div>
+                    <p className="text-[13px] font-medium text-white">{s.title}</p>
+                    <p className="mt-1 text-[12px] leading-relaxed text-white/45">{s.desc}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </div>
     </section>

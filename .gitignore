@@ -46,3 +46,4 @@ next-env.d.ts
 document/_v*_unzipped/
 document/_v*.zip
 document/_*_extracted.txt
+document/_v17_extract/

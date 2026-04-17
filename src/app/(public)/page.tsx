@@ -1,10 +1,10 @@
 import { HomeAsAsDeals } from "@/components/storefront/HomeAsAsDeals";
-import { HowItWorks } from "@/components/storefront/HowItWorks";
 import { HomeCTA } from "@/components/storefront/HomeCTA";
-import { HomeFeatured } from "@/components/storefront/HomeFeatured";
-import { HomeFeatures } from "@/components/storefront/HomeFeatures";
+import { HomeFeaturedGrid } from "@/components/storefront/HomeFeaturedGrid";
 import { HomeHero } from "@/components/storefront/HomeHero";
 import { HomeLotSales } from "@/components/storefront/HomeLotSales";
+import { HomeTrustBar } from "@/components/storefront/HomeTrustBar";
+import { HowItWorks } from "@/components/storefront/HowItWorks";
 import { mapProductPublic, STOREFRONT_LISTING_WHERE } from "@/lib/public-api";
 import { prisma } from "@/lib/prisma";
 
@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
 function loadFeaturedOnly() {
   return prisma.product.findMany({
     where: { isActive: true, isFeatured: true },
-    take: 8,
+    take: 24,
     include: {
       category: true,
       listings: {
@@ -69,11 +69,11 @@ export default async function HomePage() {
         </div>
       ) : null}
       <HomeHero />
+      <HomeTrustBar />
       <HomeLotSales />
       <HomeAsAsDeals />
-      <HomeFeatured products={featured} />
+      <HomeFeaturedGrid products={featured} />
       <HowItWorks />
-      <HomeFeatures />
       <HomeCTA />
     </>
   );

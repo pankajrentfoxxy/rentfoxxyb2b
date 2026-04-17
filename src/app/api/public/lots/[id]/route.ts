@@ -56,6 +56,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
 
   return NextResponse.json({
     id: lot.id,
+    inspectorVerified: lot.inspectorVerified,
     hasUploadedCsv: Boolean(lot.uploadedCsvSnapshot?.trim()),
     title: lot.title,
     description: lot.description,

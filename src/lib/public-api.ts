@@ -28,6 +28,8 @@ export type PublicProductCard = {
   images: string[];
   specs: Record<string, unknown>;
   isFeatured: boolean;
+  /** True after Rentfoxxy inspector has verified this product's inventory. */
+  inspectorVerified: boolean;
   category: { name: string; slug: string };
   listings: PublicListing[];
   priceMin: number;
@@ -102,6 +104,7 @@ export function mapProductPublic(
     images: normalizeProductImages(product.images),
     specs: product.specs as Record<string, unknown>,
     isFeatured: product.isFeatured,
+    inspectorVerified: product.inspectorVerified,
     category: { name: product.category.name, slug: product.category.slug },
     listings: active.map((l, i) => mapListing(l, i)),
     priceMin,
