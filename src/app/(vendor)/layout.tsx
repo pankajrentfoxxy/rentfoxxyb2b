@@ -1,6 +1,7 @@
 import { VendorAppShell } from "@/components/vendor/VendorAppShell";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { vendorHasReducePriceAlert } from "@/lib/vendor-pricing-alert";
 import { redirect } from "next/navigation";
 
 export default async function VendorLayout({
@@ -27,12 +28,14 @@ export default async function VendorLayout({
       </div>
     );
   }
+  const marketIntelAlert = await vendorHasReducePriceAlert(vendor.id);
   return (
     <VendorAppShell
       email={session.user.email}
       role={session.user.role}
       companyName={vendor.companyName}
       status={vendor.status}
+      marketIntelAlert={marketIntelAlert}
     >
       {children}
     </VendorAppShell>

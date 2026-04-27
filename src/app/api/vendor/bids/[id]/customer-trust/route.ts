@@ -1,3 +1,4 @@
+import { getBuyerBadge, type BuyerTier } from "@/lib/buyer-badge";
 import { getVendorContext } from "@/lib/vendor-auth";
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
@@ -66,12 +67,19 @@ export async function GET(_req: NextRequest, ctx: { params: Promise<{ id: string
 
   const orderCount = orders.length;
   const avgRating = profile.avgRating;
-  let tier: "gold" | "silver" | "new" = "new";
-  if (orderCount >= 3 && avgRating >= 4) tier = "gold";
-  else if (avgRating >= 3) tier = "silver";
+
+  const buyerBadge = await getBuyerBadge(profile.id);
+
+  function trustTone(t: BuyerTier): "gold" | "silver" | "bronze" | "new" {
+    if (t === "GOLD") return "gold";
+    if (t === "SILVER") return "silver";
+    if (t === "BRONZE") return "bronze";
+    return "new";
+  }
 
   return NextResponse.json({
-    tier,
+    tier: trustTone(buyerBadge.tier),
+    buyerBadge,
     avgRating: Math.round(avgRating * 10) / 10,
     reviewCount: profile.reviewCount,
     orderCount,

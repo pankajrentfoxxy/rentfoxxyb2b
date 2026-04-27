@@ -1,5 +1,6 @@
 "use client";
 
+import { CompareButton } from "@/components/storefront/CompareButton";
 import { BTN } from "@/constants/design";
 import { isUsableImageSrc } from "@/lib/image-url";
 import { specsSummary, type PublicProductCard } from "@/lib/public-api";
@@ -92,6 +93,7 @@ export function ProductCard({
 
   const actions = (
     <div className="flex flex-wrap gap-1">
+      <CompareButton product={product} />
       <Link href={`/products/${product.slug}`} className={cn(BTN.bid, "px-2 py-1.5 text-[10px]")}>
         Bid
       </Link>

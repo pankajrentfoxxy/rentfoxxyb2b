@@ -92,6 +92,12 @@ export function Navbar() {
             >
               About
             </Link>
+            <Link
+              href="/tools/fleet-calculator"
+              className="whitespace-nowrap px-2 py-2 text-sm font-medium text-white/55 hover:text-amber"
+            >
+              Fleet calc
+            </Link>
           </nav>
         </div>
 

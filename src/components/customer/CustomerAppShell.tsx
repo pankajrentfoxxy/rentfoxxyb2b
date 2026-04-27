@@ -6,6 +6,7 @@ import { UserMenu } from "@/components/shared/UserMenu";
 import type { Role } from "@prisma/client";
 import { cn } from "@/lib/utils";
 import {
+  Bell,
   FileText,
   LayoutDashboard,
   Menu,
@@ -23,6 +24,7 @@ const nav = [
   { href: "/customer/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/customer/orders", label: "My Orders", icon: Package },
   { href: "/customer/bids", label: "My Bids", icon: MessageSquare },
+  { href: "/customer/watchlist", label: "Price Watch", icon: Bell },
   { href: "/customer/invoices", label: "Invoices", icon: FileText },
   { href: "/customer/tracking", label: "Tracking", icon: Truck },
   { href: "/customer/profile", label: "Profile", icon: User },
@@ -32,6 +34,7 @@ function pageTitle(pathname: string): string {
   const hit = nav.find((n) => pathname === n.href || pathname.startsWith(`${n.href}/`));
   if (hit) return hit.label;
   if (pathname.startsWith("/customer/notifications")) return "Notifications";
+  if (pathname.startsWith("/customer/watchlist")) return "Price Watch";
   return "My Account";
 }
 
@@ -39,10 +42,12 @@ export function CustomerAppShell({
   children,
   email,
   role,
+  watchAlertCount = 0,
 }: {
   children: React.ReactNode;
   email: string | null | undefined;
   role: Role;
+  watchAlertCount?: number;
 }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
@@ -85,7 +90,14 @@ export function CustomerAppShell({
           {nav.map((item) => (
             <Link key={item.href} href={item.href} className={linkCls(item.href)} onClick={() => setOpen(false)}>
               <item.icon className="h-4 w-4 shrink-0" />
-              {item.label}
+              <span className="flex flex-1 items-center justify-between gap-2">
+                {item.label}
+                {item.href === "/customer/watchlist" && watchAlertCount > 0 ? (
+                  <span className="rounded-full bg-amber px-1.5 py-0.5 text-[9px] font-bold text-navy">
+                    {watchAlertCount}
+                  </span>
+                ) : null}
+              </span>
             </Link>
           ))}
         </nav>

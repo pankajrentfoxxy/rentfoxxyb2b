@@ -8,6 +8,7 @@ import {
 } from "@/lib/vendor-dashboard-data";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
+import { getScoreLabel } from "@/lib/vendor-score";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -34,6 +35,7 @@ export default async function VendorDashboardPage() {
   if (!session?.user?.id) redirect("/auth/login");
   const vendor = await prisma.vendorProfile.findUnique({
     where: { userId: session.user.id },
+    include: { vendorScore: true },
   });
   if (!vendor) redirect("/auth/login");
 
@@ -76,7 +78,20 @@ export default async function VendorDashboardPage() {
         <p className="mt-1 text-sm text-muted">Overview of orders, bids, and payouts for {vendor.companyName}.</p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+        <KpiCard
+          label="Performance score"
+          value={
+            vendor.vendorScore && vendor.vendorScore.overallScore > 0
+              ? String(vendor.vendorScore.overallScore)
+              : "—"
+          }
+          hint={
+            vendor.vendorScore && vendor.vendorScore.overallScore > 0
+              ? getScoreLabel(vendor.vendorScore.overallScore)
+              : "Computed daily from delivery, fulfilment & reviews"
+          }
+        />
         <KpiCard
           label="New orders to fulfil"
           value={String(newOrders)}

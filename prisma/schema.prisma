@@ -167,6 +167,7 @@ model User {
   accounts         Account[]
   sessions         Session[]
   phone            String?          @unique
+  phoneVerified    DateTime?
   passwordHash     String
   role             Role             @default(CUSTOMER)
   isVerified       Boolean          @default(false)
@@ -206,6 +207,22 @@ model VendorProfile {
   lots                     LotListing[]
   asasListings             AsAsListing[]
   verificationTasks        VerificationTask[]
+  vendorScore              VendorScore?
+}
+
+model VendorScore {
+  id               String        @id @default(cuid())
+  vendorId         String        @unique
+  vendor           VendorProfile @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  overallScore     Int           @default(0)
+  deliveryScore    Int           @default(0)
+  fulfillmentScore Int           @default(0)
+  reviewScore      Int           @default(0)
+  disputeScore     Int           @default(0)
+  totalOrders      Int           @default(0)
+  onTimeDeliveries Int           @default(0)
+  disputedOrders   Int           @default(0)
+  lastComputedAt   DateTime      @default(now())
 }
 
 model CustomerProfile {
@@ -220,6 +237,7 @@ model CustomerProfile {
   bids        Bid[]
   orders      Order[]
   cart        Cart?
+  priceWatches PriceWatch[]
   lotPurchases   LotPurchase[]
   asasPurchases  AsAsPurchase[]
   lotBids        LotBid[]
@@ -260,6 +278,29 @@ model OtpVerification {
   createdAt DateTime @default(now())
 }
 
+model SmsOtpVerification {
+  phone     String   @id
+  email     String
+  otpHash   String
+  expiresAt DateTime
+  attempts  Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+model GstinCache {
+  gstin              String   @id
+  businessName       String
+  tradeName          String?
+  status             String
+  registrationDate   String?
+  entityType         String?
+  address            String?
+  city               String?
+  state              String?
+  pincode            String?
+  cachedAt           DateTime @default(now())
+}
+
 model LotListing {
   id             String             @id @default(cuid())
   vendorId       String
@@ -283,6 +324,8 @@ model LotListing {
   inspectorVerified Boolean         @default(true)
   liveAt         DateTime?
   dispatchedAt   DateTime?
+  /// "SILVER" | "GOLD" — restrict lot to verified buyer tiers (optional).
+  minimumBuyerTier String?
   items          LotInventoryItem[]
   purchases      LotPurchase[]
   lotBids        LotBid[]
@@ -539,9 +582,10 @@ model Address {
   state     String
   pincode   String
   isDefault Boolean @default(false)
-  orders        Order[]
-  lotPurchases  LotPurchase[]
-  asAsPurchases AsAsPurchase[]
+  orders                 Order[]
+  orderDeliveryAddresses OrderDeliveryAddress[]
+  lotPurchases           LotPurchase[]
+  asAsPurchases          AsAsPurchase[]
 }
 
 model Category {
@@ -569,6 +613,7 @@ model Product {
   hsnCode     String           @default("8471")
   createdAt   DateTime         @default(now())
   listings    ProductListing[]
+  priceWatches PriceWatch[]
 }
 
 model ProductListing {
@@ -588,8 +633,29 @@ model ProductListing {
   conditionNotes        String?
   refurbImages          String[]          @default([])
   requiresAdminApproval Boolean           @default(false)
+  /// Cached overall vendor score (updated by daily cron).
+  vendorScoreSnapshot   Int?
   bids                  Bid[]
   orderItems            OrderItem[]
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+}
+
+model PriceWatch {
+  id            String            @id @default(cuid())
+  customerId    String
+  customer      CustomerProfile   @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  productId     String
+  product       Product           @relation(fields: [productId], references: [id], onDelete: Cascade)
+  targetPrice   Float
+  isActive      Boolean           @default(true)
+  lastAlertedAt DateTime?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  @@unique([customerId, productId])
+  @@index([productId])
+  @@index([customerId])
 }
 
 model Bid {
@@ -628,6 +694,10 @@ model Order {
   gstAmount   Float
   totalAmount Float
   status      OrderStatus @default(PAYMENT_PENDING)
+  /// Buyer PO reference (Addendum v1.8 P6).
+  purchaseOrderNumber String?
+  isMultiAddress      Boolean            @default(false)
+  deliveryAddresses   OrderDeliveryAddress[]
   adminNotes  String?     @db.Text
   tokenAmount        Float?
   tokenPercentage    Float?
@@ -646,6 +716,22 @@ model Order {
   payouts     Payout[]
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
+}
+
+model OrderDeliveryAddress {
+  id              String  @id @default(cuid())
+  orderId         String
+  order           Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  addressId       String
+  address         Address @relation(fields: [addressId], references: [id])
+  quantity        Int
+  label           String?
+  status          String  @default("PENDING")
+  trackingAwb     String?
+  trackingCarrier String?
+
+  @@index([orderId])
+  @@index([addressId])
 }
 
 model OrderItem {

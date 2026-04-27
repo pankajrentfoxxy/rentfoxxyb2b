@@ -9,11 +9,15 @@ import { getRazorpay } from "@/lib/razorpay";
 import type { CartLine } from "@/types/cart";
 import { NextRequest, NextResponse } from "next/server";
 
+type DeliverySplit = { addressId: string; quantity: number; label?: string };
+
 type CreateBody = {
   addressId: string;
   items?: CartLine[];
   bidId?: string;
   customerGstin?: string;
+  /** Optional: split cart quantity across multiple saved addresses (cart only). */
+  deliverySplits?: DeliverySplit[];
 };
 
 const vendorPaySelect = {
@@ -146,6 +150,45 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Provide items or bidId" }, { status: 400 });
   }
 
+  let isMultiAddress = false;
+  let deliveryCreates: { addressId: string; quantity: number; label: string | null }[] | undefined;
+
+  if (body.deliverySplits && body.deliverySplits.length > 0) {
+    if (bidIdForOrder) {
+      return NextResponse.json(
+        { error: "Multi-address delivery is only available for cart checkout" },
+        { status: 400 },
+      );
+    }
+    const sumSplits = body.deliverySplits.reduce((s, d) => s + Math.floor(Number(d.quantity) || 0), 0);
+    const sumLines = lines.reduce((s, l) => s + l.quantity, 0);
+    if (sumSplits !== sumLines) {
+      return NextResponse.json(
+        { error: "Delivery quantities must match total units in the cart" },
+        { status: 400 },
+      );
+    }
+    deliveryCreates = [];
+    for (const d of body.deliverySplits) {
+      const q = Math.floor(Number(d.quantity) || 0);
+      if (q < 1) {
+        return NextResponse.json({ error: "Invalid split quantity" }, { status: 400 });
+      }
+      const addr = await prisma.address.findFirst({
+        where: { id: d.addressId, userId: session.user.id },
+      });
+      if (!addr) {
+        return NextResponse.json({ error: "Invalid delivery address in split" }, { status: 400 });
+      }
+      deliveryCreates.push({
+        addressId: d.addressId,
+        quantity: q,
+        label: d.label?.trim() || null,
+      });
+    }
+    isMultiAddress = deliveryCreates.length > 1;
+  }
+
   const configured = isRazorpayConfigured();
   const bypass = allowInstantPaymentBypass();
   if (!configured && !bypass) {
@@ -177,6 +220,11 @@ export async function POST(req: NextRequest) {
       gstAmount: gst.gstAmount,
       totalAmount: gst.total,
       status: "PAYMENT_PENDING",
+      isMultiAddress,
+      deliveryAddresses:
+        deliveryCreates && deliveryCreates.length > 0
+          ? { create: deliveryCreates }
+          : undefined,
       items: {
         create: lines.map((l) => ({
           listingId: l.listingId,

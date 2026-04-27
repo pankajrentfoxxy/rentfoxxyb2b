@@ -38,6 +38,7 @@ export async function POST(req: NextRequest) {
     coverImage?: string | null;
     items?: LotCSVRow[];
     uploadedCsvSnapshot?: string | null;
+    minimumBuyerTier?: string | null;
   };
 
   const title = body.title?.trim();
@@ -64,6 +65,10 @@ export async function POST(req: NextRequest) {
     ? body.highlights.map((h) => String(h).trim()).filter(Boolean).slice(0, 10)
     : [];
 
+  const tierRaw = body.minimumBuyerTier?.trim().toUpperCase() || "";
+  const minimumBuyerTier =
+    tierRaw === "SILVER" || tierRaw === "GOLD" ? tierRaw : null;
+
   const lot = await prisma.lotListing.create({
     data: {
       vendorId: ctx.vendorId,
@@ -72,6 +77,7 @@ export async function POST(req: NextRequest) {
       highlights,
       coverImage: body.coverImage ?? null,
       uploadedCsvSnapshot: trimUploadSnapshot(body.uploadedCsvSnapshot ?? undefined),
+      minimumBuyerTier,
       totalQuantity,
       lotSize,
       totalLots,

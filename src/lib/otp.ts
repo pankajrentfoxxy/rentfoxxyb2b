@@ -1,6 +1,13 @@
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 
+/** When true, OTP endpoints may return `devOtp` and log the code. True for `next dev` always; never in production. */
+export function includeDevOtpInApiResponse(): boolean {
+  if (process.env.NODE_ENV === "production") return false;
+  if (process.env.NODE_ENV === "development") return true;
+  return !process.env.RESEND_API_KEY;
+}
+
 export function generateOTP(): string {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }

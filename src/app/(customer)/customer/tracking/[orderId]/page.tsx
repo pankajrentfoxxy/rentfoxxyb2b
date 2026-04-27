@@ -21,7 +21,14 @@ export default async function CustomerTrackingDetailPage({
 
   const order = await prisma.order.findFirst({
     where: { id: params.orderId, customerId: profile.id },
-    select: { id: true, orderNumber: true },
+    select: {
+      id: true,
+      orderNumber: true,
+      isMultiAddress: true,
+      deliveryAddresses: {
+        include: { address: true },
+      },
+    },
   });
   if (!order) notFound();
 
@@ -75,7 +82,33 @@ export default async function CustomerTrackingDetailPage({
         ) : null}
       </div>
 
-      <ol className="relative space-y-6 border-l-2 border-slate-200 pl-6">
+      {order.isMultiAddress && order.deliveryAddresses.length > 0 ? (
+        <div className="space-y-8">
+          {order.deliveryAddresses.map((da) => (
+            <div key={da.id} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+              <h2 className="text-sm font-semibold text-slate-900">
+                {da.label ?? "Delivery stop"} — {da.quantity} units
+              </h2>
+              <p className="mt-1 text-xs text-muted">
+                {da.address.city}, {da.address.state} {da.address.pincode}
+              </p>
+              {da.trackingAwb ? (
+                <p className="mt-2 text-sm">
+                  Tracking: <span className="font-mono font-medium">{da.trackingAwb}</span>
+                  {da.trackingCarrier ? ` · ${da.trackingCarrier}` : ""}
+                </p>
+              ) : (
+                <p className="mt-2 text-xs text-muted">Tracking for this stop will appear after dispatch.</p>
+              )}
+            </div>
+          ))}
+        </div>
+      ) : null}
+
+      <h2 className="text-sm font-semibold text-slate-900">
+        {order.isMultiAddress ? "Primary shipment timeline" : "Timeline"}
+      </h2>
+      <ol className="relative mt-4 space-y-6 border-l-2 border-slate-200 pl-6">
         {events.map((ev, i) => (
           <li key={`${ev.at}-${i}`} className={i === 0 ? "font-medium" : ""}>
             <span className="absolute -left-[9px] mt-1.5 h-4 w-4 rounded-full border-2 border-white bg-accent" />

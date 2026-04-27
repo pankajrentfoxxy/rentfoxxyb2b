@@ -23,6 +23,7 @@ export default async function VendorOrderDetailPage({ params }: { params: Promis
     include: {
       address: true,
       shipment: true,
+      deliveryAddresses: { include: { address: true } },
       items: {
         include: {
           listing: { include: { product: { select: { name: true, slug: true, brand: true } } } },
@@ -73,15 +74,44 @@ export default async function VendorOrderDetailPage({ params }: { params: Promis
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-          <h2 className="text-sm font-semibold text-slate-900">Ship to (redacted)</h2>
-          <p className="mt-2 text-sm text-slate-700">
-            {order.address.city}, {order.address.state} — {order.address.pincode}
-          </p>
-          <p className="mt-3 text-xs text-muted">
-            Full address is hidden in the vendor portal. Use AWB on the label provided by operations if
-            needed.
-          </p>
+        <div className="space-y-4">
+          <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <h2 className="text-sm font-semibold text-slate-900">Ship to (redacted)</h2>
+            <p className="mt-2 text-sm text-slate-700">
+              {order.address.city}, {order.address.state} — {order.address.pincode}
+            </p>
+            <p className="mt-3 text-xs text-muted">
+              Full address is hidden in the vendor portal. Use AWB on the label provided by operations if
+              needed.
+            </p>
+          </div>
+
+          {order.isMultiAddress && order.deliveryAddresses.length > 0 ? (
+            <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 shadow-sm">
+              <p className="text-[13px] font-medium text-amber-950">
+                Multi-address delivery — {order.deliveryAddresses.length} locations
+              </p>
+              <ul className="mt-3 divide-y divide-amber-200/60 text-sm">
+                {order.deliveryAddresses.map((da) => (
+                  <li key={da.id} className="flex flex-wrap items-center justify-between gap-2 py-2">
+                    <div>
+                      <p className="font-medium text-amber-950">{da.label ?? "Stop"}</p>
+                      <p className="text-[11px] text-amber-900/80">
+                        {da.address.city}, {da.address.state} · {da.quantity} units
+                      </p>
+                    </div>
+                    <div className="text-[11px] text-amber-900">
+                      {da.trackingAwb ? (
+                        <span>AWB {da.trackingAwb}</span>
+                      ) : (
+                        <span className="text-muted">AWB pending</span>
+                      )}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
         </div>
 
         <VendorOrderFulfilment

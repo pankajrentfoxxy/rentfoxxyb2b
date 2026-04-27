@@ -18,6 +18,7 @@ import {
   X,
   Truck,
   ShoppingCart,
+  TrendingUp,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -25,6 +26,7 @@ import { useMemo, useState } from "react";
 
 const nav = [
   { href: "/vendor/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/vendor/market-intel", label: "Market Intel", icon: TrendingUp },
   { href: "/vendor/products", label: "Products", icon: Package },
   { href: "/vendor/lots", label: "Lot sales", icon: Layers },
   { href: "/vendor/lots/orders", label: "Lot orders", icon: Truck },
@@ -49,12 +51,14 @@ export function VendorAppShell({
   role,
   companyName,
   status,
+  marketIntelAlert = false,
 }: {
   children: React.ReactNode;
   email: string | null | undefined;
   role: Role;
   companyName: string;
   status: VendorStatus;
+  marketIntelAlert?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
@@ -97,7 +101,12 @@ export function VendorAppShell({
           {nav.map((item) => (
             <Link key={item.href} href={item.href} className={linkCls(item.href)} onClick={() => setOpen(false)}>
               <item.icon className="h-4 w-4 shrink-0" />
-              {item.label}
+              <span className="flex flex-1 items-center justify-between gap-2">
+                {item.label}
+                {item.href === "/vendor/market-intel" && marketIntelAlert ? (
+                  <span className="h-2 w-2 shrink-0 rounded-full bg-amber" title="Pricing alert" />
+                ) : null}
+              </span>
             </Link>
           ))}
           <Link

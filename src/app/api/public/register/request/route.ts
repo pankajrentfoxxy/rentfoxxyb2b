@@ -1,6 +1,6 @@
 import { VerificationOtpEmail } from "@/emails/VerificationOtpEmail";
 import { sendEmail } from "@/lib/email";
-import { saveOTP } from "@/lib/otp";
+import { includeDevOtpInApiResponse, saveOTP } from "@/lib/otp";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { Role } from "@prisma/client";
@@ -90,21 +90,24 @@ export async function POST(req: NextRequest) {
         react: React.createElement(VerificationOtpEmail, { otp }),
         throwOnError: true,
       });
-    } catch {
+    } catch (err) {
+      console.error("[public/register/request] Resend send failed:", err);
       return NextResponse.json({ error: "Could not send email" }, { status: 502 });
     }
-  } else {
-    if (process.env.NODE_ENV === "production") {
-      return NextResponse.json(
-        { error: "Email verification is not configured (RESEND_API_KEY)." },
-        { status: 503 },
-      );
-    }
+  } else if (process.env.NODE_ENV === "production") {
+    return NextResponse.json(
+      { error: "Email verification is not configured (RESEND_API_KEY)." },
+      { status: 503 },
+    );
+  }
+
+  if (includeDevOtpInApiResponse()) {
     console.info(`[dev] OTP for ${email}: ${otp}`);
   }
 
+  const showDev = includeDevOtpInApiResponse();
   return NextResponse.json({
     ok: true,
-    devOtp: process.env.NODE_ENV !== "production" && !process.env.RESEND_API_KEY ? otp : undefined,
+    devOtp: showDev ? otp : undefined,
   });
 }

@@ -19,6 +19,7 @@ export function VendorLotWizard() {
   const [generatingName, setGeneratingName] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [minimumBuyerTier, setMinimumBuyerTier] = useState<"" | "SILVER" | "GOLD">("");
 
   async function generateName(items: LotCSVRow[]) {
     setGeneratingName(true);
@@ -59,6 +60,7 @@ export function VendorLotWizard() {
           coverImage: coverImage.trim() || null,
           items: cleaned,
           uploadedCsvSnapshot: uploadedCsvSnapshot.trim() || undefined,
+          minimumBuyerTier: minimumBuyerTier || null,
         }),
       });
       const data = await res.json();
@@ -272,6 +274,21 @@ export function VendorLotWizard() {
           <button type="button" className="text-sm font-medium text-accent hover:underline" onClick={() => setStep(3)}>
             ← Edit AI details
           </button>
+          <div className="rounded-lg border border-slate-200 bg-white p-4">
+            <label className="block text-sm font-semibold text-primary">Minimum buyer tier (optional)</label>
+            <p className="mt-1 text-xs text-muted">
+              Restrict viewing this lot to customers who have reached Verified Bulk Buyer (Silver) or Gold status.
+            </p>
+            <select
+              className="mt-2 w-full max-w-md rounded-lg border border-slate-300 px-3 py-2 text-sm"
+              value={minimumBuyerTier}
+              onChange={(e) => setMinimumBuyerTier(e.target.value as "" | "SILVER" | "GOLD")}
+            >
+              <option value="">All buyers</option>
+              <option value="SILVER">Silver+ (₹5L+ · 3+ orders)</option>
+              <option value="GOLD">Gold only (₹20L+ · 10+ orders)</option>
+            </select>
+          </div>
           {error ? <p className="text-sm text-red-700">{error}</p> : null}
           <button
             type="button"

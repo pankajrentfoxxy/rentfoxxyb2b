@@ -1,19 +1,34 @@
 import { prisma } from "@/lib/prisma";
+import type { Prisma } from "@prisma/client";
 import Link from "next/link";
 
 export default async function AdminVendorsPage({
   searchParams,
 }: {
-  searchParams: { tab?: string };
+  searchParams: { tab?: string; lowScore?: string };
 }) {
   const pendingOnly = searchParams.tab === "pending";
+  const lowScore = searchParams.lowScore === "1";
+
+  const and: Prisma.VendorProfileWhereInput[] = [];
+  if (pendingOnly) and.push({ status: "PENDING_APPROVAL" });
+  if (lowScore) {
+    and.push({
+      OR: [
+        { vendorScore: { is: null } },
+        { vendorScore: { overallScore: { lt: 60 } } },
+      ],
+    });
+  }
+  const where: Prisma.VendorProfileWhereInput = and.length ? { AND: and } : {};
 
   const vendors = await prisma.vendorProfile.findMany({
-    where: pendingOnly ? { status: "PENDING_APPROVAL" } : undefined,
+    where,
     orderBy: { companyName: "asc" },
     include: {
       user: { select: { email: true } },
       listings: { select: { id: true } },
+      vendorScore: { select: { overallScore: true } },
     },
   });
 
@@ -59,6 +74,12 @@ export default async function AdminVendorsPage({
         >
           Pending approval
         </Link>
+        <Link
+          href="/admin/vendors?lowScore=1"
+          className={`rounded-full px-3 py-1.5 text-sm font-medium ${lowScore && !pendingOnly ? "bg-red-600 text-white" : "bg-slate-100"}`}
+        >
+          Score below 60
+        </Link>
       </div>
 
       <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
@@ -69,6 +90,7 @@ export default async function AdminVendorsPage({
               <th className="px-4 py-3">GSTIN</th>
               <th className="px-4 py-3">Email</th>
               <th className="px-4 py-3">Status</th>
+              <th className="px-4 py-3">Score</th>
               <th className="px-4 py-3">Commission</th>
               <th className="px-4 py-3">Orders</th>
               <th className="px-4 py-3">Revenue</th>
@@ -85,6 +107,11 @@ export default async function AdminVendorsPage({
                   <td className="px-4 py-3 text-xs">{v.user.email}</td>
                   <td className="px-4 py-3">
                     <span className="rounded-full bg-surface px-2 py-0.5 text-xs font-medium">{v.status}</span>
+                  </td>
+                  <td className="px-4 py-3 font-mono text-xs">
+                    {v.vendorScore?.overallScore != null && v.vendorScore.overallScore > 0
+                      ? v.vendorScore.overallScore
+                      : "—"}
                   </td>
                   <td className="px-4 py-3">{v.commissionRate}%</td>
                   <td className="px-4 py-3">{s.orderCount}</td>

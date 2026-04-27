@@ -37,12 +37,24 @@ export function LotSalesDetailPage() {
   const [showPayModal, setShowPayModal] = useState(false);
   const [showAllItems, setShowAllItems] = useState(false);
   const [activeTab, setActiveTab] = useState<"inventory" | "simulator" | "condition">("inventory");
+  const [accessDenied, setAccessDenied] = useState<{ message: string; code?: string } | null>(null);
 
   useEffect(() => {
     if (!id) return;
-    void fetch(`/api/public/lots/${id}`)
-      .then((r) => (r.ok ? r.json() : null))
-      .then((data) => {
+    setAccessDenied(null);
+    void fetch(`/api/public/lots/${id}`, { credentials: "include" })
+      .then(async (r) => {
+        if (r.status === 403) {
+          const j = (await r.json()) as { message?: string; error?: string };
+          setAccessDenied({ message: j.message ?? "Access restricted", code: j.error });
+          setLot(null);
+          return;
+        }
+        if (!r.ok) {
+          setLot(null);
+          return;
+        }
+        const data = await r.json();
         setLot(data && !data.error ? data : null);
         if (data?.lotsRemaining) setLotsQty(1);
       })
@@ -56,6 +68,27 @@ export function LotSalesDetailPage() {
   }, [lot]);
 
   if (loading) return <LotDetailSkeleton />;
+  if (accessDenied) {
+    return (
+      <div className="mx-auto max-w-3xl px-4 py-16 text-center">
+        <p className="font-medium text-slate-800">{accessDenied.message}</p>
+        {accessDenied.code === "AUTH_REQUIRED" ? (
+          <button
+            type="button"
+            className="mt-4 inline-block rounded-lg bg-navy px-4 py-2 text-sm font-semibold text-white"
+            onClick={() =>
+              router.push(`/auth/login?callbackUrl=${encodeURIComponent(`/sales/lots/${id}`)}`)
+            }
+          >
+            Sign in
+          </button>
+        ) : null}
+        <Link href="/sales/lots" className="mt-4 block text-accent hover:underline">
+          ← All lots
+        </Link>
+      </div>
+    );
+  }
   if (!lot) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-16 text-center">

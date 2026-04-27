@@ -1,3 +1,4 @@
+import { getBuyerBadge, getNextTierMessage } from "@/lib/buyer-badge";
 import { auth } from "@/lib/auth";
 import { getStatusBadge, statusBadgeLabel } from "@/lib/status-badge";
 import { prisma } from "@/lib/prisma";
@@ -23,6 +24,7 @@ export default async function CustomerDashboardPage() {
     spendAgg,
     recentOrders,
     bidRows,
+    buyerBadge,
   ] = await Promise.all([
     prisma.order.count({
       where: {
@@ -63,6 +65,7 @@ export default async function CustomerDashboardPage() {
         listing: { include: { product: { select: { name: true, images: true, slug: true } } } },
       },
     }),
+    getBuyerBadge(profile.id),
   ]);
 
   const totalSpend = spendAgg._sum.totalAmount ?? 0;
@@ -112,6 +115,21 @@ export default async function CustomerDashboardPage() {
           </div>
         ))}
       </div>
+
+      <section className="mb-8 rounded-xl border border-amber-border bg-amber-bg/40 p-6">
+        <p className="text-[11px] font-semibold uppercase tracking-wide text-amber-dark">Buyer trust</p>
+        <p className="mt-2 text-[20px] font-semibold text-ink-primary">
+          {buyerBadge.icon} {buyerBadge.label}
+        </p>
+        <p className="mt-1 text-[13px] text-ink-secondary">{buyerBadge.description}</p>
+        <p className="mt-2 text-[12px] text-ink-muted">
+          Lifetime spend ₹{buyerBadge.lifetimeSpend.toLocaleString("en-IN")} · {buyerBadge.completedOrders}{" "}
+          completed orders
+        </p>
+        {getNextTierMessage(buyerBadge) ? (
+          <p className="mt-3 text-[12px] text-amber-dark">{getNextTierMessage(buyerBadge)}</p>
+        ) : null}
+      </section>
 
       <div className="grid gap-8 lg:grid-cols-2">
         <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">

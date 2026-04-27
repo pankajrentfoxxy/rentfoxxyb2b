@@ -1,6 +1,6 @@
 import { VerificationOtpEmail } from "@/emails/VerificationOtpEmail";
 import { sendEmail } from "@/lib/email";
-import { generateOTP, saveOTP } from "@/lib/otp";
+import { generateOTP, includeDevOtpInApiResponse, saveOTP } from "@/lib/otp";
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import * as React from "react";
@@ -35,17 +35,21 @@ export async function POST(req: NextRequest) {
         react: React.createElement(VerificationOtpEmail, { otp }),
         throwOnError: true,
       });
-    } catch {
+    } catch (err) {
+      console.error("[send-otp] Resend send failed:", err);
       return NextResponse.json({ error: "Could not send email" }, { status: 502 });
     }
   } else if (process.env.NODE_ENV === "production") {
     return NextResponse.json({ error: "Email not configured" }, { status: 503 });
-  } else {
+  }
+
+  if (includeDevOtpInApiResponse()) {
     console.info(`[dev] OTP for ${email}: ${otp}`);
   }
 
+  const showDev = includeDevOtpInApiResponse();
   return NextResponse.json({
     ok: true,
-    devOtp: process.env.NODE_ENV !== "production" && !process.env.RESEND_API_KEY ? otp : undefined,
+    devOtp: showDev ? otp : undefined,
   });
 }

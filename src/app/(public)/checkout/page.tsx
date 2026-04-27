@@ -8,7 +8,7 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Script from "next/script";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 declare global {
   interface Window {
@@ -23,6 +23,7 @@ export default function CheckoutPage() {
   const clear = useCartStore((s) => s.clear);
   const sub = useCartStore((s) => s.subtotal());
   const gst = gstBreakdown(sub);
+  const cartTotalQty = useMemo(() => items.reduce((s, i) => s + i.quantity, 0), [items]);
 
   const [step, setStep] = useState(1);
   const [addresses, setAddresses] = useState<Address[]>([]);
@@ -38,6 +39,8 @@ export default function CheckoutPage() {
     state: "",
     pincode: "",
   });
+  const [multiShip, setMultiShip] = useState(false);
+  const [splits, setSplits] = useState<{ addressId: string; quantity: number; label: string }[]>([]);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -78,6 +81,22 @@ export default function CheckoutPage() {
     setBusy(true);
     setPayError(null);
     try {
+      if (multiShip) {
+        const sum = splits.reduce((s, x) => s + (Number(x.quantity) || 0), 0);
+        if (sum !== cartTotalQty) {
+          setPayError(`Assign all ${cartTotalQty} units across delivery addresses.`);
+          setBusy(false);
+          return;
+        }
+        for (const sp of splits) {
+          if (!sp.addressId || sp.quantity < 1) {
+            setPayError("Each split needs a valid address and quantity.");
+            setBusy(false);
+            return;
+          }
+        }
+      }
+
       const cr = await fetch("/api/customer/payments/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -85,6 +104,15 @@ export default function CheckoutPage() {
           addressId,
           items,
           customerGstin: gstin || undefined,
+          ...(multiShip && splits.length > 0
+            ? {
+                deliverySplits: splits.map((s) => ({
+                  addressId: s.addressId,
+                  quantity: s.quantity,
+                  label: s.label || undefined,
+                })),
+              }
+            : {}),
         }),
       });
       const created = await cr.json();
@@ -266,10 +294,41 @@ export default function CheckoutPage() {
               </button>
             </div>
 
+            <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+              <label className="flex cursor-pointer items-center gap-2 text-sm font-medium text-slate-800">
+                <input
+                  type="checkbox"
+                  checked={multiShip}
+                  onChange={(e) => {
+                    const on = e.target.checked;
+                    setMultiShip(on);
+                    if (on && addressId) {
+                      setSplits([{ addressId, quantity: cartTotalQty, label: "" }]);
+                    }
+                    if (!on) setSplits([]);
+                  }}
+                />
+                Ship to multiple addresses (splits units across saved addresses)
+              </label>
+              {multiShip && addressId ? (
+                <p className="mt-2 text-xs text-muted">
+                  On the next step you&apos;ll assign each unit to an address. Total units in cart:{" "}
+                  <strong>{cartTotalQty}</strong>.
+                </p>
+              ) : null}
+            </div>
+
             <button
               type="button"
               disabled={!addressId}
-              onClick={() => setStep(2)}
+              onClick={() => {
+                if (multiShip && addressId) {
+                  setSplits((prev) =>
+                    prev.length > 0 ? prev : [{ addressId, quantity: cartTotalQty, label: "" }],
+                  );
+                }
+                setStep(2);
+              }}
               className="w-full rounded-lg bg-primary py-3 font-semibold text-white disabled:opacity-50"
             >
               Continue to review
@@ -318,6 +377,81 @@ export default function CheckoutPage() {
                 placeholder="For B2B tax invoice"
               />
             </label>
+
+            {multiShip ? (
+              <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
+                <p className="text-sm font-medium text-amber-950">Multi-address delivery</p>
+                <p className="mt-1 text-xs text-amber-900/80">
+                  Assign all {cartTotalQty} units. Remaining:{" "}
+                  {cartTotalQty - splits.reduce((s, x) => s + (Number(x.quantity) || 0), 0)}
+                </p>
+                <div className="mt-3 space-y-2">
+                  {splits.map((row, i) => (
+                    <div key={i} className="flex flex-wrap items-end gap-2">
+                      <select
+                        className="min-w-[160px] flex-1 rounded border border-amber-200 bg-white px-2 py-2 text-sm"
+                        value={row.addressId}
+                        onChange={(e) => {
+                          const v = e.target.value;
+                          setSplits((prev) => prev.map((p, j) => (j === i ? { ...p, addressId: v } : p)));
+                        }}
+                      >
+                        {addresses.map((a) => (
+                          <option key={a.id} value={a.id}>
+                            {a.label} — {a.city}
+                          </option>
+                        ))}
+                      </select>
+                      <input
+                        type="number"
+                        min={1}
+                        className="w-20 rounded border border-amber-200 bg-white px-2 py-2 text-center text-sm"
+                        value={row.quantity}
+                        onChange={(e) => {
+                          const v = Number(e.target.value);
+                          setSplits((prev) => prev.map((p, j) => (j === i ? { ...p, quantity: v } : p)));
+                        }}
+                      />
+                      <input
+                        type="text"
+                        className="w-36 rounded border border-amber-200 bg-white px-2 py-2 text-sm"
+                        placeholder="Label"
+                        value={row.label}
+                        onChange={(e) => {
+                          const v = e.target.value;
+                          setSplits((prev) => prev.map((p, j) => (j === i ? { ...p, label: v } : p)));
+                        }}
+                      />
+                      {i > 0 ? (
+                        <button
+                          type="button"
+                          className="text-xs text-amber-900 hover:text-red-600"
+                          onClick={() => setSplits((prev) => prev.filter((_, j) => j !== i))}
+                        >
+                          Remove
+                        </button>
+                      ) : null}
+                    </div>
+                  ))}
+                </div>
+                <button
+                  type="button"
+                  className="mt-2 text-xs font-medium text-amber-900 hover:underline disabled:text-slate-400"
+                  disabled={
+                    splits.reduce((s, x) => s + (Number(x.quantity) || 0), 0) >= cartTotalQty
+                  }
+                  onClick={() =>
+                    setSplits((prev) => [
+                      ...prev,
+                      { addressId: addressId || addresses[0]?.id || "", quantity: 1, label: "" },
+                    ])
+                  }
+                >
+                  + Add another address
+                </button>
+              </div>
+            ) : null}
+
             <div className="flex gap-3">
               <button
                 type="button"

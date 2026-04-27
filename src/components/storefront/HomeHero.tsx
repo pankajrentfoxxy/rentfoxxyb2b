@@ -28,6 +28,12 @@ export function HomeHero() {
             >
               View Lot Sales
             </Link>
+            <Link
+              href="/tools/fleet-calculator"
+              className="inline-flex rounded-lg border border-white/12 bg-white/[0.06] px-5 py-2.5 text-sm text-white/80 transition-colors hover:bg-white/10"
+            >
+              Fleet renewal calculator
+            </Link>
           </div>
           <div className="mt-6 overflow-hidden rounded-lg border border-white/10">
             <div className="grid grid-cols-2 divide-x divide-white/10 sm:grid-cols-4">

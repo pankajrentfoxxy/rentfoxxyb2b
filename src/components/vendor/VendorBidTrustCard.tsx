@@ -1,10 +1,12 @@
 "use client";
 
+import type { BuyerBadge } from "@/lib/buyer-badge";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 
 type Trust = {
-  tier: "gold" | "silver" | "new";
+  tier: "gold" | "silver" | "bronze" | "new";
+  buyerBadge?: BuyerBadge;
   avgRating: number;
   reviewCount: number;
   orderCount: number;
@@ -38,24 +40,31 @@ export function VendorBidTrustCard({ bidId }: { bidId: string }) {
   if (err) return <p className="text-xs text-muted">Trust score unavailable.</p>;
   if (!data) return <p className="text-xs text-muted">Loading buyer trust…</p>;
 
-  const tierLabel =
-    data.tier === "gold"
+  const badge = data.buyerBadge;
+  const headline = badge
+    ? `${badge.icon} ${badge.label}`
+    : data.tier === "gold"
       ? "Gold buyer — highly reliable"
       : data.tier === "silver"
         ? "Silver buyer — good track record"
-        : "New buyer — limited history";
+        : data.tier === "bronze"
+          ? "Active buyer"
+          : "New buyer — limited history";
 
   const tone =
     data.tier === "gold"
       ? "border-amber-300 bg-amber-50 text-amber-950"
       : data.tier === "silver"
         ? "border-slate-300 bg-slate-50 text-slate-900"
-        : "border-blue-200 bg-blue-50 text-blue-950";
+        : data.tier === "bronze"
+          ? "border-teal-200 bg-teal-50 text-teal-950"
+          : "border-blue-200 bg-blue-50 text-blue-950";
 
   return (
     <div className={cn("rounded-xl border p-4 shadow-sm", tone)}>
       <p className="text-xs font-semibold uppercase tracking-wide text-muted">Buyer profile</p>
-      <p className="mt-2 text-sm font-semibold">{tierLabel}</p>
+      <p className="mt-2 text-sm font-semibold">{headline}</p>
+      {badge ? <p className="mt-1 text-xs text-slate-700">{badge.description}</p> : null}
       <dl className="mt-3 space-y-1 text-xs text-slate-800">
         <div className="flex justify-between gap-2">
           <dt>Orders completed</dt>

@@ -1,6 +1,7 @@
 import { ProductDetailView } from "@/components/storefront/ProductDetailView";
 import { mapListing, mapProductPublic, STOREFRONT_LISTING_WHERE } from "@/lib/public-api";
 import { prisma } from "@/lib/prisma";
+import { listingPerformanceFields } from "@/lib/vendor-score";
 import type { Prisma } from "@prisma/client";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -26,6 +27,12 @@ const listingSelect = {
   isActive: true,
   requiresAdminApproval: true,
   condition: true,
+  vendorScoreSnapshot: true,
+  vendor: {
+    select: {
+      vendorScore: { select: { overallScore: true } },
+    },
+  },
 } satisfies Prisma.ProductListingSelect;
 
 export default async function ProductDetailPage({ params }: PageProps) {
@@ -54,6 +61,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
   const lowestId = sorted[0]?.id;
   const listings = sorted.map((l, i) => ({
     ...mapListing(l, i),
+    ...listingPerformanceFields(l),
     bestValue: l.id === lowestId,
   }));
 

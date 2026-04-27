@@ -25,11 +25,25 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (!email || !password) return null;
 
         try {
-          const user = await prisma.user.findUnique({ where: { email } });
+          const user = await prisma.user.findUnique({
+            where: { email },
+            include: {
+              customerProfile: { select: { id: true } },
+              vendorProfile: { select: { id: true } },
+            },
+          });
           if (!user?.passwordHash) return null;
 
           const valid = await bcrypt.compare(password, user.passwordHash);
           if (!valid) return null;
+
+          const hasBuyerVendorProfile = !!(user.customerProfile || user.vendorProfile);
+          if (
+            (user.role === "CUSTOMER" || user.role === "VENDOR") &&
+            !hasBuyerVendorProfile
+          ) {
+            return null;
+          }
 
           return {
             id: user.id,

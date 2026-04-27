@@ -1,6 +1,7 @@
 "use client";
 
 import { BidModal } from "@/components/storefront/BidModal";
+import { WatchButton } from "@/components/storefront/WatchButton";
 import { GradeGuideDialog } from "@/components/storefront/GradeGuideDialog";
 import { ProductPaymentChips } from "@/components/storefront/ProductPaymentChips";
 import { ProductReviewsSection } from "@/components/storefront/ProductReviewsSection";
@@ -14,7 +15,7 @@ import { ConditionBadge } from "@/components/ui/ConditionBadge";
 import { VerifiedBadge } from "@/components/ui/VerifiedBadge";
 import { useCartStore } from "@/store/cart-store";
 import * as Accordion from "@radix-ui/react-accordion";
-import { ChevronDown, Cpu, Laptop, Minus, Plus, ShoppingCart } from "lucide-react";
+import { ChevronDown, Cpu, HelpCircle, Laptop, Minus, Plus, ShoppingCart } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
@@ -171,11 +172,22 @@ export function ProductDetailView({
               <h2 className="text-[14px] font-medium text-ink-primary">Available options</h2>
               <p className="text-[12px] text-ink-muted">Choose a price tier (anonymised supply options)</p>
               <div className="mt-3 overflow-x-auto rounded-xl border border-border">
-                <table className="w-full min-w-[720px] text-left text-sm">
+                <table className="w-full min-w-[860px] text-left text-sm">
                   <thead className="bg-navy text-[10px] uppercase tracking-wide text-white">
                     <tr>
                       <th className="px-3 py-2.5">Option</th>
                       <th className="px-3 py-2.5">Condition</th>
+                      <th className="px-3 py-2.5">
+                        <span className="inline-flex items-center gap-1">
+                          Performance
+                          <span
+                            title="Supplier performance score from delivery, fulfilment, and reviews. Supplier identity stays private."
+                            className="inline-flex"
+                          >
+                            <HelpCircle className="h-3 w-3 opacity-80" aria-hidden />
+                          </span>
+                        </span>
+                      </th>
                       <th className="px-3 py-2.5">Stock</th>
                       <th className="px-3 py-2.5">MOQ</th>
                       <th className="px-3 py-2.5">Price</th>
@@ -200,6 +212,23 @@ export function ProductDetailView({
                           </td>
                           <td className="px-3 py-2.5">
                             <ConditionBadge condition={l.condition} size="sm" />
+                          </td>
+                          <td className="px-3 py-2.5 text-[12px] text-ink-secondary">
+                            {l.performanceScore != null ? (
+                              <span
+                                title={l.scoreLabel}
+                                className="font-medium text-ink-primary tabular-nums"
+                              >
+                                {l.performanceScore}
+                                <span className="ml-1 text-[10px] font-normal text-ink-muted">
+                                  · {l.scoreLabel}
+                                </span>
+                              </span>
+                            ) : (
+                              <span title={l.scoreLabel ?? "New or unrated supplier"} className="text-ink-muted">
+                                {l.scoreLabel ?? "—"}
+                              </span>
+                            )}
                           </td>
                           <td className="px-3 py-2.5 text-ink-secondary">{l.stockQty}</td>
                           <td className="px-3 py-2.5 text-ink-secondary">{l.minOrderQty}</td>
@@ -243,6 +272,11 @@ export function ProductDetailView({
               </button>
             </div>
 
+            <WatchButton
+              productId={initial.id}
+              productSlug={initial.slug}
+              currentMinPrice={initial.priceMin}
+            />
             <ProductPaymentChips slug={initial.slug} />
 
             <Accordion.Root type="single" collapsible className="overflow-hidden rounded-xl border border-border bg-card">

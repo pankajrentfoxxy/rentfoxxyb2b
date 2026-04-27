@@ -1,3 +1,4 @@
+import { listingPerformanceFields } from "@/lib/vendor-score";
 import { mapListing, mapProductPublic, STOREFRONT_LISTING_WHERE } from "@/lib/public-api";
 import { prisma } from "@/lib/prisma";
 import type { Prisma } from "@prisma/client";
@@ -14,6 +15,14 @@ const listingSelect = {
   isActive: true,
   requiresAdminApproval: true,
   condition: true,
+  vendorScoreSnapshot: true,
+  vendor: {
+    select: {
+      vendorScore: {
+        select: { overallScore: true },
+      },
+    },
+  },
 } satisfies Prisma.ProductListingSelect;
 
 export async function GET(
@@ -52,12 +61,29 @@ export async function GET(
     return a.unitPrice - b.unitPrice;
   });
   const lowestId = sorted[0]?.id;
-  const listings = sorted.map((l, i) => mapListing(l, i)).map((l) => ({
-    ...l,
-    bestValue: l.id === lowestId,
-  }));
+  const listings = sorted.map((l, i) => {
+    const pub = mapListing(l, i);
+    const perf = listingPerformanceFields(l);
+    return {
+      ...pub,
+      ...perf,
+      bestValue: l.id === lowestId,
+    };
+  });
 
-  const base = mapProductPublic({ ...product, listings: product.listings });
+  const base = mapProductPublic({
+    ...product,
+    listings: product.listings.map((l) => ({
+      id: l.id,
+      unitPrice: l.unitPrice,
+      bulkPricing: l.bulkPricing,
+      stockQty: l.stockQty,
+      minOrderQty: l.minOrderQty,
+      isActive: l.isActive,
+      requiresAdminApproval: l.requiresAdminApproval,
+      condition: l.condition,
+    })),
+  });
 
   return NextResponse.json({
     product: {

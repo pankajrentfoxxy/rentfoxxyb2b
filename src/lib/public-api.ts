@@ -17,6 +17,9 @@ export type PublicListing = {
   minOrderQty: number;
   label: string;
   condition: ProductCondition;
+  /** Addendum v1.9 P1 — anonymised supplier performance only. */
+  performanceScore?: number | null;
+  scoreLabel?: string;
 };
 
 export type PublicProductCard = {
