@@ -107,7 +107,7 @@ export default function CartPage() {
       <h1 className="text-2xl font-bold text-slate-900">Cart</h1>
 
       <div className="mt-6 rounded-xl border border-dashed border-slate-300 bg-slate-50 p-4">
-        <p className="text-sm font-medium text-slate-800">Upload company PO (PDF or TXT)</p>
+        <p className="text-sm font-medium text-slate-800">Upload company PO (PDF, TXT, CSV, or Excel)</p>
         <p className="mt-1 text-xs text-muted">
           We&apos;ll extract line items and suggest catalog matches. Requires sign-in as a customer and{" "}
           <code className="rounded bg-white px-1">GEMINI_API_KEY</code>.
@@ -115,7 +115,7 @@ export default function CartPage() {
         <input
           ref={poInputRef}
           type="file"
-          accept=".pdf,.txt,application/pdf,text/plain"
+          accept=".pdf,.txt,.csv,.xlsx,.xls,application/pdf,text/plain,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
           className="hidden"
           onChange={(e) => void onPoSelected(e.target.files?.[0])}
         />

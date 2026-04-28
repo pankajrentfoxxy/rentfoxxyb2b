@@ -2,25 +2,82 @@ import { geminiGenerateJson } from "@/lib/gemini-json";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { STOREFRONT_LISTING_WHERE } from "@/lib/public-api";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextRequest, NextResponse } from "next/server";
+import pdfParse from "pdf-parse";
 
 export const dynamic = "force-dynamic";
 
 export const runtime = "nodejs";
 
-async function fileToText(file: File): Promise<string> {
-  const buf = Buffer.from(await file.arrayBuffer());
+async function extractPdfTextNode(buffer: Buffer): Promise<string> {
+  const data = await pdfParse(buffer);
+  return (data.text ?? "").trim();
+}
+
+/** Scanned / image-only PDFs: ask Gemini to read the file (no pdfjs / DOM in Node). */
+async function extractPoTextFromPdfWithGemini(buffer: Buffer): Promise<string> {
+  const key = process.env.GEMINI_API_KEY;
+  if (!key) throw new Error("GEMINI_API_KEY not configured");
+  const genAI = new GoogleGenerativeAI(key);
+  const modelName = process.env.GEMINI_MODEL?.trim() || "gemini-2.0-flash-latest";
+  const model = genAI.getGenerativeModel({ model: modelName });
+  const result = await model.generateContent([
+    {
+      inlineData: {
+        mimeType: "application/pdf",
+        data: buffer.toString("base64"),
+      },
+    },
+    {
+      text: "Extract all readable text from this Purchase Order. Return plain text only — line items, quantities, SKUs, part numbers. No markdown or commentary.",
+    },
+  ]);
+  return result.response.text().trim();
+}
+
+async function fileToText(file: File, buf: Buffer): Promise<string> {
   const name = file.name.toLowerCase();
-  if (name.endsWith(".txt") || file.type === "text/plain") {
+  const type = file.type;
+
+  if (name.endsWith(".txt") || type === "text/plain") {
     return buf.toString("utf8");
   }
-  if (name.endsWith(".pdf") || file.type === "application/pdf") {
-    const mod = await import("pdf-parse");
-    const pdfParse = (mod as unknown as { default?: (b: Buffer) => Promise<{ text?: string }> }).default ?? (mod as unknown as (b: Buffer) => Promise<{ text?: string }>);
-    const data = await pdfParse(buf);
-    return data.text ?? "";
+
+  if (name.endsWith(".csv") || type === "text/csv") {
+    return buf.toString("utf8");
   }
-  throw new Error("Upload a .pdf or .txt PO");
+
+  if (name.endsWith(".xlsx") || name.endsWith(".xls") || type.includes("spreadsheet")) {
+    const XLSX = await import("xlsx");
+    const workbook = XLSX.read(buf, { type: "buffer" });
+    const parts: string[] = [];
+    for (const sheetName of workbook.SheetNames) {
+      const sheet = workbook.Sheets[sheetName];
+      const csv = XLSX.utils.sheet_to_csv(sheet);
+      if (csv.trim()) parts.push(`Sheet: ${sheetName}\n${csv}`);
+    }
+    return parts.join("\n\n");
+  }
+
+  if (name.endsWith(".pdf") || type === "application/pdf") {
+    let text = "";
+    try {
+      text = await extractPdfTextNode(buf);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      if (/password|encrypt/i.test(msg)) {
+        throw new Error("PDF appears password-protected. Remove the password and try again.");
+      }
+      throw e;
+    }
+    if (!text) {
+      text = await extractPoTextFromPdfWithGemini(buf);
+    }
+    return text;
+  }
+
+  throw new Error("Unsupported file type. Upload PDF, TXT, CSV, or Excel.");
 }
 
 async function matchProduct(description: string): Promise<{
@@ -80,7 +137,8 @@ export async function POST(req: NextRequest) {
 
   let poText: string;
   try {
-    poText = await fileToText(file);
+    const buf = Buffer.from(await file.arrayBuffer());
+    poText = await fileToText(file, buf);
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Could not read file";
     return NextResponse.json({ error: msg }, { status: 400 });
