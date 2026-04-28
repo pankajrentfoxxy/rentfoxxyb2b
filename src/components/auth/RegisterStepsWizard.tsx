@@ -1,6 +1,7 @@
 "use client";
 
 import { INDIAN_STATES } from "@/constants/indianStates";
+import Logo from "@/components/ui/Logo";
 import { validateGSTINFormat } from "@/lib/gstin";
 import { cn } from "@/lib/utils";
 import type { Role } from "@prisma/client";
@@ -486,6 +487,9 @@ export function RegisterStepsWizard() {
 
   return (
     <div className="mx-auto w-full max-w-md">
+      <div className="mb-6 lg:hidden">
+        <Logo size="md" variant="nav-on-light" />
+      </div>
       <div className="mb-6">
         <div className="mb-1 flex items-center justify-between text-[11px] text-ink-muted">
           <span>

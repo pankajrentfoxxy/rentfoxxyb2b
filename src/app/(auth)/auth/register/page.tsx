@@ -32,7 +32,7 @@ export default function RegisterPage() {
   return (
     <div className="mx-auto w-full max-w-sm">
       <div className="mb-8 lg:hidden">
-        <Logo size="md" variant="dark" />
+        <Logo size="md" variant="nav-on-light" />
       </div>
       <h1 className="mb-1 text-[24px] font-medium text-ink-primary">Create account</h1>
       <p className="mb-6 text-[13px] text-ink-muted">Enter your email to get started.</p>

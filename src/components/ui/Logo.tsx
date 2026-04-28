@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 const ICON_SIZES = { sm: 24, md: 32, lg: 48, xl: 64 } as const;
 
 export type LogoSize = keyof typeof ICON_SIZES;
-export type LogoVariant = "dark" | "light" | "icon-only" | "nav";
+export type LogoVariant = "dark" | "light" | "icon-only" | "nav" | "nav-on-light";
 
 type LogoProps = {
   size?: LogoSize;
@@ -68,16 +68,24 @@ function FoxIcon({ px, onDark }: { px: number; onDark?: boolean }) {
   );
 }
 
+function NavMarkPx(size: LogoSize): number {
+  const px = ICON_SIZES[size];
+  if (size === "xl") return Math.min(px, 48);
+  if (size === "lg") return Math.min(px, 40);
+  if (size === "md") return Math.min(px, 32);
+  return Math.min(px, 28);
+}
+
 export function LogoIcon({
   size = "md",
   className,
   variant = "dark",
 }: Pick<LogoProps, "size" | "className" | "variant">) {
   const px = ICON_SIZES[size];
-  if (variant === "nav") {
+  if (variant === "nav" || variant === "nav-on-light") {
     return (
       <span className={cn("inline-flex shrink-0", className)}>
-        <HexNavMark px={px} />
+        <HexNavMark px={NavMarkPx(size)} />
       </span>
     );
   }
@@ -99,7 +107,6 @@ export default function Logo({
     "font-sans font-bold tracking-tight select-none lowercase",
     variant === "dark" && "text-primary",
     variant === "light" && "text-white",
-    variant === "nav" && "text-sm font-medium tracking-tight text-white",
   );
 
   const gap =
@@ -121,13 +128,38 @@ export default function Logo({
     );
   }
 
-  if (variant === "nav") {
+  if (variant === "nav" || variant === "nav-on-light") {
+    const onDarkBar = variant === "nav";
+    const titleSize =
+      size === "sm"
+        ? "text-sm"
+        : size === "md"
+          ? "text-base"
+          : size === "lg"
+            ? "text-xl"
+            : "text-2xl";
+    const tagSize =
+      size === "sm" ? "text-[8px]" : size === "md" ? "text-[9px]" : "text-[10px]";
     return (
       <span className={cn("inline-flex items-center gap-2", className)} aria-label={ariaLabel}>
-        <HexNavMark px={Math.min(px, 32)} />
+        <HexNavMark px={NavMarkPx(size)} />
         <span className="flex flex-col leading-tight">
-          <span className="text-sm font-medium tracking-tight text-white lowercase">rentfoxxy</span>
-          <span className="text-[8px] font-normal uppercase tracking-widest text-white/[0.3]">
+          <span
+            className={cn(
+              "font-medium tracking-tight lowercase",
+              titleSize,
+              onDarkBar ? "text-white" : "text-primary",
+            )}
+          >
+            rentfoxxy
+          </span>
+          <span
+            className={cn(
+              "font-normal uppercase tracking-widest",
+              tagSize,
+              onDarkBar ? "text-white/[0.3]" : "text-ink-muted",
+            )}
+          >
             B2B LAPTOP PROCUREMENT
           </span>
         </span>

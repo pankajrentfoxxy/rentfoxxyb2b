@@ -57,7 +57,7 @@ export function AuthLoginForm({
   return (
     <div className={cn("mx-auto w-full max-w-sm", className)}>
       <div className="mb-8 lg:hidden">
-        <Logo size="md" variant="dark" />
+        <Logo size="md" variant="nav-on-light" />
       </div>
       <h1 className="mb-1 text-[24px] font-medium text-ink-primary">Sign in to Rentfoxxy</h1>
       <p className="mb-6 text-[13px] text-ink-muted">Welcome back. Enter your credentials to continue.</p>

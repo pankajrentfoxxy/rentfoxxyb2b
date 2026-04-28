@@ -12,7 +12,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           }}
         />
         <div className="relative z-10">
-          <Logo size="lg" variant="light" />
+          <Logo size="lg" variant="nav" />
         </div>
         <div className="relative z-10 flex max-w-md flex-1 flex-col justify-center">
           <h2 className="mb-8 text-[28px] font-medium leading-[1.3] text-white">
