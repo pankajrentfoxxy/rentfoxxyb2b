@@ -1,8 +1,16 @@
 "use client";
 
 import type { OrderStatus } from "@prisma/client";
+import {
+  CommonGenericInput,
+  CommonNumberInput,
+  CommonSearchableSelect,
+  type SearchableSelectOption,
+} from "@/components/commonStyle/CommonFormFields";
+import { BRAND_COLOR } from "@/components/commonStyle/CommonTable";
+import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
-import { useTransition } from "react";
+import { useMemo, useTransition } from "react";
 
 const STATUSES: OrderStatus[] = [
   "PAYMENT_PENDING",
@@ -25,23 +33,41 @@ const STATUSES: OrderStatus[] = [
   "TOKEN_FORFEITED",
 ];
 
+const STATUS_FILTER_OPTIONS: SearchableSelectOption[] = [
+  { value: "", label: "All statuses" },
+  ...STATUSES.map((s) => ({ value: s, label: s.replace(/_/g, " ") })),
+];
+
+export type AdminOrdersFilterInitial = {
+  vendorId: string;
+  status: string;
+  dateFrom: string;
+  dateTo: string;
+  minAmount: string;
+  maxAmount: string;
+  bidOnly: boolean;
+};
+
 export function AdminOrdersFilter({
   vendors,
   initial,
+  variant = "inline",
+  onApplied,
 }: {
   vendors: { id: string; companyName: string }[];
-  initial: {
-    vendorId: string;
-    status: string;
-    dateFrom: string;
-    dateTo: string;
-    minAmount: string;
-    maxAmount: string;
-    bidOnly: boolean;
-  };
+  initial: AdminOrdersFilterInitial;
+  /** `drawer`: full-width fields for a narrow panel. */
+  variant?: "inline" | "drawer";
+  /** Called after navigation to filtered URL (e.g. close drawer). */
+  onApplied?: () => void;
 }) {
   const router = useRouter();
   const [pending, start] = useTransition();
+
+  const vendorOptions = useMemo<SearchableSelectOption[]>(
+    () => [{ value: "", label: "All vendors" }, ...vendors.map((v) => ({ value: v.id, label: v.companyName }))],
+    [vendors],
+  );
 
   function apply(formData: FormData) {
     const q = new URLSearchParams();
@@ -59,7 +85,10 @@ export function AdminOrdersFilter({
     if (minA) q.set("minAmount", minA);
     if (maxA) q.set("maxAmount", maxA);
     if (bid) q.set("bidOnly", "1");
-    start(() => router.push(`/admin/orders?${q.toString()}`));
+    start(() => {
+      router.push(`/admin/orders?${q.toString()}`);
+      onApplied?.();
+    });
   }
 
   const exportHref = (() => {
@@ -74,95 +103,117 @@ export function AdminOrdersFilter({
     return `/api/admin/orders/export?${q.toString()}`;
   })();
 
+  const searchableSelectFieldClass =
+    variant === "drawer" ? "mt-1 w-full min-w-0 max-w-full" : "mt-1 min-w-[10rem] max-w-[16rem]";
+
   return (
     <form
       onSubmit={(e) => {
         e.preventDefault();
         apply(new FormData(e.currentTarget));
       }}
-      className="flex flex-wrap items-end gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
+      className={cn(
+        variant === "inline"
+          ? "flex flex-wrap items-end gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
+          : "flex w-full flex-col gap-4 rounded-none border-0 bg-transparent p-0 shadow-none",
+      )}
     >
       <label className="text-xs font-medium text-slate-700">
         Vendor
-        <select
+        <CommonSearchableSelect
           name="vendorId"
+          options={vendorOptions}
           defaultValue={initial.vendorId}
-          className="mt-1 block rounded-lg border border-slate-200 px-2 py-1.5 text-sm"
-        >
-          <option value="">All</option>
-          {vendors.map((v) => (
-            <option key={v.id} value={v.id}>
-              {v.companyName}
-            </option>
-          ))}
-        </select>
+          placeholder="Choose vendor…"
+          emptyMessage="No vendors match"
+          className={searchableSelectFieldClass}
+          maxSuggestions={80}
+        />
       </label>
       <label className="text-xs font-medium text-slate-700">
         Status
-        <select
+        <CommonSearchableSelect
           name="status"
+          options={STATUS_FILTER_OPTIONS}
           defaultValue={initial.status}
-          className="mt-1 block rounded-lg border border-slate-200 px-2 py-1.5 text-sm"
-        >
-          <option value="">All</option>
-          {STATUSES.map((s) => (
-            <option key={s} value={s}>
-              {s.replace(/_/g, " ")}
-            </option>
-          ))}
-        </select>
+          placeholder="Choose status…"
+          emptyMessage="No status matches"
+          className={searchableSelectFieldClass}
+          maxSuggestions={40}
+        />
       </label>
       <label className="text-xs font-medium text-slate-700">
         From
-        <input
+        <CommonGenericInput
           type="date"
           name="dateFrom"
           defaultValue={initial.dateFrom}
-          className="mt-1 block rounded-lg border border-slate-200 px-2 py-1.5 text-sm"
+          className={cn(variant === "drawer" ? "mt-1 w-full min-w-0" : "mt-1 min-w-[11rem]")}
         />
       </label>
       <label className="text-xs font-medium text-slate-700">
         To
-        <input
+        <CommonGenericInput
           type="date"
           name="dateTo"
           defaultValue={initial.dateTo}
-          className="mt-1 block rounded-lg border border-slate-200 px-2 py-1.5 text-sm"
+          className={cn(variant === "drawer" ? "mt-1 w-full min-w-0" : "mt-1 min-w-[11rem]")}
         />
       </label>
       <label className="text-xs font-medium text-slate-700">
         Min ₹
-        <input
+        <CommonNumberInput
           name="minAmount"
           defaultValue={initial.minAmount}
-          className="mt-1 block w-24 rounded-lg border border-slate-200 px-2 py-1.5 text-sm"
+          className={cn(variant === "drawer" ? "mt-1 w-full" : "mt-1 w-28")}
+          inputClassName="min-w-0"
         />
       </label>
       <label className="text-xs font-medium text-slate-700">
         Max ₹
-        <input
+        <CommonNumberInput
           name="maxAmount"
           defaultValue={initial.maxAmount}
-          className="mt-1 block w-24 rounded-lg border border-slate-200 px-2 py-1.5 text-sm"
+          className={cn(variant === "drawer" ? "mt-1 w-full" : "mt-1 w-28")}
+          inputClassName="min-w-0"
         />
       </label>
       <label className="flex items-center gap-2 text-xs font-medium text-slate-700">
-        <input type="checkbox" name="bidOnly" defaultChecked={initial.bidOnly} className="mt-3" />
+        <input
+          type="checkbox"
+          name="bidOnly"
+          defaultChecked={initial.bidOnly}
+          className="mt-3 h-4 w-4 shrink-0 rounded border-slate-300 accent-amber-600 focus:outline-none focus:ring-1 focus:ring-amber-500"
+        />
         Bid orders only
       </label>
-      <button
-        type="submit"
-        disabled={pending}
-        className="rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-white disabled:opacity-50"
+      <div
+        className={cn(
+          "flex gap-2",
+          variant === "drawer" ? "mt-2 flex-col sm:flex-row" : "items-end",
+        )}
       >
-        Apply
-      </button>
-      <a
-        href={exportHref}
-        className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-800"
-      >
-        Export CSV
-      </a>
+        <button
+          type="submit"
+          disabled={pending}
+          className={cn(
+            BRAND_COLOR,
+            variant === "drawer" && "w-full sm:flex-1",
+            "rounded-lg px-3 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-amber-700 disabled:opacity-50",
+          )}
+        >
+          Apply
+        </button>
+        <a
+          href={exportHref}
+          className={cn(
+            "rounded-lg border border-slate-200 bg-white px-3 py-2 text-center text-sm font-semibold text-slate-800 shadow-sm transition-colors hover:border-amber-300 hover:text-amber-700",
+            variant === "drawer" && "w-full sm:flex-1",
+          )}
+        >
+          Export CSV
+        </a>
+      </div>
     </form>
   );
 }

@@ -129,7 +129,7 @@ export function AdminAppShell({
             <UserMenu email={email} role={role} />
           </div>
         </header>
-        <main className="p-4 md:p-8">{children}</main>
+        <main className="p-2 md:p-2">{children}</main>
       </div>
     </div>
   );
