@@ -54,17 +54,18 @@ export default function CommissionListClient({ initialData }: { initialData: Com
   ];
 
   return (
-    <CommonTable
-      title=""
-      subtitle=""
-      actionButton={null}
-      searchQuery={searchQuery}
-      onSearchChange={setSearchQuery}
-      searchPlaceholder="Searching..."
-      columns={columns}
-      data={filteredData}
-      keyExtractor={(v) => v.id}
-      emptyMessage="No vendors found"
-    />
+    <div className="!mt-1">
+      <CommonTable
+        title="Commission"
+        subtitle={undefined}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        searchPlaceholder="Searching..."
+        columns={columns}
+        data={filteredData}
+        keyExtractor={(v) => v.id}
+        emptyMessage="No vendors found"
+      />
+    </div>
   );
 }

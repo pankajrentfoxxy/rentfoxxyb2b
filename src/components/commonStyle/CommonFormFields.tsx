@@ -416,16 +416,10 @@ export function CommonSearchableSelect({
 }: CommonSearchableSelectProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const listId = useId();
-  const optionsRef = useRef(options);
-  optionsRef.current = options;
-
-  const stableOptionsKey = JSON.stringify(
-    options.map((o) => ({ v: o?.value ?? null, l: o?.label ?? null })),
-  );
 
   const normalizedOptions = useMemo(
-    () => normalizeSearchableOptions(optionsRef.current),
-    [stableOptionsKey],
+    () => normalizeSearchableOptions(options),
+    [options],
   );
 
   const selectedRef = useRef(defaultValue);

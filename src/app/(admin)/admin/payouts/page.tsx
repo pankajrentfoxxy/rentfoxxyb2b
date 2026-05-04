@@ -3,6 +3,7 @@ import { FilterTabChip } from "@/components/commonStyle/FilterTabChip";
 import { prisma } from "@/lib/prisma";
 import CommissionListClient, { CommissionVendorRow } from "./CommissionListClient";
 import PayoutSettlementListClient, { PayoutSettlementRow } from "./PayoutSettlementListClient";
+import { PageHeader } from "@/components/shared/PageHeader";
 
 export default async function AdminPayoutsPage({
   searchParams,
@@ -74,25 +75,49 @@ export default async function AdminPayoutsPage({
 
   return (
     <div className="mx-auto max-w-6xl space-y-6">
-      <div className="flex flex-wrap gap-2 border-b border-slate-200 pb-2">
-        {(
-          [
-            ["pending", "Pending release"],
-            ["processing", "Processing"],
-            ["released", "Released"],
-            ["commission", "Commission"],
-          ] as const
-        ).map(([id, label]) => (
-          <FilterTabChip
-            key={id}
-            // variant="primary"
-            active={tab === id}
-            href={`/admin/payouts?tab=${id}`}
-          >
-            {label}
-          </FilterTabChip>
-        ))}
-      </div>
+            <PageHeader
+              title="Payouts"
+              subtitle=""
+              className="mb-0"
+            />
+          <div className="flex flex-wrap gap-2 border-b border-slate-200 pb-2 sm:pb-0 sm:border-b-0">
+            {(
+              [
+                ["pending", "Pending release"],
+                ["processing", "Processing"],
+                ["released", "Released"],
+                ["commission", "Commission"],
+              ] as const
+            ).map(([id, label]) => (
+              <FilterTabChip
+                key={id}
+                active={tab === id}
+                href={`/admin/payouts?tab=${id}`}
+              >
+                {label}
+              </FilterTabChip>
+            ))}
+          </div>
+        {/* Mobile: show tabs row at bottom with border */}
+        <div className="sm:hidden flex flex-wrap gap-2 border-b border-slate-200 pb-2">
+          {(
+            [
+              ["pending", "Pending release"],
+              ["processing", "Processing"],
+              ["released", "Released"],
+              ["commission", "Commission"],
+            ] as const
+          ).map(([id, label]) => (
+            <FilterTabChip
+              key={id}
+              // variant="primary"
+              active={tab === id}
+              href={`/admin/payouts?tab=${id}`}
+            >
+              {label}
+            </FilterTabChip>
+          ))}
+        </div>
 
       {tab === "pending" ? (
         pending.length === 0 ? (

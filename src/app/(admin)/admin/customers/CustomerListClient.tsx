@@ -93,7 +93,7 @@ export default function CustomerListClient({ initialData }: { initialData: Custo
 
   return (
     <CommonTable
-      title=""
+      title="Customers"
       subtitle=""
       actionButton={null}
       searchQuery={searchQuery}

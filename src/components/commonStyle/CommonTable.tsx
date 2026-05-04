@@ -66,10 +66,11 @@ export function CommonTable<T>({
 }: CommonTableProps<T>) {
   return (
     <div className="flex-1 w-full space-y-2">
+      <div className="flex items-center justify-between">
       {(title || subtitle) ? (
         <div>
           {title ? (
-            <h2 className="text-xl font-black tracking-tight text-slate-900">{title}</h2>
+            <h2 className="text-xl font-black tracking-tight text-slate-900 px-2">{title}</h2>
           ) : null}
           {subtitle ? (
             <p className="mt-1 text-sm text-muted">{subtitle}</p>
@@ -115,6 +116,7 @@ export function CommonTable<T>({
           )}
         </div>
       )}
+      </div>
 
       {/* TABLE CONTAINER */}
       <div className="bg-white rounded-md shadow-sm border border-slate-200 overflow-hidden flex flex-col">
@@ -143,7 +145,9 @@ export function CommonTable<T>({
                         style={columnWidthStyle(col.width)}
                         className={`px-6 py-4 whitespace-nowrap ${col.cellClassName || ''}`}
                         >
-                        {col.render ? col.render(item) : (item as any)[col.key]}
+                        {col.render
+                          ? col.render(item)
+                          : String((item as Record<string, unknown>)[col.key] ?? "")}
                       </td>
                     ))}
                   </tr>

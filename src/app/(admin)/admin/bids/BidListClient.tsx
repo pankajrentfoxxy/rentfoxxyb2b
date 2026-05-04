@@ -135,7 +135,7 @@ export default function BidListClient({ initialData }: { initialData: BidData[] 
 
   return (
     <CommonTable
-      title=""
+      title="Bids"
       subtitle=""
       actionButton={null}
       searchQuery={searchQuery}

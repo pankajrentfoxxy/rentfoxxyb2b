@@ -111,9 +111,10 @@ export default function PayoutSettlementListClient({
   ];
 
   return (
+    <div className="!mt-1">
     <CommonTable
-      title=""
-      subtitle=""
+      title={title}
+      subtitle={subtitle}
       actionButton={null}
       searchQuery={searchQuery}
       onSearchChange={setSearchQuery}
@@ -122,5 +123,6 @@ export default function PayoutSettlementListClient({
       data={filteredData}
       keyExtractor={(r) => r.id}
     />
+    </div>
   );
 }

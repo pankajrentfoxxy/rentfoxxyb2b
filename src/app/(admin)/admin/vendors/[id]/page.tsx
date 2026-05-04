@@ -75,19 +75,6 @@ function StatMini({ label, value }: { label: string; value: ReactNode }) {
   );
 }
 
-function vendorStatusBadgeClasses(status: string) {
-  switch (status) {
-    case "ACTIVE":
-      return "border-emerald-100 bg-emerald-50 text-emerald-700";
-    case "PENDING_APPROVAL":
-      return "border-amber-100 bg-amber-50 text-amber-800";
-    case "SUSPENDED":
-      return "border-red-100 bg-red-50 text-red-700";
-    default:
-      return "border-slate-200 bg-slate-50 text-slate-700";
-  }
-}
-
 function StatusNavIcon({ status }: { status: string }) {
   const cls = "shrink-0";
   if (status === "ACTIVE") return <CheckCircle2 size={12} className={cls} />;

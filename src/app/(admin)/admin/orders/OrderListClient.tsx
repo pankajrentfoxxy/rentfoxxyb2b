@@ -150,7 +150,7 @@ export default function OrderListClient({
   return (
     <CommonTable
       title="Orders"
-      subtitle="Cross-vendor visibility for ops and support."
+      subtitle=""
       actionButton={filterSlot ?? null}
       searchQuery={searchQuery}
       onSearchChange={setSearchQuery}

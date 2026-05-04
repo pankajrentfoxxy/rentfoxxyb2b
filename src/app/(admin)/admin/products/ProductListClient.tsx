@@ -166,6 +166,7 @@ export default function ProductListClient({
 
   return (
     <CommonTable
+      title="Products"
       actionButton={null}
       tabs={tabs}
       searchQuery={searchQuery}

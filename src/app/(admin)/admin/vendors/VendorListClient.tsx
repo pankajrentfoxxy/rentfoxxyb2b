@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from "next/navigation";
 import { Eye, Edit } from 'lucide-react';
 import { EditVendorDialog } from '@/components/admin/EditVendorDialog';
-import { CommonTable, Column, BRAND_RING, BRAND_TEXT, BRAND_COLOR, BRAND_SHADOW } from '@/components/commonStyle/CommonTable';
+import { CommonTable, Column, BRAND_TEXT } from '@/components/commonStyle/CommonTable';
 
 export type VendorData = {
   id: string;
@@ -157,6 +157,7 @@ export default function VendorListClient({
         onSaved={() => startRefresh(() => router.refresh())}
       />
       <CommonTable
+        title="Vendors"
         actionButton={null}
         tabs={tabs}
         searchQuery={searchQuery}

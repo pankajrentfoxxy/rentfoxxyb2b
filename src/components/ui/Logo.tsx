@@ -146,12 +146,12 @@ export default function Logo({
         <span className="flex flex-col leading-tight">
           <span
             className={cn(
-              "font-medium tracking-tight lowercase",
+              "font-medium tracking-tight",
               titleSize,
               onDarkBar ? "text-white" : "text-primary",
             )}
           >
-            rentfoxxy
+            Supply India
           </span>
           <span
             className={cn(
@@ -160,7 +160,7 @@ export default function Logo({
               onDarkBar ? "text-white/[0.3]" : "text-ink-muted",
             )}
           >
-            B2B LAPTOP PROCUREMENT
+            Suppling Today&apos;s, Building India&apos;s Tomorrow
           </span>
         </span>
       </span>
