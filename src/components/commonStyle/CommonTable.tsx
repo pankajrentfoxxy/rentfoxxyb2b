@@ -1,8 +1,9 @@
 "use client";
 
-import React from 'react';
-import { Search, ChevronLeft, ChevronRight } from 'lucide-react';
-import { FilterTabChip } from '@/components/commonStyle/FilterTabChip';
+import React from "react";
+import { Search, ChevronLeft, ChevronRight } from "lucide-react";
+import { FilterTabChip } from "@/components/commonStyle/FilterTabChip";
+import { cn } from "@/lib/utils";
 
 export const BRAND_COLOR = "bg-amber-600";
 export const BRAND_TEXT = "text-amber-600";
@@ -12,16 +13,22 @@ export const BRAND_SHADOW = "shadow-amber-100";
 export interface Column<T> {
   header: string;
   key: string;
-  /** Pixel width (number) or CSS length (e.g. "12rem", "20%"). Applied to header and cells. */
+  /**
+   * Optional cap (number = px, or CSS length). Columns otherwise size from content (`table-auto`).
+   * Implemented as maxWidth so text can wrap and cells don’t overlap.
+   */
   width?: number | string;
   headerClassName?: string;
   cellClassName?: string;
+  /** Keep cell on one line; default is wrap + break-words to avoid column overlap. */
+  nowrap?: boolean;
   render?: (item: T) => React.ReactNode;
 }
 
-function columnWidthStyle(width: number | string | undefined): React.CSSProperties | undefined {
+function columnSizeStyle(width: number | string | undefined): React.CSSProperties | undefined {
   if (width === undefined) return undefined;
-  return { width: typeof width === "number" ? `${width}px` : width };
+  const value = typeof width === "number" ? `${width}px` : width;
+  return { maxWidth: value };
 }
 
 export interface TabItem {
@@ -119,16 +126,19 @@ export function CommonTable<T>({
       </div>
 
       {/* TABLE CONTAINER */}
-      <div className="bg-white rounded-md shadow-sm border border-slate-200 overflow-hidden flex flex-col">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse min-w-[960px]">
+      <div className="bg-white rounded-md shadow-sm border border-slate-200 overflow-hidden flex min-w-0 flex-col">
+        <div className="min-w-0 overflow-x-auto">
+          <table className="w-full max-w-full table-auto border-collapse text-left">
             <thead>
               <tr className={`${BRAND_COLOR} text-white`}>
                 {columns.map((col) => (
-                  <th 
+                  <th
                     key={col.key}
-                    style={columnWidthStyle(col.width)}
-                    className={`px-3 py-3 text-[10px] font-black uppercase tracking-widest border-r border-amber-500/20 last:border-r-0 ${col.headerClassName || ''}`}
+                    style={columnSizeStyle(col.width)}
+                    className={cn(
+                      "min-w-0 break-words px-3 py-3 text-[10px] font-black uppercase tracking-widest border-r border-amber-500/20 last:border-r-0",
+                      col.headerClassName,
+                    )}
                   >
                     {col.header}
                   </th>
@@ -138,13 +148,17 @@ export function CommonTable<T>({
             <tbody className="divide-y divide-slate-100">
               {data.length > 0 ? (
                 data.map((item) => (
-                  <tr key={keyExtractor(item)} className="hover:bg-amber-50/20 transition-colors group">
+                  <tr key={keyExtractor(item)} className="group transition-colors hover:bg-amber-50/20">
                     {columns.map((col) => (
                       <td
                         key={col.key}
-                        style={columnWidthStyle(col.width)}
-                        className={`px-6 py-4 whitespace-nowrap ${col.cellClassName || ''}`}
-                        >
+                        style={columnSizeStyle(col.width)}
+                        className={cn(
+                          "min-w-0 px-4 py-3 align-top text-sm",
+                          col.nowrap ? "whitespace-nowrap" : "whitespace-normal break-words",
+                          col.cellClassName,
+                        )}
+                      >
                         {col.render
                           ? col.render(item)
                           : String((item as Record<string, unknown>)[col.key] ?? "")}

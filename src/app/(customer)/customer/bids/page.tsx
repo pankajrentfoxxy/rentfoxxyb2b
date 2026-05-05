@@ -6,6 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { BidCountdown } from "@/components/customer/BidCountdown";
+import { FilterTabChip } from "@/components/commonStyle/FilterTabChip";
 
 const placeholder =
   "data:image/svg+xml," +
@@ -23,10 +24,17 @@ function tabFilter(tab: Tab): BidStatus[] | undefined {
   return ["EXPIRED", "CANCELLED"];
 }
 
+const TAB_IDS: Tab[] = ["all", "pending", "approved", "rejected", "expired"];
+
+function parseTab(raw: string | undefined): Tab {
+  if (raw && TAB_IDS.includes(raw as Tab)) return raw as Tab;
+  return "all";
+}
+
 export default async function CustomerBidsPage({
   searchParams,
 }: {
-  searchParams: { tab?: string };
+  searchParams: Promise<{ tab?: string }>;
 }) {
   const session = await auth();
   if (!session?.user?.id) redirect("/auth/login");
@@ -36,7 +44,8 @@ export default async function CustomerBidsPage({
   });
   if (!profile) redirect("/auth/login");
 
-  const tab = (searchParams.tab ?? "all") as Tab;
+  const sp = await searchParams;
+  const tab = parseTab(sp.tab);
   const statusIn = tabFilter(tab);
 
   const [bids, lotBids, asAsBids] = await Promise.all([
@@ -73,9 +82,9 @@ export default async function CustomerBidsPage({
   ]);
 
   const unified = [
-    ...bids.map((b) => ({ kind: "product" as const, createdAt: b.createdAt, data: b })),
-    ...lotBids.map((b) => ({ kind: "lot" as const, createdAt: b.createdAt, data: b })),
-    ...asAsBids.map((b) => ({ kind: "asas" as const, createdAt: b.createdAt, data: b })),
+    ...bids.map((b: (typeof bids)[number]) => ({ kind: "product" as const, createdAt: b.createdAt, data: b })),
+    ...lotBids.map((b: (typeof lotBids)[number]) => ({ kind: "lot" as const, createdAt: b.createdAt, data: b })),
+    ...asAsBids.map((b: (typeof asAsBids)[number]) => ({ kind: "asas" as const, createdAt: b.createdAt, data: b })),
   ].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 
   const tabs: { id: Tab; label: string }[] = [
@@ -97,17 +106,11 @@ export default async function CustomerBidsPage({
         </p>
       </div>
 
-      <div className="flex flex-wrap gap-2 border-b border-slate-200 pb-2">
+      <div className="flex flex-wrap items-center gap-1.5 overflow-x-auto border-b border-slate-200 pb-2">
         {tabs.map((t) => (
-          <Link
-            key={t.id}
-            href={`/customer/bids?tab=${t.id}`}
-            className={`rounded-full px-3 py-1.5 text-sm font-medium ${
-              tab === t.id ? "bg-navy text-white" : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-            }`}
-          >
+          <FilterTabChip key={t.id} active={tab === t.id} href={`/customer/bids?tab=${t.id}`}>
             {t.label}
-          </Link>
+          </FilterTabChip>
         ))}
       </div>
 

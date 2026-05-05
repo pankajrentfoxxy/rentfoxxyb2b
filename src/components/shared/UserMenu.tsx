@@ -47,16 +47,16 @@ export function UserMenu({
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuItem asChild>
           <span className="flex flex-col items-start gap-0.5">
-            <span className="truncate">{email ?? "Account"}</span>
-            <span className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+          <span className="text-md font-bold uppercase tracking-wide text-primary">
               {role.replace(/_/g, " ")}
             </span>
+            <span className="text-sm font-medium text-slate-500">{email ?? "Account"}</span>
           </span>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={() => signOut({ callbackUrl: "/" })}
-          className="text-danger focus:text-danger"
+          className="text-danger focus:text-danger flex items-center gap-2"
         >
           Log out
         </DropdownMenuItem>

@@ -33,8 +33,6 @@ export default async function VendorLayout({
     <VendorAppShell
       email={session.user.email}
       role={session.user.role}
-      companyName={vendor.companyName}
-      status={vendor.status}
       marketIntelAlert={marketIntelAlert}
     >
       {children}

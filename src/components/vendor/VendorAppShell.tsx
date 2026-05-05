@@ -3,7 +3,8 @@
 import Logo from "@/components/ui/Logo";
 import { VendorLiveNotificationBell } from "@/components/vendor/VendorLiveNotificationBell";
 import { UserMenu } from "@/components/shared/UserMenu";
-import type { Role, VendorStatus } from "@prisma/client";
+import { BRAND_COLOR, BRAND_SHADOW, BRAND_TEXT } from "@/components/commonStyle/CommonTable";
+import type { Role } from "@prisma/client";
 import { cn } from "@/lib/utils";
 import {
   Gavel,
@@ -15,14 +16,13 @@ import {
   Layers,
   RefreshCw,
   ClipboardList,
-  X,
   Truck,
   ShoppingCart,
   TrendingUp,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 const nav = [
   { href: "/vendor/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -35,139 +35,153 @@ const nav = [
   { href: "/vendor/orders", label: "Orders", icon: ShoppingCart },
   { href: "/vendor/payouts", label: "Payouts", icon: IndianRupee },
   { href: "/vendor/profile", label: "Profile", icon: User },
+  { href: "/vendor/listings/verifications", label: "Verifications", icon: ClipboardList },
 ];
 
-function pageTitle(pathname: string): string {
-  const hit = nav.find((n) => pathname === n.href || pathname.startsWith(`${n.href}/`));
-  if (hit) return hit.label;
-  if (pathname.includes("/listings/verifications")) return "Verifications";
-  if (pathname.includes("/notifications")) return "Notifications";
-  return "Vendor Portal";
+function navItemActive(pathname: string, href: string) {
+  return pathname === href || pathname.startsWith(`${href}/`);
 }
 
 export function VendorAppShell({
   children,
   email,
   role,
-  companyName,
-  status,
   marketIntelAlert = false,
 }: {
   children: React.ReactNode;
   email: string | null | undefined;
   role: Role;
-  companyName: string;
-  status: VendorStatus;
   marketIntelAlert?: boolean;
 }) {
-  const [open, setOpen] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const pathname = usePathname();
-  const title = useMemo(() => pageTitle(pathname), [pathname]);
 
-  const linkCls = (href: string) =>
+  useEffect(() => {
+    setMobileNavOpen(false);
+  }, [pathname]);
+
+  const navLinkCls = (href: string) =>
     cn(
-      "flex items-center gap-3 border-l-2 border-transparent px-3 py-2.5 text-[12px] font-medium transition-colors",
-      pathname === href || pathname.startsWith(`${href}/`)
-        ? "border-verified bg-verified/10 text-verified"
-        : "text-white/55 hover:bg-white/6 hover:text-white",
+      "flex items-center gap-2 whitespace-nowrap rounded-md px-3 py-2 text-[13px] font-medium transition-colors",
+      navItemActive(pathname, href)
+        ? cn(BRAND_COLOR, BRAND_SHADOW, "text-white ring-1 ring-amber-700/30")
+        : "text-slate-700 hover:bg-amber-50 hover:text-slate-900",
+    );
+
+  const navIconCls = (href: string) =>
+    cn(
+      "h-4 w-4 shrink-0",
+      navItemActive(pathname, href) ? "text-white opacity-100" : cn(BRAND_TEXT, "opacity-80"),
     );
 
   return (
-    <div className="min-h-screen bg-surface">
-      <aside
-        className={cn(
-          "fixed inset-y-0 left-0 z-40 flex w-56 flex-col border-r border-white/10 bg-[#0A2618] transition-transform lg:translate-x-0",
-          open ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
-        )}
-      >
-        <div className="border-b border-white/10 px-4 pb-4 pt-5">
-          <div className="flex items-start justify-between gap-2">
-            <Link href="/" onClick={() => setOpen(false)} className="block">
-              <Logo variant="nav" size="sm" />
-            </Link>
-            <button
-              type="button"
-              className="rounded-lg p-2 text-white/70 lg:hidden"
-              onClick={() => setOpen(false)}
-              aria-label="Close sidebar"
-            >
-              <X className="h-5 w-5" />
-            </button>
-          </div>
-          <p className="mt-3 text-[10px] font-medium uppercase tracking-widest text-white/40">Vendor Portal</p>
-        </div>
-
-        <nav className="flex-1 space-y-0.5 overflow-y-auto p-3 pb-24">
-          {nav.map((item) => (
-            <Link key={item.href} href={item.href} className={linkCls(item.href)} onClick={() => setOpen(false)}>
-              <item.icon className="h-4 w-4 shrink-0" />
-              <span className="flex flex-1 items-center justify-between gap-2">
-                {item.label}
-                {item.href === "/vendor/market-intel" && marketIntelAlert ? (
-                  <span className="h-2 w-2 shrink-0 rounded-full bg-amber" title="Pricing alert" />
-                ) : null}
-              </span>
-            </Link>
-          ))}
+    <div className="flex min-h-dvh flex-col bg-surface">
+      {/* Tier 1 — brand bar (matches CommonTable header tone) */}
+      <header className={cn("sticky top-0 z-40 shrink-0 flex h-14 w-full items-center shadow-md", BRAND_COLOR, BRAND_SHADOW)}>
+        <div
+          className="absolute left-0 top-0 flex h-full items-center bg-white pl-4 pr-14 sm:pl-6 sm:pr-20"
+          style={{
+            width: "min(400px, 92vw)",
+            clipPath: "path('M 0 0 H 280 C 320 0 300 56 340 56 H 0 Z')",
+          }}
+        >
           <Link
-            href="/vendor/listings/verifications"
-            className={linkCls("/vendor/listings/verifications")}
-            onClick={() => setOpen(false)}
+            href="/"
+            className={cn("flex min-w-0 items-center gap-2 transition-opacity hover:opacity-90", BRAND_TEXT)}
+            onClick={() => setMobileNavOpen(false)}
           >
-            <ClipboardList className="h-4 w-4 shrink-0" />
-            Verifications
+            <Logo variant="nav-on-light" size="sm" />
           </Link>
-        </nav>
+        </div>
 
-        <div className="absolute bottom-0 left-0 right-0 border-t border-white/10 bg-black/20 px-4 py-3">
-          <p className="truncate text-[12px] font-medium text-white">{companyName}</p>
-          <div className="mt-2">
-            {status === "ACTIVE" ? (
-              <span className="inline-flex rounded-full bg-verified/20 px-2 py-0.5 text-[10px] font-semibold text-verified">
-                Active
-              </span>
-            ) : status === "PENDING_APPROVAL" ? (
-              <span className="inline-flex rounded-full bg-amber/20 px-2 py-0.5 text-[10px] font-semibold text-amber">
-                Pending approval
-              </span>
-            ) : (
-              <span className="inline-flex rounded-full bg-red-500/20 px-2 py-0.5 text-[10px] font-semibold text-red-300">
-                Suspended
-              </span>
-            )}
+        <div className="ml-[min(280px,72vw)] flex min-w-0 flex-1 items-center justify-end gap-2 px-3 sm:gap-4 sm:px-4">
+          <div className="mr-auto hidden min-w-0 max-w-[min(240px,40vw)] md:block">
+            {/* <p className="truncate text-[13px] font-semibold text-white/95">{companyName}</p>
+            <span
+              className={cn(
+                "mt-0.5 inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold",
+                statusLabel.className,
+              )}
+            >
+              {statusLabel.text}
+            </span> */}
+          </div>
+          <div className="flex shrink-0 items-center gap-3 text-white/90 sm:gap-5">
+            <VendorLiveNotificationBell />
+            <UserMenu email={email} role={role} triggerVariant="toolbar" />
           </div>
         </div>
-      </aside>
+      </header>
 
-      {open ? (
-        <button
-          type="button"
-          className="fixed inset-0 z-30 bg-black/40 lg:hidden"
-          aria-label="Close overlay"
-          onClick={() => setOpen(false)}
-        />
-      ) : null}
+      {/* Tier 2 — horizontal nav (sticks under 3.5rem brand bar) */}
+      <nav className={cn("sticky top-14 z-30 shrink-0 border-b bg-white shadow-sm", "border-amber-100")}>
+        <div className="relative mx-auto flex max-w-[1600px] items-center gap-2 px-3 py-2 md:px-4">
+          <button
+            type="button"
+            className={cn(
+              "rounded-lg p-2 text-slate-600 transition-colors hover:bg-amber-50 hover:text-amber-700 md:hidden",
+            )}
+            aria-label="Open menu"
+            aria-expanded={mobileNavOpen}
+            onClick={() => setMobileNavOpen((v) => !v)}
+          >
+            <Menu className="h-6 w-6" />
+          </button>
 
-      <div className="lg:pl-56">
-        <header className="sticky top-0 z-20 flex min-h-14 items-center justify-between gap-3 border-b border-border bg-white px-4 py-3 md:px-6">
-          <div className="flex min-w-0 flex-1 items-center gap-3">
+          <div className="hidden min-w-0 flex-1 flex-wrap items-center gap-1 md:flex lg:gap-1">
+            {nav.map((item) => (
+              <Link key={item.href} href={item.href} className={navLinkCls(item.href)}>
+                <item.icon className={navIconCls(item.href)} aria-hidden />
+                <span className="flex items-center gap-2">
+                  {item.label}
+                  {item.href === "/vendor/market-intel" && marketIntelAlert ? (
+                    <span className="h-2 w-2 shrink-0 rounded-full bg-amber-400" title="Pricing alert" />
+                  ) : null}
+                </span>
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        {mobileNavOpen ? (
+          <>
             <button
               type="button"
-              className="rounded-lg p-2 text-ink-secondary lg:hidden"
-              onClick={() => setOpen(true)}
-              aria-label="Open sidebar"
-            >
-              <Menu className="h-6 w-6" />
-            </button>
-            <h1 className="truncate text-[15px] font-medium text-ink-primary">{title}</h1>
-          </div>
-          <div className="flex shrink-0 items-center gap-2">
-            <VendorLiveNotificationBell />
-            <UserMenu email={email} role={role} />
-          </div>
-        </header>
-        <main className="p-4 md:p-8">{children}</main>
-      </div>
+              className="fixed inset-0 z-[45] bg-black/40 md:hidden"
+              aria-label="Close menu"
+              onClick={() => setMobileNavOpen(false)}
+            />
+            <div className="absolute left-0 right-0 top-full z-[50] max-h-[70vh] overflow-y-auto border-b border-amber-100 bg-white py-2 shadow-lg md:hidden">
+              <div className="flex flex-col px-2">
+                {nav.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={cn(navLinkCls(item.href), "justify-start")}
+                    onClick={() => setMobileNavOpen(false)}
+                  >
+                    <item.icon className={navIconCls(item.href)} aria-hidden />
+                    <span className="flex flex-1 items-center justify-between gap-2">
+                      {item.label}
+                      {item.href === "/vendor/market-intel" && marketIntelAlert ? (
+                        <span className="h-2 w-2 shrink-0 rounded-full bg-amber-400" title="Pricing alert" />
+                      ) : null}
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </>
+        ) : null}
+      </nav>
+
+      <main className="flex-1 min-h-0 p-2 pb-14 md:p-2 md:pb-14">{children}</main>
+
+      <footer
+        className={`fixed bottom-0 left-0 right-0 z-30 flex h-8 items-center justify-center border-t border-slate-200 bg-amber-600 px-4 text-xs font-bold text-white md:px-6`}
+      >
+        Copyright © RentFoxxy {new Date().getFullYear()}
+      </footer>
     </div>
   );
 }

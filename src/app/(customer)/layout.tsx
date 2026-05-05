@@ -10,16 +10,18 @@ export default async function CustomerLayout({
 }) {
   const session = await auth();
   if (!session?.user) redirect("/auth/login");
-  const watchAlertCount =
-    session.user.role === "CUSTOMER"
-      ? await customerWatchReachedCount(session.user.id)
-      : 0;
+
+  if (session.user.role !== "CUSTOMER") {
+    if (session.user.role === "VENDOR") redirect("/vendor/dashboard");
+    if (session.user.role === "ADMIN" || session.user.role === "INSPECTION_MANAGER") redirect("/admin/dashboard");
+    if (session.user.role === "INSPECTOR") redirect("/inspector/dashboard");
+    redirect("/");
+  }
+
+  const watchAlertCount = await customerWatchReachedCount(session.user.id);
+
   return (
-    <CustomerAppShell
-      email={session.user.email}
-      role={session.user.role}
-      watchAlertCount={watchAlertCount}
-    >
+    <CustomerAppShell email={session.user.email} role={session.user.role} watchAlertCount={watchAlertCount}>
       {children}
     </CustomerAppShell>
   );

@@ -1,7 +1,7 @@
 "use client";
 
 import { getPaymentOptionConfig, parsePaymentOption } from "@/constants/payment-options";
-import { cn } from "@/lib/utils";
+import { FilterTabChip } from "@/components/commonStyle/FilterTabChip";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
@@ -26,10 +26,10 @@ type BidRow = {
   paymentOption: string;
 };
 
-const TABS = ["PENDING", "APPROVED", "COUNTER_OFFERED", "REJECTED", "ALL"] as const;
+const TABS = ["ALL", "PENDING", "APPROVED", "COUNTER_OFFERED", "REJECTED"] as const;
 
 export function VendorBidInbox() {
-  const [tab, setTab] = useState<string>("PENDING");
+  const [tab, setTab] = useState<string>("ALL");
   const [rows, setRows] = useState<BidRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -86,19 +86,11 @@ export function VendorBidInbox() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap gap-2 border-b border-slate-200 pb-2">
+      <div className="flex flex-wrap items-center gap-1.5 overflow-x-auto border-b border-slate-200 pb-2">
         {TABS.map((t) => (
-          <button
-            key={t}
-            type="button"
-            onClick={() => setTab(t)}
-            className={cn(
-              "rounded-full px-3 py-1.5 text-xs font-semibold transition",
-              tab === t ? "bg-teal-700 text-white" : "bg-slate-100 text-slate-700 hover:bg-slate-200",
-            )}
-          >
-            {t === "ALL" ? "All" : t.replace("_", " ")}
-          </button>
+          <FilterTabChip key={t} active={tab === t} onClick={() => setTab(t)}>
+            {t === "ALL" ? "All" : t.replace(/_/g, " ")}
+          </FilterTabChip>
         ))}
       </div>
 

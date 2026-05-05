@@ -1,9 +1,9 @@
 "use client";
 
-import { cn } from "@/lib/utils";
 import type { Address } from "@prisma/client";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
+import { FilterTabChip } from "@/components/commonStyle/FilterTabChip";
 
 const tabs = [
   { id: "personal", label: "Personal info" },
@@ -13,6 +13,13 @@ const tabs = [
 ] as const;
 
 type TabId = (typeof tabs)[number]["id"];
+
+const TAB_IDS: TabId[] = ["personal", "addresses", "security", "notifications"];
+
+function parseProfileTab(raw: string | null): TabId {
+  if (raw && TAB_IDS.includes(raw as TabId)) return raw as TabId;
+  return "personal";
+}
 
 export function CustomerProfileClient({
   initialUser,
@@ -26,7 +33,8 @@ export function CustomerProfileClient({
   initialAddresses: Address[];
 }) {
   const router = useRouter();
-  const [tab, setTab] = useState<TabId>("personal");
+  const searchParams = useSearchParams();
+  const tab = parseProfileTab(searchParams.get("tab"));
   const [name, setName] = useState(initialUser.name ?? "");
   const [phone, setPhone] = useState(initialUser.phone ?? "");
   const [companyName, setCompanyName] = useState(initialCompanyName ?? "");
@@ -124,22 +132,11 @@ export function CustomerProfileClient({
         <p className="mt-1 text-sm text-muted">Account and company details for B2B invoices.</p>
       </div>
 
-      <div className="flex flex-wrap gap-2 border-b border-slate-200 pb-2">
+      <div className="flex flex-wrap items-center gap-1.5 overflow-x-auto border-b border-slate-200 pb-2">
         {tabs.map((t) => (
-          <button
-            key={t.id}
-            type="button"
-            onClick={() => {
-              setTab(t.id);
-              setMsg(null);
-            }}
-            className={cn(
-              "rounded-full px-3 py-1.5 text-sm font-medium",
-              tab === t.id ? "bg-accent text-white" : "bg-slate-100 text-slate-700 hover:bg-slate-200",
-            )}
-          >
+          <FilterTabChip key={t.id} active={tab === t.id} href={`/customer/profile?tab=${t.id}`}>
             {t.label}
-          </button>
+          </FilterTabChip>
         ))}
       </div>
 
